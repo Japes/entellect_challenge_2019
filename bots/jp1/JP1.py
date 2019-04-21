@@ -2,6 +2,7 @@
 """
 Entelect StarterBot for Python3
 """
+import time
 import json
 import os
 import logging
@@ -96,21 +97,16 @@ class StarterBot:
         Takes into account if there are any obstacles in the way.
         If there is an obstacle, the worm is seen as not in range.
         """
-        logger.info('dafuq100')
         max_range = self.current_worm_info['weapon']['range']
         current_x = self.current_worm_info['position']['x']
         current_y = self.current_worm_info['position']['y']
 
-        logger.info('dafuq101')
         cells_in_range = []
         for opponent in self.enemy_info:
-            logger.info('dafuq102')
             for w in opponent['worms']:
-                logger.info('dafuq103')
                 worm = w['position']
                 dist = np.floor(distance.euclidean([worm['x'], worm['y']], [current_x, current_y]))
                 if dist <= max_range:
-                    logger.info('dafuq104')
                     direction = get_cardinal_direction([current_x, current_y], [worm['x'], worm['y']])
                     obstacles = self.check_for_obstacles_in_path([current_x, current_y], [worm['x'], worm['y']],
                                                                  direction)
@@ -119,7 +115,6 @@ class StarterBot:
                     else:
                         cells_in_range.append([worm['x'], worm['y'], direction])
 
-        logger.info('dafuq105')
         return cells_in_range
 
     def check_for_obstacles_in_path(self, reference, target, direction):
@@ -193,74 +188,6 @@ class StarterBot:
                     available_cells.append(cell)
         return available_cells
 
-    def starter_bot_logic(self):
-        """
-        If one of the opponent's worms is within range fire at it.
-            - Must be in range of current worm's weapon range.
-            - No obstacles can be in the path.
-
-        Otherwise choose a block in a random direction and do one of the following things
-            - If the chosen block is air, move to that block
-            - If the chosen block is dirt, dig out that block
-            - If the chosen block is deep space, do nothing
-
-        Commands in the format :
-            MOVE - move <x> <y>
-            DIG - dig <x> <y>
-            SHOOT - shoot <direction { N, NE, E, SE, S, SW, W, NW }>
-            DO NOTHING - nothing
-
-
-        ****THIS IS WHERE YOU CAN ADD OR CHANGE THE LOGIC OF THE BOT****
-        """
-
-        logger.info('dafuq1')
-        worms_in_range = self.get_worms_in_range()
-        logger.info('dafuq2')
-
-        if len(worms_in_range) > 0:
-            logger.info('dafuq3')
-            number_worms = len(worms_in_range)
-            choice = np.random.randint(number_worms)
-            attack_x = worms_in_range[choice][0]
-            attack_y = worms_in_range[choice][1]
-            direction = worms_in_range[choice][2]
-            self.command = f'shoot {direction}'
-
-        else:
-            logger.info('dafuq4')
-            move_options = ['move', 'dig', 'nothing']
-            choice = np.random.randint(len(move_options))
-            selected_move = move_options[choice]
-
-            if selected_move == 'nothing':
-                self.command = selected_move
-
-            elif selected_move == 'dig':
-                available_cells = self.get_available_cells('dig')
-                number_avail_cells = len(available_cells)
-                if number_avail_cells == 0:
-                    self.command = f'nothing'
-                else:
-                    choice = np.random.randint(len(available_cells))
-                    selected_cell = available_cells[choice]
-                    self.command = f"dig {selected_cell.x} {selected_cell.y}"
-
-            elif selected_move == 'move':
-                available_cells = self.get_available_cells('move')
-                number_avail_cells = len(available_cells)
-                if number_avail_cells == 0:
-                    self.command = f'nothing'
-                else:
-                    choice = np.random.randint(len(available_cells))
-                    selected_cell = available_cells[choice]
-                    self.command = f"move {selected_cell.x} {selected_cell.y}"
-            else:
-                self.command = f'nothing'
-
-        logger.info('dafuq5')
-        return None
-
     def write_action(self):
         """
         command in form : C;<round number>;<command>
@@ -299,6 +226,69 @@ class StarterBot:
 
             self.write_action()
 
+    def starter_bot_logic(self):
+        """
+        If one of the opponent's worms is within range fire at it.
+            - Must be in range of current worm's weapon range.
+            - No obstacles can be in the path.
+
+        Otherwise choose a block in a random direction and do one of the following things
+            - If the chosen block is air, move to that block
+            - If the chosen block is dirt, dig out that block
+            - If the chosen block is deep space, do nothing
+
+        Commands in the format :
+            MOVE - move <x> <y>
+            DIG - dig <x> <y>
+            SHOOT - shoot <direction { N, NE, E, SE, S, SW, W, NW }>
+            DO NOTHING - nothing
+
+
+        ****THIS IS WHERE YOU CAN ADD OR CHANGE THE LOGIC OF THE BOT****
+        """
+
+        worms_in_range = self.get_worms_in_range()
+
+        if len(worms_in_range) > 0:
+            number_worms = len(worms_in_range)
+            choice = np.random.randint(number_worms)
+            attack_x = worms_in_range[choice][0]
+            attack_y = worms_in_range[choice][1]
+            direction = worms_in_range[choice][2]
+            self.command = f'shoot {direction}'
+
+        else:
+            logger.info('dafuq4')
+            move_options = ['move', 'dig', 'nothing']
+            choice = np.random.randint(len(move_options))
+            selected_move = move_options[choice]
+
+            if selected_move == 'nothing':
+                self.command = selected_move
+
+            elif selected_move == 'dig':
+                available_cells = self.get_available_cells('dig')
+                number_avail_cells = len(available_cells)
+                if number_avail_cells == 0:
+                    self.command = f'nothing'
+                else:
+                    choice = np.random.randint(len(available_cells))
+                    selected_cell = available_cells[choice]
+                    self.command = f"dig {selected_cell.x} {selected_cell.y}"
+
+            elif selected_move == 'move':
+                available_cells = self.get_available_cells('move')
+                number_avail_cells = len(available_cells)
+                if number_avail_cells == 0:
+                    self.command = f'nothing'
+                else:
+                    choice = np.random.randint(len(available_cells))
+                    selected_cell = available_cells[choice]
+                    self.command = f"move {selected_cell.x} {selected_cell.y}"
+            else:
+                self.command = f'nothing'
+        time.sleep(0.2)
+        return None
 
 if __name__ == '__main__':
     bot = StarterBot()
