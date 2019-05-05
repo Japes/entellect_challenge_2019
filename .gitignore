@@ -11,3 +11,7 @@ rounds/
 *.log
 
 *.pyc
+
+.vscode
+
+*.o
