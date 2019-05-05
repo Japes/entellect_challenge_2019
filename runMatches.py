@@ -19,7 +19,9 @@ bot2 = ''
 #function defs###############################################################################
 def showUsage():
     print("Usage: runMatches [-v0|-v1|-v2] bot1 bot2 ...")
-    print("       runs matches between bots with verbosity specified by -v")
+    print("       runs matches between bots")
+    print("       bot1, bot2 etc are folder names of bots in " + botsPath)
+    print("       -v specifies verbosity (with 0 being least verbose)")
 
 def parseArgs():
     global verbosity
@@ -28,6 +30,7 @@ def parseArgs():
 
     if(len(sys.argv) < 2):
         showUsage()
+        exit()
 
     #defaults
     verbosity = 2
