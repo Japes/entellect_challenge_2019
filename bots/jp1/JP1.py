@@ -11,6 +11,7 @@ from scipy.spatial import distance
 
 from cell import Cell, AugmentedCell
 from direction_helper import get_cardinal_direction, get_straight_line
+import astar
 
 logging.basicConfig(filename='sample_python_bot.log', filemode='w', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ class StarterBot:
         self.consecutive_no_commands = None
         self.current_worm_info = None
         self.worms = None
+        self.health_pack_positions = []
 
         self.augmented_map = None
 
@@ -68,18 +70,23 @@ class StarterBot:
         self.current_worm_info = self.get_worm_player_info(self.current_worm_id)
 
         self.augmented_map = self.get_augmented_map()
-        logger.info('Done loading new round info')
+        logger.info('Done loading new round info.  health packs are at ' + str(self.health_pack_positions))
 
         return None
 
     def get_map(self):
         map = []
+        self.health_pack_positions = []
         for row in self.full_map:
             for cell in row:
                 if 'occupied' in cell.keys():
                     map.append(Cell(cell['x'], cell['y'], cell['type'], cell['occupied']))
                 else:
                     map.append(Cell(cell['x'], cell['y'], cell['type'], None))
+                if 'powerup' in cell.keys():
+                    for x in cell:
+                        logger.info (str(x) + ':' + str(cell[x]))
+                    self.health_pack_positions.append([cell['x'], cell['y']])
         return map
 
     def get_worm_player_info(self, worm_id):
@@ -213,6 +220,30 @@ class StarterBot:
         next_round = int(input())
         return next_round
 
+    def should_i_fight(self, worms_in_range):
+        return None
+        if len(worms_in_range) == 0:
+            return None
+        #can I win a fight here?
+        number_worms = len(worms_in_range)
+        #for i, worm in enumerate(worms_in_range):
+            
+        #choice = np.random.randint(number_worms)
+        #attack_x = worms_in_range[choice][0]
+        #attack_y = worms_in_range[choice][1]
+        #direction = worms_in_range[choice][2]
+        #return f'shoot {direction}'
+
+    def astar_cost(self, current, neighbor ):
+        if self.get_cell_type(neighbor[0], neighbor[1]) == "AIR":
+            return 1
+        elif self.get_cell_type(neighbor[0], neighbor[1]) == "DIRT":
+            return 2
+        elif self.get_cell_type(neighbor[0], neighbor[1]) == "DEEP_SPACE":
+            return 999999
+        else:
+            logger.error("ERROR IN astar_cost, what is this cell? " + str(neighbor))
+
     def run_bot(self):
         logger.info("Bot has started Running")
         while True:
@@ -222,43 +253,47 @@ class StarterBot:
             self.current_round = next_round_number
             self.get_current_round_details()
             logger.info('Beginning StarterBot Logic Sequence')
-            self.starter_bot_logic()
+            self.bot_logic()
 
             self.write_action()
 
-    def starter_bot_logic(self):
-        """
-        If one of the opponent's worms is within range fire at it.
-            - Must be in range of current worm's weapon range.
-            - No obstacles can be in the path.
-
-        Otherwise choose a block in a random direction and do one of the following things
-            - If the chosen block is air, move to that block
-            - If the chosen block is dirt, dig out that block
-            - If the chosen block is deep space, do nothing
-
-        Commands in the format :
-            MOVE - move <x> <y>
-            DIG - dig <x> <y>
-            SHOOT - shoot <direction { N, NE, E, SE, S, SW, W, NW }>
-            DO NOTHING - nothing
-
-
-        ****THIS IS WHERE YOU CAN ADD OR CHANGE THE LOGIC OF THE BOT****
-        """
-
-        worms_in_range = self.get_worms_in_range()
-
-        if len(worms_in_range) > 0:
-            number_worms = len(worms_in_range)
-            choice = np.random.randint(number_worms)
-            attack_x = worms_in_range[choice][0]
-            attack_y = worms_in_range[choice][1]
-            direction = worms_in_range[choice][2]
-            self.command = f'shoot {direction}'
-
+    def bot_logic(self):
+        '''
+        am I in a fight I can win?  
+            Keep fighting.
         else:
-            logger.info('dafuq4')
+            are the healthpacks still there? 
+                race for them
+            else,
+                is there a target I can beat in a fight?
+                    hunt them
+                else 
+                    am I far from an ally?
+                        move towards nearest
+                    else
+                        mine for points
+        '''
+        worms_in_range = self.get_worms_in_range()
+        fight_command = self.should_i_fight(worms_in_range)
+        if(fight_command != None):
+            self.command = fight_command
+            return None
+
+#NOTE THIS BOT IS TOTALLY UNFINISHED AND BROKEN-------------------------
+
+        #make a beeline for the healthpacks
+        #finder = astar.pathfinder( distance=distance.euclidean, cost=self.astar_cost)#, neighbors=grid_neighbors(10,10) )
+        finder = astar.pathfinder()
+
+        current_x = self.current_worm_info['position']['x']
+        current_y = self.current_worm_info['position']['y']
+        path = finder( (current_x,current_y), (self.health_pack_positions[0][0],self.health_pack_positions[0][1]) )
+        logger.info("GOT A PATH FROM : " + str([current_x, current_y]) + " to " + str(self.health_pack_positions[0]) + " : " + str(path))
+
+
+        return None
+'''
+        else:
             move_options = ['move', 'dig', 'nothing']
             choice = np.random.randint(len(move_options))
             selected_move = move_options[choice]
@@ -287,8 +322,7 @@ class StarterBot:
                     self.command = f"move {selected_cell.x} {selected_cell.y}"
             else:
                 self.command = f'nothing'
-        time.sleep(0.2)
-        return None
+                '''
 
 if __name__ == '__main__':
     bot = StarterBot()

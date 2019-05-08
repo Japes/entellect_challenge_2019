@@ -1,0 +1,127 @@
+============================================================================================================================================================================================
+JAVA GAME RUNNER============================================================================================================================================================================
+============================================================================================================================================================================================
+
+main entry point is GameBootStrapper.java
+    it calls GameEngineRunner.runMatch
+    GameEngineRunner.java
+        - creates map with generateGameMap
+        - in a loop while !winCondition:
+            gets the player's moves: for each player, player.executeBot(gameMap)
+            roundProcessor.processRound
+            this trickles down to the Kotlin code described below.
+
+============================================================================================================================================================================================
+KOTLIN ENGINE===============================================================================================================================================================================
+============================================================================================================================================================================================
+
+(I think @JsName is how it exposes methods to java)
+
+looks like you got 3 main classes that handle the logic:
+    WormsMap
+        calculates winning worm 
+        keeps track of the map state, bunch of cells each with an occupier
+    WormsPlayer
+        represents a player/bot.  Basically an amalgamation of the 3 Worms, stores total hp, points, etc
+        "Worm" class is basically a struct with worm stats and convenience functions for moving, taking damage etc
+    WormsCommand
+        base class for all the commands like "shoot", "dig" etc.  They are responsible for:
+            validating the commands
+            performing the logic of that move (making changes to WormsMap)
+            ensuring that the commands are processed in the correct order (they have an "order" member)
+
+Other classes of interest
+    Point
+        used by WormsMap for geometry
+    CommandParser
+        parses command strings
+    HealthPack
+        contains logic for applying health packs.  Inherits from common interface for future powerups
+
+
+=======PSEUDOCODE SIMPLIFICATION OF THE ENGINE=========
+
+class WormsRoundProcessor(val config: GameConfig) {
+
+    fun processRound(wormsMap: WormsMap, wormsCommands: Map<WormsPlayer, WormsCommand>): Boolean {
+
+        //call CommandExecutor.execute on all commands============================================================================
+        val commands = wormsCommands.entries.sortedBy { it.value.order }
+                .map { (player, command) -> CommandExecutor(player, wormsMap, command, config) } //does validation of the command here.  See  "TeleportCommand.kt" and it's ilk for validation
+
+        for (command in commands) {
+            command.execute()
+
+            fun execute() {
+                logger.info { "Executing command $worm Command($command) $moveValidation " }
+
+                if (moveValidation.isNothing) {
+                    player.consecutiveDoNothingsCount++
+                } else {
+                    player.consecutiveDoNothingsCount = 0
+                }
+
+                if (moveValidation.isValid) {
+                    val commandFeedback = command.execute(map, worm) //does "TeleportCommand.kt" and it's ilk for each implementation of command
+
+                    player.commandScore += commandFeedback.score
+                    map.addFeedback(commandFeedback)
+
+                    if (!commandFeedback.success) {
+                        addErrorToMap(commandFeedback.message)
+                    }
+                } else {
+                    map.addFeedback(StandardCommandFeedback("invalid", config.scores.invalidCommand, player.id, false))
+                    addErrorToMap(moveValidation.reason)
+                    player.commandScore += config.scores.invalidCommand
+                }
+            }
+        }
+
+        //Update player's active worms============================================================================================
+        for (player in wormsMap.livingPlayers) {
+            player.selectNextWorm()
+            fun selectNextWorm() {
+                val nextIndex = (livingWorms.indexOf(currentWorm) + 1) % livingWorms.size
+                previousWorm = currentWorm
+                currentWorm = livingWorms[nextIndex]
+            }
+        }
+
+        //Applying powerups=======================================================================================================
+        wormsMap.applyHealthPacks()
+        override fun applyHealthPacks() {
+            /**
+                * Right now we only have single use powerups. If that changes,
+                * we can move the clearing logic into the powerup `applyTo` method
+                */
+            players.flatMap { it.worms }
+                    .forEach { worm ->
+                        val cell = this[worm.position]
+                        if (cell.occupier == worm) {
+                            cell.powerup?.applyTo(worm)
+                            cell.powerup = null
+                        }
+                    }
+        }
+
+        //Removing dead worms from the map=======================================================================================
+        wormsMap.removeDeadWorms()
+        override fun removeDeadWorms() {
+        players.flatMap { it.worms }
+                .filter { it.dead || it.player.disqualified }
+                .forEach { 
+                    val mapCell = get(worm.position)
+
+                    if (mapCell.occupier == worm) {
+                        mapCell.occupier = null
+                    } 
+                }
+        }  
+
+        return true
+    }
+
+}
+
+
