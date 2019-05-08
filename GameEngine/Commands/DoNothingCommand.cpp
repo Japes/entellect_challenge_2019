@@ -5,7 +5,7 @@ DoNothingCommand::DoNothingCommand()
     _order = 0;
 }
 
-void DoNothingCommand::Execute(GameState& state)
+void DoNothingCommand::Execute(bool player1, GameState& state) const
 {
     //lol
 }

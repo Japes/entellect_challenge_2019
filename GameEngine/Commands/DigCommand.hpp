@@ -7,7 +7,7 @@ class DigCommand : public Command
 {
 	public:
     DigCommand();
-    void Execute(GameState& state) override;
+    void Execute(bool player1, GameState& state) const override;
 };
 
 #endif

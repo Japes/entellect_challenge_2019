@@ -19,6 +19,18 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
     //shoot
 }
 
+TEST_CASE( "Invalid commands are replaced with Do_Nothing", "[invalid_commands]" ) {
+    //check all command types
+}
+
+TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
+    //test when worms have died
+}
+
+TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
+    //check for player 1 and player 2
+}
+
 TEST_CASE( "Points are allocated correctly", "[command_order]" ) {
     //check for each thing mentioned in the rules and confirm game engine concurs
 }
