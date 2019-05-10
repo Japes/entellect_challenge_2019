@@ -6,8 +6,11 @@
 class TeleportCommand : public Command
 {
 	public:
-    TeleportCommand();
+    Position _pos;
+
+    TeleportCommand(Position pos);
     void Execute(bool player1, GameState& state) const override;
+    bool IsValid() const override;
 };
 
 #endif

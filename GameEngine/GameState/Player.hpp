@@ -14,7 +14,18 @@ struct Player
     int score;
     int health;
     int currentWormId; //1-indexed
+    int consecutiveDoNothingCount;
     std::vector<Worm> worms;
+
+    Player() :
+        id{0},
+        score{0},
+        currentWormId{1},
+        consecutiveDoNothingCount{0},
+        worms(3)
+    {
+        std::for_each(worms.begin(), worms.end(), [&](Worm w){health += w.health;});
+    }
 
     Worm GetCurrentWorm()
     {

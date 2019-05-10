@@ -9,3 +9,8 @@ void ShootCommand::Execute(bool player1, GameState& state) const
 {
 
 }
+
+bool ShootCommand::IsValid() const
+{
+    return true;
+}

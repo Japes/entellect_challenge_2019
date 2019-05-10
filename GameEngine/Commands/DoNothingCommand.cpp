@@ -9,3 +9,8 @@ void DoNothingCommand::Execute(bool player1, GameState& state) const
 {
     //lol
 }
+
+bool DoNothingCommand::IsValid() const
+{
+    return true;
+}

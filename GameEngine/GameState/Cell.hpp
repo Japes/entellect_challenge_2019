@@ -16,6 +16,13 @@ struct Cell
     CellType type;
     Player * player; //can be null
     PowerUp * powerup; //can be null
+
+    Cell()
+    {
+        type = CellType::AIR;
+        player = nullptr;
+        powerup = nullptr;
+    }
 };
 
 #endif

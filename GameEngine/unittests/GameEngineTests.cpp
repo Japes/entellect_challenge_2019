@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "../GameEngine.hpp"
+#include "AllCommands.hpp"
 
 TEST_CASE( "I can make a game engine instance", "[sanity]" ) {
     GameEngine eng;
@@ -20,7 +21,20 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 }
 
 TEST_CASE( "Invalid commands are replaced with Do_Nothing", "[invalid_commands]" ) {
+    GameState state;
+
+    state.player1.worms[0].position = {10,10};
+    GameEngine eng(state);
+
     //check all command types
+    REQUIRE(state.player1.consecutiveDoNothingCount == 0);
+    REQUIRE(state.player2.consecutiveDoNothingCount == 0);
+
+    DigCommand dig({1,1});
+    eng.AdvanceState(dig,dig);
+    
+    REQUIRE(state.player1.consecutiveDoNothingCount == 1);
+    REQUIRE(state.player2.consecutiveDoNothingCount == 1);
 }
 
 TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {

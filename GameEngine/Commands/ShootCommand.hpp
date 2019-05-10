@@ -8,6 +8,7 @@ class ShootCommand : public Command
 	public:
     ShootCommand();
     void Execute(bool player1, GameState& state) const override;
+    bool IsValid() const override;
 };
 
 #endif
