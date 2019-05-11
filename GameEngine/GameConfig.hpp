@@ -1,6 +1,8 @@
 #ifndef GAME_CONFIG_H
 #define GAME_CONFIG_H
 
+#define MAP_SIZE ((int)33)
+
 struct WeaponConfig
 {
     const int damage = 8;
@@ -36,7 +38,7 @@ struct GameConfig
     static const int maxDoNothings = 12;
     static const CommandoWorms commandoWorms;
     static const int pushbackDamage =  20;
-    static const int mapSize =  33;
+    static const int mapSize = MAP_SIZE;
     static const int healthPackHp =  10;
     static const int totalHealthPacks =  2;
     static const Scores scores;

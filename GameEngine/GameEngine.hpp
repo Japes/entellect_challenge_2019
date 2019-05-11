@@ -8,12 +8,14 @@ class GameEngine
 {
 	public:
     GameEngine();
-    GameEngine(GameState state);
+    GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
 
+    //GetValidMovesForWorm()
+
     private:
-    GameState _state;
+    std::shared_ptr<GameState> _state;
 
 };
 

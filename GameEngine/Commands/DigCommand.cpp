@@ -1,36 +1,34 @@
 #include "DigCommand.hpp"
+#include <iostream>
 
-DigCommand::DigCommand(Position pos) :
+DigCommand::DigCommand(bool player1, std::shared_ptr<GameState> state, Position pos) :
+    Command(player1, state),
     _pos{pos}
 {
     _order = 1;
 }
 
-void DigCommand::Execute(bool player1, GameState& state) const
+//NOTE this assumes move is valid
+void DigCommand::Execute() const
 {
-        val targetCell = gameMap[target]
-        targetCell.type = CellType.AIR
-
-        return StandardCommandFeedback(this.toString(), score = config.scores.dig, playerId = worm.player.id)
+    _state->map[_pos.x][_pos.y].type = CellType::AIR;
 }
 
 bool DigCommand::IsValid() const
 {
-            if (target !in gameMap) {
-            return CommandValidation.invalidMove("$target out of map bounds")
-        }
+    if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
+        _pos.x < 0 || _pos.y < 0 ) {
+        return false;
+    }
 
-        val targetCell = gameMap[target]
+    if(_state->map[_pos.x][_pos.y].type != CellType::DIRT) {
+        return false;
+    }
 
-        if (!targetCell.type.diggable) {
-            return CommandValidation.invalidMove("Cell type ${targetCell.type} not diggable")
-        }
-
-        if (target.movementDistance(worm.position) > worm.diggingRange) {
-            return CommandValidation.invalidMove("Cell $target too far away")
-        }
-
-        return CommandValidation.validMove()
+    if (_worm->position.MovementDistanceTo(_pos) > _worm->diggingRange) {
+        std::cout << "Too far: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
+        return false;
+    }
 
     return true;
 }
