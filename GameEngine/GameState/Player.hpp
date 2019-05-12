@@ -36,6 +36,11 @@ struct Player
         return &worms[wormIndex];
     }
 
+    Worm* GetWormByIndex(int index)
+    {
+        return &worms[index - 1];
+    }
+
     void UpdateCurrentWorm()
     {
         ++currentWormId;

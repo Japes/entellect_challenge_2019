@@ -16,6 +16,9 @@ class GameState
 
     GameState();
 
+    Cell* Cell_at(Position pos);
+
+    void Move_worm(Worm* worm, Position pos);
 };
 
 #endif

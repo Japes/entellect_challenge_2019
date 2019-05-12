@@ -19,6 +19,16 @@ struct Position
     //fun euclideanDistance(other: Point) = sqrt((x - other.x).pow(2) + (y - other.y).pow(2))
     //fun euclideanDistance(other: Pair<Double, Double>) = sqrt((x - other.first).pow(2) + (y - other.second).pow(2))
 
+    bool operator==(const Position& other) const
+    {
+        return x == other.x && y == other.y;
+    }
+
+    bool operator!=(const Position& other) const
+    {
+        return ! (*this == other);
+    }
+
 };
 
 std::ostream & operator << (std::ostream &out, const Position &pos);

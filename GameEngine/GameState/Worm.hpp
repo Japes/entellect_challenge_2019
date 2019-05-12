@@ -12,6 +12,7 @@ struct Worm
     unsigned id;
     int health;
     Position position;
+    Position previous_position; //for pushback logic
     Weapon weapon;
     int diggingRange;
     int movementRange;
