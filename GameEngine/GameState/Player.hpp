@@ -27,13 +27,13 @@ struct Player
         std::for_each(worms.begin(), worms.end(), [&](Worm w){health += w.health;});
     }
 
-    Worm GetCurrentWorm()
+    Worm* GetCurrentWorm()
     {
         unsigned wormIndex = currentWormId - 1;
         if(wormIndex >= worms.size()) {
             throw std::runtime_error("Problem getting next worm for player");
         }
-        return worms[wormIndex];
+        return &worms[wormIndex];
     }
 
     void UpdateCurrentWorm()

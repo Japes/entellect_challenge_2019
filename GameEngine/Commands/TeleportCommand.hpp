@@ -8,7 +8,7 @@ class TeleportCommand : public Command
 	public:
     Position _pos;
 
-    TeleportCommand(Position pos);
+    TeleportCommand(bool player1, std::shared_ptr<GameState> state, Position pos);
     void Execute() const override;
     bool IsValid() const override;
 };

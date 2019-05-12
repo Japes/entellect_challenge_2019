@@ -14,13 +14,13 @@ enum class CellType : uint8_t {
 struct Cell
 {
     CellType type;
-    Player * player; //can be null
+    Worm * worm; //can be null
     PowerUp * powerup; //can be null
 
     Cell()
     {
         type = CellType::AIR;
-        player = nullptr;
+        worm = nullptr;
         powerup = nullptr;
     }
 };
