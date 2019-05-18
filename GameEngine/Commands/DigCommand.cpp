@@ -26,7 +26,7 @@ bool DigCommand::IsValid() const
     }
 
     if (_worm->position.MovementDistanceTo(_pos) > _worm->diggingRange) {
-        std::cout << "Too far: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
+        std::err << "Too far: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
         return false;
     }
 

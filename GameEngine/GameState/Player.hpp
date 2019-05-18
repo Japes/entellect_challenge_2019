@@ -22,9 +22,12 @@ struct Player
         score{0},
         health{0},
         currentWormId{1},
-        consecutiveDoNothingCount{0},
-        worms(3)
+        consecutiveDoNothingCount{0}
     {
+        //not sure why the usual vector constructors aren't working here...
+        worms.push_back(Worm());
+        worms.push_back(Worm());
+        worms.push_back(Worm());
         RecalculateHealth();
     }
 
