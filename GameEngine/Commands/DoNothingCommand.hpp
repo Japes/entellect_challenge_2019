@@ -6,7 +6,7 @@
 class DoNothingCommand : public Command
 {
 	public:
-    DoNothingCommand();
+    DoNothingCommand(bool player1, std::shared_ptr<GameState> state);
     void Execute() const override;
     bool IsValid() const override;
 };

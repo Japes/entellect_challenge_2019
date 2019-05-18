@@ -17,6 +17,7 @@ int Position::MaximumDimension(Position other)
     return std::max(std::abs(x - other.x), std::abs(y - other.y));
 }
 
+//number of steps it would take to get to other
 int Position::MovementDistanceTo(Position other)
 {
    return MaximumDimension(other);

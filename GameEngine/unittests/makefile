@@ -13,7 +13,8 @@ INCLUDE+=-I$(GAMESTATE_SRC_DIR)
 INCLUDE+=-I$(COMMANDS_SRC_DIR)
 
 CXX=g++
-CXXFLAGS+=-Wall -std=c++14 -fPIC #these are the flags that I always want
+#these are the flags that I always want
+CXXFLAGS+=-Wall -std=c++14 -fPIC
 
 #grab all source files of interest
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -28,6 +29,9 @@ OBJ_FILES := $(patsubst $(GAMESTATE_SRC_DIR)/%.cpp,%.o,$(OBJ_FILES))
 OBJ_FILES := $(patsubst $(ENGINE_SRC_DIR)/%.cpp,%.o,$(OBJ_FILES))
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,%.o,$(OBJ_FILES))
 
+debug: CXXFLAGS+=-g
+debug: all
+
 all: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME) run
 
 $(OBJ_DIR)/$(EXENAME): $(OBJ_FILES)
@@ -40,7 +44,7 @@ $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
 run:
-	./$(OBJ_DIR)/$(EXENAME)
+	./$(OBJ_DIR)/$(EXENAME) $(TEST)
 	
 clean:
 	rm -f ./bin/*

@@ -1,6 +1,7 @@
 #include "DoNothingCommand.hpp"
 
-DoNothingCommand::DoNothingCommand()
+DoNothingCommand::DoNothingCommand(bool player1, std::shared_ptr<GameState> state) :
+    Command(player1, state)
 {
     _order = 0;
 }

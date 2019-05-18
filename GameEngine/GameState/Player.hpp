@@ -20,11 +20,12 @@ struct Player
     Player() :
         id{0},
         score{0},
+        health{0},
         currentWormId{1},
         consecutiveDoNothingCount{0},
         worms(3)
     {
-        std::for_each(worms.begin(), worms.end(), [&](Worm w){health += w.health;});
+        RecalculateHealth();
     }
 
     Worm* GetCurrentWorm()
@@ -47,6 +48,12 @@ struct Player
         if(currentWormId > static_cast<int>(worms.size())) {
             currentWormId = 1;
         }
+    }
+
+    void RecalculateHealth()
+    {
+        health = 0;
+        std::for_each(worms.begin(), worms.end(), [&](Worm w){health += w.health;});
     }
 };
 

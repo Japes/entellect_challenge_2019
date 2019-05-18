@@ -6,7 +6,8 @@
 struct WeaponConfig
 {
     const int damage = 8;
-    const int range = 4;
+    const int range = 4;    //range in a straight line //NOTE YOU NEED TO UPDATE DIAG RANGE IF YOU UPDATE THIS
+    const int diagRange = 3; //diagonal range. //NOTE THIS MUST BE MANUALLY UPDATED EVERY TIME YOU UPDATE RANGE
 };
 
 struct CommandoWorms
