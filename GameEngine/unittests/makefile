@@ -24,28 +24,25 @@ SRC_FILES += $(wildcard $(COMMANDS_SRC_DIR)/*.cpp)
 
 #obj files is list of all source files (without their directories) with .o appended
 #$(patsubst pattern,replacement,text) Finds whitespace-separated words in text that match pattern and replaces them with replacement
-OBJ_FILES := $(patsubst $(COMMANDS_SRC_DIR)/%.cpp,%.o,$(SRC_FILES))
-OBJ_FILES := $(patsubst $(GAMESTATE_SRC_DIR)/%.cpp,%.o,$(OBJ_FILES))
-OBJ_FILES := $(patsubst $(ENGINE_SRC_DIR)/%.cpp,%.o,$(OBJ_FILES))
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,%.o,$(OBJ_FILES))
+OBJ_FILES := $(patsubst %.cpp,%.o,$(SRC_FILES))
 
 debug: CXXFLAGS+=-g
 debug: all
 
-all: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME) run
+all: run
+
+run: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME)
+	./$(OBJ_DIR)/$(EXENAME) $(TEST)
 
 $(OBJ_DIR)/$(EXENAME): $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $^ -o $@
 
-$(OBJ_FILES): $(SRC_FILES)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $(SRC_FILES)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c -o $@ $<
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
-
-run:
-	./$(OBJ_DIR)/$(EXENAME) $(TEST)
 	
 clean:
 	rm -f ./bin/*
-	rm -f *.o
+	rm -f $(OBJ_FILES)
