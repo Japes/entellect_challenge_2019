@@ -73,4 +73,54 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
     }
 }
 
-//TODO check WormRoundProcessorTest.kt
+/*
+    fun processRound_digSameHole() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(2, 2))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.DIRT)
+        val command = DigCommand(1, 1, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, command), Pair(player2, command))
+        roundProcessor.processRound(map, commandMap)
+
+        assertEquals(CellType.AIR, map[1, 1].type)
+    }
+
+    @Test
+    fun processRound_moveDigSameLocation() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(2, 2))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.DIRT)
+        val digCommand = DigCommand(1, 1, TEST_CONFIG)
+        val moveCommand = TeleportCommand(Point(1, 1), random, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, digCommand), Pair(player2, moveCommand))
+        roundProcessor.processRound(map, commandMap)
+
+        assertNull(map[1, 1].occupier)
+        assertEquals(CellType.AIR, map[1, 1].type)
+        assertEquals(player1.worms[0], map[0, 0].occupier)
+        assertEquals(player2.worms[0], map[2, 2].occupier)
+        assertEquals(1, map.currentRoundErrors.size)
+    }
+
+
+    @Test
+    fun processRound_shootDigOpen() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(2, 2))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.DIRT)
+        map[0, 0].type = CellType.AIR
+
+        val digCommand = DigCommand(1, 1, TEST_CONFIG)
+        val shootCommand = ShootCommand(Direction.UP_LEFT, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, digCommand), Pair(player2, shootCommand))
+        roundProcessor.processRound(map, commandMap)
+
+        assertNull(map[1, 1].occupier)
+        assertEquals(CellType.AIR, map[1, 1].type)
+        assertEquals(config.commandoWorms.initialHp, player2.worms[0].health)
+        assertNotEquals(config.commandoWorms.initialHp, player1.worms[0].health)
+    }
+*/

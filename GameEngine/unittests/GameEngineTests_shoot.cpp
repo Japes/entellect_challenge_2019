@@ -3,7 +3,7 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 
-void place_worm(bool player1, int wormNumber, Position pos, std::shared_ptr<GameState> state)
+Worm* place_worm(bool player1, int wormNumber, Position pos, std::shared_ptr<GameState> state)
 {
     Worm* worm_under_test;
     if(player1) {
@@ -13,6 +13,8 @@ void place_worm(bool player1, int wormNumber, Position pos, std::shared_ptr<Game
     }
     worm_under_test->position = worm_under_test->previous_position = pos;
     state->Cell_at(pos)->worm = worm_under_test;
+
+    return worm_under_test;
 }
 
 bool shot_hits(std::shared_ptr<GameState> state, int targetWormNumber, ShootCommand::ShootDirection dir, bool friendlyWorm = false)
@@ -500,6 +502,71 @@ TEST_CASE( "Shoot command obstacles : other worms", "[Shoot_command][Shot_missed
     }
 }
 
+TEST_CASE( "Dead worms are removed correctly", "[dead_worms]" ) {
+    GIVEN("A target worm lined up for a kill")
+    {
+        auto state = std::make_shared<GameState>();
+
+        Position shooting_worm_pos{10,10};
+        Worm* shooting_worm = place_worm(true, 1, shooting_worm_pos, state);
+        Position target_worm_pos{10,11};
+        Worm* target_worm = place_worm(false, 1, target_worm_pos, state);
+        target_worm->health = shooting_worm->weapon.damage;
+
+        CHECK(!shooting_worm->IsDead());
+        CHECK(!target_worm->IsDead());
+        CHECK(state->Cell_at(shooting_worm_pos)->worm != nullptr);
+        CHECK(state->Cell_at(target_worm_pos)->worm != nullptr);
+
+        THEN("Shooting him kills him")
+        {
+            ShootCommand player1move(true, state, ShootCommand::ShootDirection::S);
+            DoNothingCommand player2move(false, state);
+
+            GameEngine eng(state);
+            eng.AdvanceState(player1move,player2move);
+
+            CHECK(!shooting_worm->IsDead());
+            CHECK(target_worm->IsDead());
+            CHECK(state->Cell_at(shooting_worm_pos)->worm != nullptr);
+            CHECK(state->Cell_at(target_worm_pos)->worm == nullptr);
+        }
+
+    }
+}
+
 //TODO check correct behaviour when 2 worms shoot the same guy in the same turn
 
-//TODO check WormRoundProcessorTest.kt
+/*
+@Test
+    fun processRound_moveIntoShot() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(1, 1))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.AIR)
+
+        val shootCommand = ShootCommand(Direction.DOWN, TEST_CONFIG)
+        val moveCommand = TeleportCommand(Point(0, 2), random, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, shootCommand), Pair(player2, moveCommand))
+        roundProcessor.processRound(map, commandMap)
+
+        assertNotEquals(config.commandoWorms.initialHp, player2.worms[0].health)
+        assertEquals(config.commandoWorms.initialHp, player1.worms[0].health)
+    }
+
+    @Test
+    fun processRound_moveOutOfShot() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(0, 2))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.AIR)
+
+        val shootCommand = ShootCommand(Direction.DOWN, TEST_CONFIG)
+        val moveCommand = TeleportCommand(Point(1, 1), random, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, shootCommand), Pair(player2, moveCommand))
+        roundProcessor.processRound(map, commandMap)
+
+        assertEquals(config.commandoWorms.initialHp, player2.worms[0].health)
+        assertEquals(config.commandoWorms.initialHp, player1.worms[0].health)
+    }
+    */

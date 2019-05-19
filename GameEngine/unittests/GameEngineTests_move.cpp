@@ -224,4 +224,44 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
     }
 }
 
-//TODO check WormRoundProcessorTest.kt
+/*
+    @Test
+    fun processRound_moveSameLocation() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(2, 2))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.AIR)
+        val command = TeleportCommand(Point(1, 1), random, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, command), Pair(player2, command))
+        roundProcessor.processRound(map, commandMap)
+
+        assertNull(map[1, 1].occupier)
+        assertNotNull(map[0, 0].occupier)
+        assertNotNull(map[2, 2].occupier)
+
+        val expectedHealth = config.commandoWorms.initialHp - config.pushbackDamage
+        assertEquals(expectedHealth, player1.health)
+        assertEquals(expectedHealth, player2.health)
+    }
+
+    @Test
+    fun processRound_moveSameLocationWithPowerup() {
+        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
+        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(2, 2))), config)
+        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.AIR)
+        map[1, 1].powerup = HealthPack(config.healthPackHp)
+        val command = TeleportCommand(Point(1, 1), random, TEST_CONFIG)
+
+        val commandMap = mapOf(Pair(player1, command), Pair(player2, command))
+        roundProcessor.processRound(map, commandMap)
+
+        assertNull(map[1, 1].occupier)
+        assertNotNull(map[0, 0].occupier)
+        assertNotNull(map[2, 2].occupier)
+
+        val expectedHealth = config.commandoWorms.initialHp - config.pushbackDamage
+        assertEquals(player2.health, player1.health, "Players should have equal health")
+        assertEquals(expectedHealth, player1.health)
+        assertEquals(expectedHealth, player2.health)
+    }
+*/

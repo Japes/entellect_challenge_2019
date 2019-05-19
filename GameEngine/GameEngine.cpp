@@ -38,3 +38,14 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
 
     //at this point we'd ask the players for their next moves
 }
+
+void GameEngine::Playthrough(bool player1, const Command& command)
+{
+
+}
+
+std::vector<Command> GameEngine::GetValidMovesForWorm(bool player1)
+{
+    std::vector<Command> ret;
+    return ret;
+}

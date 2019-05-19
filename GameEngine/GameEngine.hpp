@@ -3,6 +3,7 @@
 
 #include "GameState.hpp"
 #include "Command.hpp"
+#include <vector>
 
 class GameEngine
 {
@@ -11,8 +12,8 @@ class GameEngine
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
-
-    //GetValidMovesForWorm()
+    void Playthrough(bool player1, const Command& command);
+    std::vector<Command> GetValidMovesForWorm(bool player1);
 
     private:
     std::shared_ptr<GameState> _state;
