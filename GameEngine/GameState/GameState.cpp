@@ -1,6 +1,8 @@
 #include "GameState.hpp"
 
 GameState::GameState() :
+    player1(this),
+    player2(this),
     roundNumber{1}
 {
     player1.id = 1;

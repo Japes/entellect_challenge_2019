@@ -18,8 +18,6 @@ void TeleportCommand::Execute() const
     if(worm_there == nullptr) {
         _state->Move_worm(_worm, _pos);
     } else if ( WormMovedThisRound (worm_there)) {
-        _worm->health -= GameConfig::pushbackDamage;
-        worm_there->health -= GameConfig::pushbackDamage;
 
         // 50% chance to pushback or swap positions
         if (FiftyFiftyChance()) {
@@ -34,6 +32,9 @@ void TeleportCommand::Execute() const
             _state->Move_worm(_worm, worm_there->previous_position);
             _state->Move_worm(worm_there, _worm->previous_position);
         }
+
+        _worm->TakeDamage(GameConfig::pushbackDamage);
+        worm_there->TakeDamage(GameConfig::pushbackDamage);
     }
 }
 

@@ -1,13 +1,12 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
+#include "GameConfig.hpp"
 #include "Player.hpp"
 #include "Cell.hpp"
-#include "GameConfig.hpp"
 #include "./rapidjson/document.h"
 
 //current state of the game
-
 class GameState
 {
 	public:

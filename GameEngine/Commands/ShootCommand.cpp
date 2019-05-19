@@ -42,9 +42,7 @@ void ShootCommand::Execute() const
 
         if (cell->worm != nullptr) {
             //std::cerr << "HIT A WORM!" << std::endl;
-            cell->worm->health -= _worm->weapon.damage;
-            _state->player1.RecalculateHealth();
-            _state->player2.RecalculateHealth();
+            cell->worm->TakeDamage(_worm->weapon.damage);
             return;
         }
 

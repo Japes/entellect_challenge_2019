@@ -5,10 +5,13 @@
 #include "Weapon.hpp"
 #include "GameConfig.hpp"
 
+class GameState; //forward declaration
+
 //current state of a worm
 
 struct Worm
 {
+    GameState* state;
     unsigned id;
     int health;
     Position position;
@@ -17,12 +20,10 @@ struct Worm
     int diggingRange;
     int movementRange;
 
-    Worm() : id{0}
-    {
-        health = GameConfig::commandoWorms.initialHp;
-        diggingRange = GameConfig::commandoWorms.diggingRange;
-        movementRange = GameConfig::commandoWorms.movementRange;
-    }
+    Worm(GameState* _state);
+
+    bool IsDead();
+    void TakeDamage(int dmgAmount);
 };
 
 #endif
