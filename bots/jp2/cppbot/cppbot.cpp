@@ -7,6 +7,8 @@
 #include <functional>
 #include <cmath>
 #include <random>
+#include "GameEngine.hpp"
+#include "AllCommands.hpp"
 
 static std::string dirt = "DIRT";
 static std::string air = "AIR";
@@ -170,15 +172,16 @@ std::string RandomStrategy(rapidjson::Document& roundJSON)
   return "nothing";
 }
 
+//expects command string to be returned e.g. "dig 5 6"
 std::string runStrategy(rapidjson::Document& roundJSON)
 {
-  const auto shootable = getShootableOpponent(roundJSON);
-  if (shootable.second >= 0)
-  {
-    return "shoot " + directionNames[shootable.second];
-  }
+  auto state = std::make_shared<GameState>(roundJSON);
+  DigCommand p1Move(true, state, {-11,-1});
+  DigCommand p2Move(false, state, {-11,-1});
+  GameEngine eng(state);
+  eng.AdvanceState(p1Move,p2Move);
 
-  return RandomStrategy(roundJSON);
+  return "dig 5 6";
 }
 
 std::string executeRound(std::string& roundNumber)

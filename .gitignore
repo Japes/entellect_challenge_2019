@@ -16,8 +16,9 @@ rounds/
 
 *.o
 *.d
+*.exe
 
-bin
+bin/
 
 CMakeFiles
 cmakeBuildDir

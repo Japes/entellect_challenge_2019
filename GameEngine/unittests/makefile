@@ -2,8 +2,8 @@ SRC_DIR := .
 OBJ_DIR := bin
 ENGINE_SRC_DIR := ..
 #need to add a line here for every subfoler in GameEngine
-GAMESTATE_SRC_DIR := ../GameState
-COMMANDS_SRC_DIR := ../Commands
+GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
+COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
 
 EXENAME=unit_tests
 
@@ -27,10 +27,10 @@ SRC_FILES += $(wildcard $(COMMANDS_SRC_DIR)/*.cpp)
 OBJ_FILES := $(patsubst %.cpp,%.o,$(SRC_FILES))
 HEADER_DEPS := $(patsubst %.cpp,%.d,$(SRC_FILES))
 
+all: run
+
 debug: CXXFLAGS+=-g
 debug: all
-
-all: run
 
 run: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME)
 	./$(OBJ_DIR)/$(EXENAME) $(TEST)
