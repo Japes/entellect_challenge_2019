@@ -15,6 +15,7 @@ rounds/
 .vscode
 
 *.o
+*.d
 
 bin
 
