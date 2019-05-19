@@ -175,11 +175,16 @@ std::string RandomStrategy(rapidjson::Document& roundJSON)
 //expects command string to be returned e.g. "dig 5 6"
 std::string runStrategy(rapidjson::Document& roundJSON)
 {
+  //load the state
   auto state = std::make_shared<GameState>(roundJSON);
+
+  //do simulations for every possible move
   DigCommand p1Move(true, state, {-11,-1});
   DigCommand p2Move(false, state, {-11,-1});
   GameEngine eng(state);
   eng.AdvanceState(p1Move,p2Move);
+
+  //choose the best move and do it
 
   return "dig 5 6";
 }

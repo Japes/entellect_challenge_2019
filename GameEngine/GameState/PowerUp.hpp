@@ -5,6 +5,10 @@ struct PowerUp
 {
     //"type": "HEALTH_PACK", //TODO add enum when we have more types
     int value;
+
+    PowerUp() {
+        value = GameConfig::healthPackHp;
+    }
 };
 
 #endif

@@ -56,7 +56,7 @@ struct Player
     void RecalculateHealth()
     {
         health = 0;
-        std::for_each(worms.begin(), worms.end(), [&](Worm w){health += w.health;});
+        std::for_each(worms.begin(), worms.end(), [&](Worm w){ health += (w.health > 0) ? w.health : 0;});
     }
 };
 

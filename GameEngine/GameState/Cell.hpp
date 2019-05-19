@@ -11,6 +11,8 @@ enum class CellType : uint8_t {
     DEEP_SPACE
 };
 
+CellType strToCellType(std::string str);
+
 struct Cell
 {
     CellType type;
