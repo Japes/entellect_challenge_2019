@@ -2,58 +2,38 @@
 #include "../GameEngine.hpp"
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
+#include "GameEngineTestUtils.hpp"
 
 TEST_CASE( "Healthpack", "[powerup]" ) {
 
-/*
-    GIVEN("A game state and a dig command")
+    GIVEN("A game state with a worm next to a powerup")
     {
         auto state = std::make_shared<GameState>();
-
-        state->player1.GetCurrentWorm()->position = {10,10};
-        state->map[11][10].type = CellType::DIRT;
-        state->map[11][11].type = CellType::DIRT;
-        state->map[10][11].type = CellType::DEEP_SPACE;
+        Position worm_under_test_pos{10,10};
+        Worm* worm = place_worm(true, 1, worm_under_test_pos, state);
+        Position powerup_pos{10,10};
+        place_powerup(powerup_pos, state);
         GameEngine eng(state);
 
-        int expectedDoNothings = 0;
-        REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-
-        DigCommand player1move(true, state, {0,0});
-        DigCommand player2move(false, state, {0,0});
-
-        THEN("out of bounds (too low) is invalid")
+        THEN("A healthpack can resurrect a worm that is still on the map (i.e. it died in this round")
         {
-            player1move = DigCommand(true, state, {-11,-1});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            worm->health = 0;
+            TeleportCommand player1move(true, state, powerup_pos);
+            DoNothingCommand player2move(false, state);
+            eng.AdvanceState(player1move, player2move);
 
+            REQUIRE(worm->health == GameConfig::healthPackHp);
+            REQUIRE(worm == state->Cell_at(powerup_pos)->worm);
+            REQUIRE(state->Cell_at(powerup_pos)->powerup == nullptr);
+            REQUIRE(!worm->IsDead());
+        }
     }
-    */
 }
 
-/*
-
-    // A healthpack can resurrect a worm that is still on the map (i.e. it died in this round)
-    @Test
-    fun processRound_applyHealthpackResurrection() {
-        val worm = CommandoWorm.build(0, config, Point(2, 2))
-        worm.health = 0
-        val player = WormsPlayer.build(0, listOf(worm), config)
-        val map = buildMapWithCellType(listOf(player), 5, CellType.AIR)
-
-        val target = Point(1, 2)
-        val command = TeleportCommand(target, Random, config)
-        map[target].powerup = HealthPack(config.healthPackHp)
-
-        command.execute(map, worm)
-        roundProcessor.processRound(map, mapOf(Pair(player, command)))
-
-        assertEquals(config.healthPackHp, player.health)
-        assertEquals(worm, map[target].occupier)
-        assertNull(map[target].powerup)
-        assertFalse(player.dead)
-    }
-
+    //this test is in the kotlin engine, not sure i understand it
+    //of course a worm wont be revived if it's not on the same spot as the powerup?
+    
+    /*
      // A healthpack cannot resurrect a worm that is no longer on the map (i.e. it died in a previous round)
     @Test
     fun  processRound_applyHealthpackNoResurrection() {

@@ -36,7 +36,29 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     _state->player1.UpdateCurrentWorm();
     _state->player2.UpdateCurrentWorm();
 
+    ApplyPowerups();
+
     //at this point we'd ask the players for their next moves
+}
+
+void GameEngine::ApplyPowerups()
+{
+    for(auto& worm : _state->player1.worms) {
+        auto powerupHere = _state->Cell_at(worm.position)->powerup;
+        if(powerupHere != nullptr) {
+            powerupHere->ApplyTo(&worm);
+            _state->Cell_at(worm.position)->powerup = nullptr;
+        }
+    }
+
+    //lame that this is duplicated
+    for(auto& worm : _state->player2.worms) {
+        auto powerupHere = _state->Cell_at(worm.position)->powerup;
+        if(powerupHere != nullptr) {
+            powerupHere->ApplyTo(&worm);
+            _state->Cell_at(worm.position)->powerup = nullptr;
+        }
+    }
 }
 
 void GameEngine::Playthrough(bool player1, const Command& command)

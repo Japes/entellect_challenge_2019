@@ -9,6 +9,11 @@ struct PowerUp
     PowerUp() {
         value = GameConfig::healthPackHp;
     }
+
+    void ApplyTo(Worm* worm)
+    {
+        worm->health += value;
+    }
 };
 
 #endif

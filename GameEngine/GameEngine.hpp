@@ -16,6 +16,8 @@ class GameEngine
     std::vector<Command> GetValidMovesForWorm(bool player1);
 
     private:
+    void ApplyPowerups();
+    
     std::shared_ptr<GameState> _state;
 
 };
