@@ -1,17 +1,22 @@
 #include "GameEngine.hpp"
+#include <algorithm>
 
 GameEngine::GameEngine()
 {
-
 }
 
-GameEngine::GameEngine(std::shared_ptr<GameState> state) : _state{state}
+GameEngine::GameEngine(std::shared_ptr<GameState> state) : 
+    _state{state}
 {
 
 }
 
 void GameEngine::AdvanceState(const Command& player1_command, const Command& player2_command)
 {
+    if(_currentResult.result != ResultType::IN_PROGRESS) {
+        return; //nothing more to do here
+    }
+
     const Command* firstCommand = &player1_command;
     const Command* secondCommand = &player2_command;
 
@@ -38,8 +43,40 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
 
     ApplyPowerups();
 
+    ++_state->roundNumber;
+
+    UpdateWinCondition();
+
     //at this point we'd ask the players for their next moves
 }
+
+void GameEngine::UpdateWinCondition()
+{
+    bool anySurvivors1 = std::any_of(_state->player1.worms.begin(), _state->player1.worms.end(), [](Worm& w){return !w.IsDead();});
+    bool anySurvivors2 = std::any_of(_state->player2.worms.begin(), _state->player2.worms.end(), [](Worm& w){return !w.IsDead();});
+
+    //check for knockout
+    if(anySurvivors1 != anySurvivors2) {
+        _currentResult.result = ResultType::FINISHED_KO;
+        _currentResult.winningPlayer = anySurvivors1 ? &_state->player1 : &_state->player2;
+        _currentResult.losingPlayer = (_currentResult.winningPlayer == &_state->player1) ? &_state->player2 : &_state->player1;
+        return;
+    }
+
+    //update scores
+    if(_state->player1.score == _state->player1.score) {
+        _currentResult.winningPlayer = _currentResult.losingPlayer = nullptr;
+    } else {
+        _currentResult.winningPlayer = (_state->player1.score > _state->player2.score) ? &_state->player1 : &_state->player2;
+        _currentResult.losingPlayer = (_currentResult.winningPlayer == &_state->player1) ? &_state->player2 : &_state->player1;
+    }
+
+    //check for tie
+    if(_state->roundNumber > GameConfig::maxRounds || (!anySurvivors1 && !anySurvivors2)) {
+        _currentResult.result = ResultType::FINISHED_POINTS;
+    }
+}
+
 
 void GameEngine::ApplyPowerups()
 {
@@ -64,6 +101,11 @@ void GameEngine::ApplyPowerups()
 void GameEngine::Playthrough(bool player1, const Command& command)
 {
 
+}
+
+GameEngine::GameResult GameEngine::GetResult()
+{
+    return _currentResult;
 }
 
 std::vector<Command> GameEngine::GetValidMovesForWorm(bool player1)
