@@ -149,11 +149,11 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 1, {1,1}, state);
-        place_worm(true, 2, {2,2}, state);
-        place_worm(true, 3, {3,3}, state);
-        place_worm(false, 1, {11,11}, state);
-        place_worm(false, 2, {12,12}, state);
-        place_worm(false, 3, {13,13}, state);
+        place_worm(true, 2, {1,10}, state);
+        place_worm(true, 3, {1,20}, state);
+        place_worm(false, 1, {20,5}, state);
+        place_worm(false, 2, {21,10}, state);
+        place_worm(false, 3, {22,20}, state);
 
         TeleportCommand player1move(true, state, {0,0});
         TeleportCommand player2move(false, state, {0,0});
@@ -165,20 +165,21 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
         WHEN("game goes until maxturns - 1")
         {
             bool flipflop = false;
-            for(unsigned i = 1; i < GameConfig::maxRounds - 10; i++) {
+            for(unsigned i = 1; i < GameConfig::maxRounds; i++) {
                 //make sure moves are valid
                 if(flipflop) {
                     player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
-                    player2move = TeleportCommand(false, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+                    player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
                 } else {
                     player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{-1,-1});
-                    player2move = TeleportCommand(false, state, state->player1.GetCurrentWorm()->position + Position{-1,-1});
+                    player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{-1,-1});
                 }
                 eng.AdvanceState(player1move, player2move);
                 flipflop = ~flipflop;
             }
 
             THEN("Game is still in progress") {
+                REQUIRE(state->roundNumber == GameConfig::maxRounds);
                 REQUIRE(eng.GetResult().result == resType::IN_PROGRESS);
             }
 
@@ -197,6 +198,10 @@ TEST_CASE( "Game goes to score if both players die in the same round", "[double_
     {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
+        state->player1.worms[1].health = 0;
+        state->player1.worms[2].health = 0;
+        state->player2.worms[1].health = 0;
+        state->player2.worms[2].health = 0;
         Worm* worm1 = place_worm(true, 1, {9,10}, state);
         Worm* worm2 = place_worm(false, 1, {10,10}, state);
         worm1->health = 1;
@@ -223,6 +228,10 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
     {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
+        state->player1.worms[1].health = 0;
+        state->player1.worms[2].health = 0;
+        state->player2.worms[1].health = 0;
+        state->player2.worms[2].health = 0;
         Worm* worm1 = place_worm(true, 1, {9,10}, state);
         Worm* worm2 = place_worm(false, 1, {10,10}, state);
         worm1->health = 1;
@@ -247,7 +256,7 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
         WHEN("Player2 knocks out player1")
         {
             DoNothingCommand player1move(true, state);
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::E);
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::W);
 
             eng.AdvanceState(player1move, player2move);
 
