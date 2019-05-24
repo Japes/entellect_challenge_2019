@@ -26,6 +26,6 @@ int Position::MovementDistanceTo(Position other)
 //to help with debugging...
 std::ostream & operator << (std::ostream &out, const Position &pos)
 {
-    out << "[" << pos.x << ", " << pos.y << "]" << std::endl;
+    out << "[" << pos.x << ", " << pos.y << "]";
     return out;
 }

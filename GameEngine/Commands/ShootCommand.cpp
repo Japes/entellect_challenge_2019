@@ -4,7 +4,7 @@
 ShootCommand::ShootCommand(bool player1, std::shared_ptr<GameState> state, ShootCommand::ShootDirection dir) :
     Command(player1, state)
 {
-    _order = 2;
+    _order = 3;
     switch (dir)
     {
         case ShootDirection::N:     _shootVector = Position(0,-1); break;

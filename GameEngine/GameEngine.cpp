@@ -26,17 +26,8 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
         secondCommand = &player1_command;
     }
 
-    if(firstCommand->IsValid()) {
-        firstCommand->Execute();
-    } else {
-        ++firstCommand->GetPlayer()->consecutiveDoNothingCount;
-    }
-
-    if(secondCommand->IsValid()) {
-        secondCommand->Execute();
-    } else {
-        ++secondCommand->GetPlayer()->consecutiveDoNothingCount;
-    }
+    DoCommand(firstCommand);
+    DoCommand(secondCommand);
 
     _state->player1.UpdateCurrentWorm();
     _state->player2.UpdateCurrentWorm();
@@ -50,6 +41,16 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     //at this point we'd ask the players for their next moves
 }
 
+void GameEngine::DoCommand(const Command* command)
+{
+    if(command->IsValid() && command->Order() != 0) {
+        command->Execute();
+        command->GetPlayer()->consecutiveDoNothingCount = 0;
+    } else {
+        ++command->GetPlayer()->consecutiveDoNothingCount;
+    }
+}
+
 void GameEngine::UpdateWinCondition()
 {
     bool anySurvivors1 = std::any_of(_state->player1.worms.begin(), _state->player1.worms.end(), [](Worm& w){return !w.IsDead();});
@@ -60,10 +61,20 @@ void GameEngine::UpdateWinCondition()
         _currentResult.result = ResultType::FINISHED_KO;
         _currentResult.winningPlayer = anySurvivors1 ? &_state->player1 : &_state->player2;
         _currentResult.losingPlayer = (_currentResult.winningPlayer == &_state->player1) ? &_state->player2 : &_state->player1;
+        //std::cout << "knockout" << std::endl;
         return;
     }
 
-    //update scores
+    //check for disqualification
+    if(_state->player1.consecutiveDoNothingCount >= GameConfig::maxDoNothings || _state->player2.consecutiveDoNothingCount >= GameConfig::maxDoNothings) {
+        _currentResult.result = ResultType::FINISHED_KO;
+        _currentResult.winningPlayer = _state->player1.consecutiveDoNothingCount >= GameConfig::maxDoNothings? &_state->player2 : &_state->player1;
+        _currentResult.losingPlayer = (_currentResult.winningPlayer == &_state->player1) ? &_state->player2 : &_state->player1;
+        //std::cout << "disqualification" << std::endl;
+        return;
+    }
+
+    //update currently winning player
     if(_state->player1.score == _state->player1.score) {
         _currentResult.winningPlayer = _currentResult.losingPlayer = nullptr;
     } else {
@@ -73,6 +84,7 @@ void GameEngine::UpdateWinCondition()
 
     //check for tie
     if(_state->roundNumber > GameConfig::maxRounds || (!anySurvivors1 && !anySurvivors2)) {
+        //std::cout << "rounds done" << std::endl;
         _currentResult.result = ResultType::FINISHED_POINTS;
     }
 }
