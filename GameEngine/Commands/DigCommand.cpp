@@ -5,7 +5,7 @@ DigCommand::DigCommand(bool player1, std::shared_ptr<GameState> state, Position 
     Command(player1, state),
     _pos{pos}
 {
-    _order = 1;
+    _order = 2;
 }
 
 //NOTE this assumes move is valid

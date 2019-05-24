@@ -121,6 +121,110 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
     //move
     //dig
     //shoot
+
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 2, {0,2}, state);
+        place_worm(true, 3, {0,3}, state);
+        place_worm(false, 2, {0,5}, state);
+        place_worm(false, 3, {0,6}, state);
+
+        place_worm(true, 1, {10,9}, state);
+        place_worm(false, 1, {10,11}, state);
+        state->Cell_at({10, 10})->type = CellType::DIRT;
+
+        REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+        REQUIRE(state->player2.consecutiveDoNothingCount == 0);
+
+        //Move happens before dig----------------
+        WHEN("A player moves and a player digs")
+        {
+            TeleportCommand player1move(true, state, {10,8});
+            DigCommand player2move(false, state, {10,10});
+            eng.AdvanceState(player1move, player2move);
+            THEN("Its fine")
+            {
+                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state->player2.consecutiveDoNothingCount == 0);
+            }
+        }
+
+        WHEN("A player tries to move into something dug this round")
+        {
+            TeleportCommand player1move(true, state, {10,10});
+            DigCommand player2move(false, state, {10,10});
+            eng.AdvanceState(player1move, player2move);
+            THEN("The move is evaluated before the dig")
+            {
+                REQUIRE(state->player1.consecutiveDoNothingCount == 1);
+                REQUIRE(state->player2.consecutiveDoNothingCount == 0);
+            }
+        }
+
+        //Dig happens before shoot----------------
+        Worm* targetWorm = state->player1.GetCurrentWorm();
+
+        REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::commandoWorms.initialHp);
+        WHEN("A player digs and a player shoots")
+        {
+            DigCommand player1move(true, state, {10,10});
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            eng.AdvanceState(player1move, player2move);
+            THEN("Its fine")
+            {
+                REQUIRE(targetWorm->health < GameConfig::commandoWorms.initialHp);
+            }
+        }
+
+        WHEN("A player tries to shoot through dirt")
+        {
+            DigCommand player1move(true, state, {9,9});
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            eng.AdvanceState(player1move, player2move);
+            THEN("It fails")
+            {
+                REQUIRE(targetWorm->health == GameConfig::commandoWorms.initialHp);
+            }
+        }
+
+        //Move happens before shoot----------------
+        REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::commandoWorms.initialHp);
+        WHEN("A player moves away from a shot")
+        {
+            state->Cell_at({10, 10})->type = CellType::AIR;
+            TeleportCommand player1move(true, state, {9,9});
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            eng.AdvanceState(player1move, player2move);
+            THEN("He doesn't get hit")
+            {
+                REQUIRE(targetWorm->health == GameConfig::commandoWorms.initialHp);
+            }
+        }
+
+        WHEN("A player moves into a shot")
+        {
+            state->Cell_at({10, 10})->type = CellType::AIR;
+            //move player1 out of firing range
+            TeleportCommand player1move(true, state, {9,9});
+            DoNothingCommand player2doNothing(false, state);
+            eng.AdvanceState(player1move, player2doNothing);
+            //do another 2 turns so its their turn again
+            eng.AdvanceState(DoNothingCommand(true, state), DoNothingCommand(false, state));
+            eng.AdvanceState(DoNothingCommand(true, state), DoNothingCommand(false, state));
+
+            //now do the test
+
+            player1move = TeleportCommand(true, state, {10,9});
+            ShootCommand player2shoot(false, state, ShootCommand::ShootDirection::N);
+            eng.AdvanceState(player1move, player2shoot);
+            THEN("He gets hit")
+            {
+                REQUIRE(targetWorm->health < GameConfig::commandoWorms.initialHp);
+            }
+        }
+    }
 }
 
 TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {

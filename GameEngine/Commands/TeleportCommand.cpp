@@ -8,7 +8,7 @@ TeleportCommand::TeleportCommand(bool player1, std::shared_ptr<GameState> state,
     _pos{pos},
     _forceRandom{forceRandom}
 {
-    _order = 2;
+    _order = 1;
 }
 
 //note: assumes move is valid.
