@@ -23,7 +23,7 @@ bool shot_hits(std::shared_ptr<GameState> state, int targetWormNumber, ShootComm
     hit &= (target_worm->health == targetWormStartingHealth - GameConfig::commandoWorms.weapon.damage);
     hit &= (target_player->health == targetPlayerStartingHealth - GameConfig::commandoWorms.weapon.damage);
 
-    //std::cout << "state->player1.consecutiveDoNothingCount: " << state->player1.consecutiveDoNothingCount << 
+    //std::cerr << "state->player1.consecutiveDoNothingCount: " << state->player1.consecutiveDoNothingCount << 
     //" target_worm->health: " << targetWormStartingHealth <<
     //" target_player->health: " << targetPlayerStartingHealth <<
     //std::endl;

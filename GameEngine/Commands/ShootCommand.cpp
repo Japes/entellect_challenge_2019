@@ -1,5 +1,6 @@
 #include "ShootCommand.hpp"
 #include <iostream>
+#include <algorithm>
 
 ShootCommand::ShootCommand(bool player1, std::shared_ptr<GameState> state, ShootCommand::ShootDirection dir) :
     Command(player1, state)
@@ -30,6 +31,7 @@ void ShootCommand::Execute() const
         if( (pos.x != _worm->position.x && pos.y != _worm->position.y) && //i.e. we are shooting diagonally
             _worm->position.MovementDistanceTo(pos) > _worm->weapon.diagRange) {
             //std::cerr << "OUT OF RANGE! (" <<_worm->position.MovementDistanceTo(pos) << " > " << _worm->weapon.diagRange << ")" << std::endl;
+            _player->command_score += GameConfig::scores.missedAttack;
             return;
         }
 
@@ -37,17 +39,33 @@ void ShootCommand::Execute() const
 
         if (cell->type != CellType::AIR) {
             //std::cerr << "HIT DIRT!" << std::endl;
+            _player->command_score += GameConfig::scores.missedAttack;
             return;
         }
 
         if (cell->worm != nullptr) {
             //std::cerr << "HIT A WORM!" << std::endl;
-            cell->worm->TakeDamage(_worm->weapon.damage);
+            auto wormRef = cell->worm;
+            wormRef->TakeDamage(_worm->weapon.damage);
+
+            if(wormRef->IsDead()) {
+                _player->command_score += GameConfig::scores.killShot;
+            } else {
+                if(std::any_of(_player->worms.begin(), _player->worms.end(), [&](Worm& w){return &w == wormRef;})) {
+                    _player->command_score += GameConfig::scores.friendlyFire;
+                } else {
+                    _player->command_score += GameConfig::scores.attack;
+                }
+            }
+
             return;
         }
 
         pos += _shootVector;
     }
+
+    //if we get this far, shot didn't hit anything
+    _player->command_score += GameConfig::scores.missedAttack;
 }
 
 bool ShootCommand::IsValid() const

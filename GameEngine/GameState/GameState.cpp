@@ -33,7 +33,7 @@ void GameState::PopulatePlayers(rapidjson::Document& roundJSON)
 
 void GameState::PopulatePlayer(Player& player, const rapidjson::Value& playerJson)
 {
-    player.score = playerJson["score"].GetInt();
+    player.command_score = playerJson["score"].GetInt();
     player.health = 0; //player.health = playerJson["health"].GetInt(); only myPlayer has this
 
     auto wormsJson = playerJson.GetObject()["worms"].GetArray();
@@ -44,6 +44,8 @@ void GameState::PopulatePlayer(Player& player, const rapidjson::Value& playerJso
     }
 
     player.RecalculateHealth(); 
+
+    player.command_score -= player.GetAverageWormHealth();
 }
 
 void GameState::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)

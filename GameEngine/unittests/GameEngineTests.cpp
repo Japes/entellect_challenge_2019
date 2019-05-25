@@ -378,8 +378,139 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
     }
 }
 
-TEST_CASE( "Points are allocated correctly", "[command_order]" ) {
-    //check for each thing mentioned in the rules and confirm game engine concurs
+TEST_CASE( "Points are allocated correctly", "[scores]" ) {
+
+    /*
+    The total score value is determined by adding together the player's average worm health and the points for every single command the they played:
+
+    Attack:
+        Shooting any worm unconscious gives 40 points
+        Shooting an enemy worm gives 20 points
+        Shooting one of your own worms will reduce your points by 20
+        A missed attack gives 2 points
+    Moving gives 5 point
+    Digging gives 7 points
+    Doing nothing gives 0 points
+    An invalid command will reduce your points by 4
+    */
+
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 1, {0,0}, state);
+        place_worm(true, 2, {2,2}, state);
+        place_worm(true, 3, {0,6}, state);
+        place_worm(false, 1, {0,8}, state);
+        place_worm(false, 2, {0,12}, state);
+        place_worm(false, 3, {0,15}, state);
+
+        state->Cell_at({0, 1})->type = CellType::DIRT;
+        state->Cell_at({0, 9})->type = CellType::DIRT;
+
+        WHEN("both players do nothing")
+        {
+            DoNothingCommand player1move(true, state);
+            DoNothingCommand player2move(false, state);
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.doNothing);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.doNothing);
+            }
+        }
+
+        WHEN("both players just move")
+        {
+            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{1,0});
+            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{1,0});
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.move);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.move);
+            }
+        }
+
+        WHEN("both players just shoot")
+        {
+            ShootCommand player1move(true, state, ShootCommand::ShootDirection::E);
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::E);
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.missedAttack);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.missedAttack);
+            }
+        }
+
+        WHEN("both players just dig")
+        {
+            DigCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+            DigCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                CHECK(eng.GetResult().winningPlayer != eng.GetResult().losingPlayer);
+                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.dig);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.dig);
+            }
+        }
+
+        WHEN("both players do an invalid command")
+        {
+            DigCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{1,0});
+            DigCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{1,0});
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.invalidCommand);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.invalidCommand);
+            }
+        }
+
+        WHEN("player1 shoots a friendly, player2 shoots an enemy")
+        {
+            ShootCommand player1move(true, state, ShootCommand::ShootDirection::SE);
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                auto player1Score = state->player1.GetScore();
+                auto player2Score = state->player2.GetScore();
+                int expectedAverageWormHealth = (GameConfig::commandoWorms.initialHp*3 - GameConfig::commandoWorms.weapon.damage*2) / 3; //he gets hit by himself and player 2
+                CHECK( player1Score == expectedAverageWormHealth + GameConfig::scores.friendlyFire);
+                CHECK( player2Score == GameConfig::commandoWorms.initialHp + GameConfig::scores.attack);
+            }
+        }
+
+        WHEN("player1 kills a friendly, plaer 2 kills an enemy")
+        {
+            state->player1.worms[1].health = 1;
+            state->player1.worms[2].health = 1;
+            ShootCommand player1move(true, state, ShootCommand::ShootDirection::SE);
+            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("points are as expected")
+            {
+                auto player1Score = state->player1.GetScore();
+                auto player2Score = state->player2.GetScore();
+                int expectedAverageWormHealth = (GameConfig::commandoWorms.initialHp) / 3; //loses a guy to himself and to player 2
+                CHECK( player1Score == expectedAverageWormHealth + GameConfig::scores.killShot);
+                CHECK( player2Score == GameConfig::commandoWorms.initialHp + GameConfig::scores.killShot);
+            }
+        }
+
+        //looks like scores aren't applied for powerups in their engine?
+        //const int powerup =  20;
+    }
 }
 
 TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {

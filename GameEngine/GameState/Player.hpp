@@ -14,7 +14,7 @@ struct Player
 {
     GameState* state;
     unsigned id;
-    int score;
+    int command_score;
     int health;
     int currentWormId; //1-indexed
     int consecutiveDoNothingCount;
@@ -26,6 +26,8 @@ struct Player
     Worm* GetWormByIndex(int index);
     void UpdateCurrentWorm();
     void RecalculateHealth();
+    int GetAverageWormHealth();
+    int GetScore();
 };
 
 #endif

@@ -36,6 +36,8 @@ void TeleportCommand::Execute() const
         _worm->TakeDamage(GameConfig::pushbackDamage);
         worm_there->TakeDamage(GameConfig::pushbackDamage);
     }
+
+    _player->command_score += GameConfig::scores.move;
 }
 
 bool TeleportCommand::IsValid() const

@@ -63,7 +63,7 @@ TEST_CASE( "Load GameState from rapidJSON object", "[IO]" ) {
     CHECK(state.player1.consecutiveDoNothingCount == 0); //unknown from this file - should be default starting
     CHECK(state.player1.currentWormId == 1); //unknown from this file - should be default starting
     CHECK(state.player1.health == 182); //implied from worm health
-    CHECK(state.player1.score == 1847);
+    CHECK(state.player1.GetScore() == 1847);
 
     CheckWorm(&state.player1.worms[0], 1, 0, Position(14, 27), Position(14, 27), movementRange, diggingRange, weaponDmg, weaponRange);
     CheckWorm(&state.player1.worms[1], 2, 54, Position(14, 27), Position(14, 27), movementRange, diggingRange, weaponDmg, weaponRange); //dunno htw pos is the same as worm 1 but ok
@@ -73,7 +73,7 @@ TEST_CASE( "Load GameState from rapidJSON object", "[IO]" ) {
     CHECK(state.player2.consecutiveDoNothingCount == 0);
     CHECK(state.player2.currentWormId == 2);
     CHECK(state.player2.health == 188);
-    CHECK(state.player2.score == 1381);
+    CHECK(state.player2.GetScore() == 1381);
 
     CheckWorm(&state.player2.worms[0], 1, -2, Position(30, 17), Position(30, 17), movementRange, diggingRange, weaponDmg, weaponRange);
     CheckWorm(&state.player2.worms[1], 2, 38, Position(12, 27), Position(12, 27), movementRange, diggingRange, weaponDmg, weaponRange);

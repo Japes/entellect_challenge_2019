@@ -12,6 +12,7 @@ DigCommand::DigCommand(bool player1, std::shared_ptr<GameState> state, Position 
 void DigCommand::Execute() const
 {
     _state->map[_pos.x][_pos.y].type = CellType::AIR;
+    _player->command_score += GameConfig::scores.dig;
 }
 
 bool DigCommand::IsValid() const
