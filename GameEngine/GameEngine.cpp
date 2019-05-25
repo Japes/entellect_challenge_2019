@@ -110,6 +110,9 @@ void GameEngine::ApplyPowerups()
     }
 }
 
+//do a random playthrough to the end and return:
+//+1 if player wins
+//-1 if player loses
 void GameEngine::Playthrough(bool player1, const Command& command)
 {
 
@@ -120,8 +123,37 @@ GameEngine::GameResult GameEngine::GetResult()
     return _currentResult;
 }
 
-std::vector<Command> GameEngine::GetValidMovesForWorm(bool player1)
+//2 things are implied and left out from this return:
+//1. "do nothing"
+//2. "shoot" in any direction
+std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1)
 {
-    std::vector<Command> ret;
+    std::vector<std::shared_ptr<Command>> ret;
+    Worm* worm = player1? _state->player1.GetCurrentWorm() : _state->player2.GetCurrentWorm();
+
+    std::vector<Position> surroundingSpaces;
+    surroundingSpaces.push_back(worm->position + Position(-1, -1));
+    surroundingSpaces.push_back(worm->position + Position(0, -1));
+    surroundingSpaces.push_back(worm->position + Position(1, -1));
+    surroundingSpaces.push_back(worm->position + Position(1, 0));
+    surroundingSpaces.push_back(worm->position + Position(1, 1));
+    surroundingSpaces.push_back(worm->position + Position(0, 1));
+    surroundingSpaces.push_back(worm->position + Position(-1, 1));
+    surroundingSpaces.push_back(worm->position + Position(-1, 0));
+
+    for(auto const & space : surroundingSpaces) {
+        if(!space.IsOnMap() ||
+         _state->Cell_at(space)->worm != nullptr) {
+            continue;
+        }
+
+        if(_state->Cell_at(space)->type == CellType::AIR) {
+            ret.push_back(std::make_shared<TeleportCommand>(player1, _state, space) );
+        } else if(_state->Cell_at(space)->type == CellType::DIRT) {
+            ret.push_back(std::make_shared<DigCommand>(player1, _state, space) );
+        }
+
+    }
+
     return ret;
 }

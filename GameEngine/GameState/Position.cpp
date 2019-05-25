@@ -1,4 +1,5 @@
 #include "Position.hpp"
+#include "GameConfig.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -21,6 +22,11 @@ int Position::MaximumDimension(Position other)
 int Position::MovementDistanceTo(Position other)
 {
    return MaximumDimension(other);
+}
+
+bool Position::IsOnMap() const
+{
+    return x < GameConfig::mapSize && y < GameConfig::mapSize;
 }
 
 //to help with debugging...

@@ -16,6 +16,8 @@ class TeleportCommand : public Command
 
     bool FiftyFiftyChance() const;
 
+    bool operator==(const TeleportCommand& other);
+
     private:
     bool* _forceRandom;
     static bool _randomReturnFlipFlop;

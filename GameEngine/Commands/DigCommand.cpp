@@ -33,3 +33,12 @@ bool DigCommand::IsValid() const
 
     return true;
 }
+
+bool DigCommand::operator==(const DigCommand& other)
+{
+        return
+        _player == other._player &&
+        _worm == other._worm &&
+        _state == other._state &&
+        _pos == other._pos;
+}

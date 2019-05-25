@@ -13,6 +13,7 @@ struct Position
     Position(int x, int y);
     int MaximumDimension(Position other);
     int MovementDistanceTo(Position other);
+    bool IsOnMap() const;
 
     //fun shootingDistance(other: Point): Double = floor(euclideanDistance(other))
     //fun manhattanDistance(other: Point) = abs(x - other.x) + abs(y - other.y)

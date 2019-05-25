@@ -21,6 +21,8 @@ class ShootCommand : public Command
     void Execute() const override;
     bool IsValid() const override;
 
+    bool operator==(const ShootCommand& other);
+
     private:
     Position _shootVector; //e.g. south east is {-1, 1}
 };

@@ -17,7 +17,7 @@ struct Cell
 {
     CellType type;
     Worm * worm; //can be null
-    PowerUp * powerup; //can be null
+    PowerUp * powerup{nullptr}; //can be null
 
     Cell()
     {

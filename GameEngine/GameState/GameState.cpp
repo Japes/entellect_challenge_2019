@@ -112,7 +112,11 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
 
 Cell* GameState::Cell_at(Position pos)
 {
-    return &map[pos.x][pos.y];
+    if(pos.IsOnMap()) {
+        return &map[pos.x][pos.y];
+    }
+
+    return nullptr;
 }
 
 void GameState::Move_worm(Worm* worm, Position pos)

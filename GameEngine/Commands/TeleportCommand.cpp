@@ -79,21 +79,12 @@ bool TeleportCommand::FiftyFiftyChance() const
     return _randomReturnFlipFlop;
 }
 
-/*
-
-        private fun pushbackWorms(worm: Worm, occupier: Worm, gameMap: WormsMap) {
-        val wormPosition = worm.position
-        val occupierPosition = occupier.previousPosition
-
-        worm.moveTo(gameMap, wormPosition)
-        occupier.moveTo(gameMap, occupierPosition)
-    }
-
-    private fun swapWorms(worm: Worm, occupier: Worm, gameMap: WormsMap) {
-        val wormPosition = worm.position
-        val occupierPosition = occupier.previousPosition
-
-        worm.moveTo(gameMap, occupierPosition)
-        occupier.moveTo(gameMap, wormPosition)
-    }
-*/
+bool TeleportCommand::operator==(const TeleportCommand& other)
+{
+        return
+        _player == other._player &&
+        _worm == other._worm &&
+        _state == other._state &&
+        _forceRandom == other._forceRandom &&
+        _pos == other._pos;
+}

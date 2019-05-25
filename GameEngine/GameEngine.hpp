@@ -2,7 +2,7 @@
 #define GAME_ENGINE_H
 
 #include "GameState.hpp"
-#include "Command.hpp"
+#include "AllCommands.hpp"
 #include <vector>
 
 class GameEngine
@@ -28,7 +28,7 @@ class GameEngine
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
     void Playthrough(bool player1, const Command& command);
-    std::vector<Command> GetValidMovesForWorm(bool player1);
+    std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1);
     GameResult GetResult();
 
     private:

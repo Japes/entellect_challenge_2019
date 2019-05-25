@@ -12,6 +12,9 @@ class DigCommand : public Command
     DigCommand(bool player1, std::shared_ptr<GameState> state, Position pos);
     void Execute() const override;
     bool IsValid() const override;
+
+    bool operator==(const DigCommand& other);
 };
+
 
 #endif

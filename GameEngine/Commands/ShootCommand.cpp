@@ -23,9 +23,7 @@ void ShootCommand::Execute() const
 {
     Position pos = _worm->position + _shootVector;
 
-    while (pos.x < GameConfig::mapSize &&
-            pos.y < GameConfig::mapSize &&
-            _worm->position.MovementDistanceTo(pos) <= _worm->weapon.range) {
+    while (pos.IsOnMap() && _worm->position.MovementDistanceTo(pos) <= _worm->weapon.range) {
 
         //check diag
         if( (pos.x != _worm->position.x && pos.y != _worm->position.y) && //i.e. we are shooting diagonally
@@ -71,4 +69,13 @@ void ShootCommand::Execute() const
 bool ShootCommand::IsValid() const
 {
     return true; //always valid!
+}
+
+bool ShootCommand::operator==(const ShootCommand& other)
+{
+        return
+        _player == other._player &&
+        _worm == other._worm &&
+        _state == other._state &&
+        _shootVector == other._shootVector;
 }

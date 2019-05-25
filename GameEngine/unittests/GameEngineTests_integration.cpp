@@ -112,6 +112,132 @@ TEST_CASE( "Load GameState from rapidJSON object", "[IO]" ) {
     CheckCellEmpty(state.Cell_at({12, 24}), CellType::DIRT);
 }
 
+bool Contains_one(std::vector<std::shared_ptr<Command>>& haystack, std::shared_ptr<Command> needle)
+{
+    int num_found = 0;
+    for(unsigned i = 0; i < haystack.size(); i++) {
+
+        {
+            ShootCommand* hay_ptr = dynamic_cast<ShootCommand*>(haystack[i].get());
+            ShootCommand* needle_ptr = dynamic_cast<ShootCommand*>(needle.get());
+            if(hay_ptr != nullptr && needle_ptr != nullptr &&
+                *hay_ptr == *needle_ptr) {
+                num_found++;
+            }
+        }
+
+        {
+            TeleportCommand* hay_ptr = dynamic_cast<TeleportCommand*>(haystack[i].get());
+            TeleportCommand* needle_ptr = dynamic_cast<TeleportCommand*>(needle.get());
+            if(hay_ptr != nullptr && needle_ptr != nullptr &&
+                *hay_ptr == *needle_ptr) {
+                num_found++;
+            }
+        }
+
+        {
+            DigCommand* hay_ptr = dynamic_cast<DigCommand*>(haystack[i].get());
+            DigCommand* needle_ptr = dynamic_cast<DigCommand*>(needle.get());
+            if(hay_ptr != nullptr && needle_ptr != nullptr &&
+                *hay_ptr == *needle_ptr) {
+                num_found++;
+            }
+        }
+    }
+
+    return num_found == 1;
+}
+
+TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
+    GIVEN("A semi realistic game state and engine")
+    {
+        /*
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   .   .   .
+        .   .   .   .   .   D   .   .
+        .   .   .   .   D   11  12  S
+        .   .   .   .   D   21  .   .
+        .   .   .   .   .   .   .   .            
+        */
+
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 1, {5,5}, state);
+        place_worm(true, 2, {6,5}, state);
+        place_worm(true, 3, {20,20}, state);
+        place_worm(false, 1, {5,6}, state);
+        place_worm(false, 2, {25,25}, state);
+        place_worm(false, 3, {32,0}, state);
+        state->Cell_at({4, 5})->type = CellType::DIRT;
+        state->Cell_at({5, 4})->type = CellType::DIRT;
+        state->Cell_at({4, 6})->type = CellType::DIRT;
+        state->Cell_at({7, 5})->type = CellType::DEEP_SPACE;
+
+        THEN("Valid moves for player 1 are as expected")
+        {
+            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
+            std::vector<std::shared_ptr<Command>> expected_moves;
+            expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position(4,4)));
+            expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,4})));
+            expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,6})));
+            expected_moves.push_back(std::make_shared<DigCommand>(true, state, Position(5,4)));
+            expected_moves.push_back(std::make_shared<DigCommand>(true, state, Position(4,5)));
+            expected_moves.push_back(std::make_shared<DigCommand>(true, state, Position(4,6)));
+
+            REQUIRE(moves.size() == expected_moves.size());
+
+            for(unsigned i = 0; i < expected_moves.size(); i++) {
+                bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
+                CHECK(containsExactlyOne);
+            }
+        }
+
+        THEN("Valid moves for player 2 are as expected")
+        {
+            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false);
+            std::vector<std::shared_ptr<Command>> expected_moves;
+            expected_moves.push_back(std::make_shared<DigCommand>(false, state, Position(4,6)));
+            expected_moves.push_back(std::make_shared<DigCommand>(false, state, Position(4,5)));
+            expected_moves.push_back(std::make_shared<TeleportCommand>(false, state, Position(6,6)));
+            expected_moves.push_back(std::make_shared<TeleportCommand>(false, state, Position({6,7})));
+            expected_moves.push_back(std::make_shared<TeleportCommand>(false, state, Position({5,7})));
+            expected_moves.push_back(std::make_shared<TeleportCommand>(false, state, Position({4,7})));
+
+            REQUIRE(moves.size() == expected_moves.size());
+
+            for(unsigned i = 0; i < expected_moves.size(); i++) {
+                bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
+                CHECK(containsExactlyOne);
+            }
+        }
+
+        AND_THEN("Progressing the game forward 1 turn")
+        {
+            eng.AdvanceState(DoNothingCommand(true, state), DoNothingCommand(false, state));
+
+            THEN("Valid moves for player 1 are as expected")
+            {
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
+                std::vector<std::shared_ptr<Command>> expected_moves;
+                expected_moves.push_back(std::make_shared<DigCommand>(true, state, Position(5,4)));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,4})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({7,4})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({7,6})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,6})));
+
+                REQUIRE(moves.size() == expected_moves.size());
+
+                for(unsigned i = 0; i < expected_moves.size(); i++) {
+                    bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
+                    CHECK(containsExactlyOne);
+                }
+            }
+        }
+    }
+}
+
 TEST_CASE( "Performance tests", "[performance]" ) {
 }
 
