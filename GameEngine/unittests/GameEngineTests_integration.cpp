@@ -5,6 +5,23 @@
 #include "GameEngineTestUtils.hpp"
 #include <fstream>
 #include <sstream>
+#include <chrono>
+
+rapidjson::Document ReadJsonFile(std::string filePath)
+{
+    std::ifstream dataIn;
+    dataIn.open(filePath, std::ifstream::in);
+    REQUIRE(dataIn.is_open());
+
+    std::stringstream buffer;
+    buffer << dataIn.rdbuf();
+    std::string stateJson = buffer.str();
+    rapidjson::Document roundJSON;
+    const bool parsed = !roundJSON.Parse(stateJson.c_str()).HasParseError();
+    REQUIRE(parsed);
+
+    return roundJSON;
+}
 
 void CheckWorm(Worm* worm, int id, int health, Position pos, Position last_pos, int moveRange, int digRange, int weaponDmg, int weaponRange)
 {
@@ -34,18 +51,8 @@ void CheckCellEmpty(Cell* cell, CellType type)
 }
 
 TEST_CASE( "Load GameState from rapidJSON object", "[IO]" ) {
-    
-    const std::string filePath = "./Test_files/state2.json";
-    std::ifstream dataIn;
-    dataIn.open(filePath, std::ifstream::in);
-    REQUIRE(dataIn.is_open());
 
-    std::stringstream buffer;
-    buffer << dataIn.rdbuf();
-    std::string stateJson = buffer.str();
-    rapidjson::Document roundJSON;
-    const bool parsed = !roundJSON.Parse(stateJson.c_str()).HasParseError();
-    REQUIRE(parsed);
+    auto roundJSON = ReadJsonFile("./Test_files/state2.json");
 
     GameState state(roundJSON);
 
@@ -179,6 +186,14 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         {
             std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
             std::vector<std::shared_ptr<Command>> expected_moves;
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
             expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position(4,4)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,4})));
             expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,6})));
@@ -198,6 +213,14 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         {
             std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false);
             std::vector<std::shared_ptr<Command>> expected_moves;
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
+            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
             expected_moves.push_back(std::make_shared<DigCommand>(false, state, Position(4,6)));
             expected_moves.push_back(std::make_shared<DigCommand>(false, state, Position(4,5)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(false, state, Position(6,6)));
@@ -221,6 +244,14 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
             {
                 std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
                 std::vector<std::shared_ptr<Command>> expected_moves;
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
+                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
                 expected_moves.push_back(std::make_shared<DigCommand>(true, state, Position(5,4)));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,4})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({7,4})));
@@ -238,7 +269,26 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
     }
 }
 
-TEST_CASE( "Performance tests", "[performance]" ) {
+uint64_t Get_ns_since_epoch() {
+    return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
+}
+
+TEST_CASE( "Performance tests", "[.performance]" ) {
+
+    auto roundJSON = ReadJsonFile("./Test_files/state2.json");
+    auto state = std::make_shared<GameState>(roundJSON);
+    GameEngine eng(state);
+
+    unsigned count = 0;
+    unsigned num_seconds = 3;
+    auto start_time = Get_ns_since_epoch();
+
+    while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
+        eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true).get(), *eng.GetRandomValidMoveForWorm(false).get());
+        ++count;
+    }
+    INFO("Moves per second: " << count/num_seconds << " (" << count << " moves in " << num_seconds << " seconds)");
+    CHECK(false);
 }
 
 TEST_CASE( "Comparison with java engine", "[comparison]" ) {

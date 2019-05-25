@@ -1,5 +1,7 @@
 #include "GameEngine.hpp"
+#include "pcg_random.hpp"
 #include <algorithm>
+#include <random>
 
 GameEngine::GameEngine()
 {
@@ -125,10 +127,21 @@ GameEngine::GameResult GameEngine::GetResult()
 
 //2 things are implied and left out from this return:
 //1. "do nothing"
-//2. "shoot" in any direction
 std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1)
 {
     std::vector<std::shared_ptr<Command>> ret;
+
+    //can always shoot
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::N));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::S));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::E));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::W));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::NW));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::NE));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::SW));
+    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::SE));
+
+    //now get digs/moves
     Worm* worm = player1? _state->player1.GetCurrentWorm() : _state->player2.GetCurrentWorm();
 
     std::vector<Position> surroundingSpaces;
@@ -156,4 +169,19 @@ std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool play
     }
 
     return ret;
+}
+
+std::shared_ptr<Command> GameEngine::GetRandomValidMoveForWorm(bool player1)
+{
+    std::vector<std::shared_ptr<Command>> moves = GetValidMovesForWorm (player1);
+
+    // Seed with a real random value, if available
+    pcg_extras::seed_seq_from<std::random_device> seed_source;
+    // Make a random number engine 
+    pcg32 rng(seed_source);
+    // Choose a random mean between 1 and 6
+    std::uniform_int_distribution<int> uniform_dist(0, moves.size()-1);
+    int mean = uniform_dist(rng);
+
+    return moves[mean];
 }

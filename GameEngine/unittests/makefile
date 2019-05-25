@@ -4,6 +4,7 @@ ENGINE_SRC_DIR := ..
 #need to add a line here for every subfoler in GameEngine
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
+RNG_SRC_DIR := ../../pcg-cpp-0.98/include
 
 EXENAME=unit_tests
 
@@ -11,6 +12,7 @@ INCLUDE+=-I$(SRC_DIR)
 INCLUDE+=-I$(ENGINE_SRC_DIR)
 INCLUDE+=-I$(GAMESTATE_SRC_DIR)
 INCLUDE+=-I$(COMMANDS_SRC_DIR)
+INCLUDE+=-I$(RNG_SRC_DIR)
 
 CXX=g++
 #these are the flags that I always want

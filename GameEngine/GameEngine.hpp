@@ -29,6 +29,7 @@ class GameEngine
     void AdvanceState(const Command& player1_command, const Command& player2_command);
     void Playthrough(bool player1, const Command& command);
     std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1);
+    std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1);
     GameResult GetResult();
 
     private:
