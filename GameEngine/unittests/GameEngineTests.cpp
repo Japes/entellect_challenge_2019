@@ -228,7 +228,125 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 }
 
 TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
-    //test when worms have died
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 1, {0,0}, state);
+        place_worm(true, 2, {1,0}, state);
+        place_worm(true, 3, {2,0}, state);
+        place_worm(false, 1, {3,0}, state);
+        place_worm(false, 2, {4,0}, state);
+        place_worm(false, 3, {5,0}, state);
+
+        WHEN("We advancd state with a move to the right")
+        {
+            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("worm 1 for each player moves")
+            {
+                REQUIRE(state->player1.worms[0].position.y == 1);
+                REQUIRE(state->player1.worms[1].position.y == 0);
+                REQUIRE(state->player1.worms[2].position.y == 0);
+                REQUIRE(state->player2.worms[0].position.y == 1);
+                REQUIRE(state->player2.worms[1].position.y == 0);
+                REQUIRE(state->player2.worms[2].position.y == 0);
+
+                WHEN("We advancd state with a move to the right")
+                {
+                    TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+                    TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                    eng.AdvanceState(player1move, player2move);
+                    
+                    THEN("worm 2 for each player moves")
+                    {
+                        REQUIRE(state->player1.worms[0].position.y == 1);
+                        REQUIRE(state->player1.worms[1].position.y == 1);
+                        REQUIRE(state->player1.worms[2].position.y == 0);
+                        REQUIRE(state->player2.worms[0].position.y == 1);
+                        REQUIRE(state->player2.worms[1].position.y == 1);
+                        REQUIRE(state->player2.worms[2].position.y == 0);
+
+                        WHEN("We advancd state with a move to the right")
+                        {
+                            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+                            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                            eng.AdvanceState(player1move, player2move);
+                            
+                            THEN("worm 3 for each player moves")
+                            {
+                                REQUIRE(state->player1.worms[0].position.y == 1);
+                                REQUIRE(state->player1.worms[1].position.y == 1);
+                                REQUIRE(state->player1.worms[2].position.y == 1);
+                                REQUIRE(state->player2.worms[0].position.y == 1);
+                                REQUIRE(state->player2.worms[1].position.y == 1);
+                                REQUIRE(state->player2.worms[2].position.y == 1);
+
+                                WHEN("We advancd state with a move to the right")
+                                {
+                                    TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+                                    TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                                    eng.AdvanceState(player1move, player2move);
+                                    
+                                    THEN("worm 1 for each player moves again")
+                                    {
+                                        REQUIRE(state->player1.worms[0].position.y == 2);
+                                        REQUIRE(state->player1.worms[1].position.y == 1);
+                                        REQUIRE(state->player1.worms[2].position.y == 1);
+                                        REQUIRE(state->player2.worms[0].position.y == 2);
+                                        REQUIRE(state->player2.worms[1].position.y == 1);
+                                        REQUIRE(state->player2.worms[2].position.y == 1);
+
+                                        THEN("we kill worm 3")
+                                        {
+                                            state->player1.worms[2].TakeDamage(5000);
+                                            state->player2.worms[2].TakeDamage(5000);
+
+                                            WHEN("We advancd state with a move to the right")
+                                            {
+                                                TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+                                                TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                                                eng.AdvanceState(player1move, player2move);
+                                                
+                                                THEN("worm 2 for each player moves again")
+                                                {
+                                                    REQUIRE(state->player1.worms[0].position.y == 2);
+                                                    REQUIRE(state->player1.worms[1].position.y == 2);
+                                                    REQUIRE(state->player1.worms[2].position.y == 1);
+                                                    REQUIRE(state->player2.worms[0].position.y == 2);
+                                                    REQUIRE(state->player2.worms[1].position.y == 2);
+                                                    REQUIRE(state->player2.worms[2].position.y == 1);
+
+                                                    WHEN("We advancd state with a move to the right")
+                                                    {
+                                                        TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
+                                                        TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                                                        eng.AdvanceState(player1move, player2move);
+                                                        
+                                                        THEN("worm 1 for each player moves again - not worm 3 coz hes dead!")
+                                                        {
+                                                            REQUIRE(state->player1.worms[0].position.y == 3);
+                                                            REQUIRE(state->player1.worms[1].position.y == 2);
+                                                            REQUIRE(state->player1.worms[2].position.y == 1);
+                                                            REQUIRE(state->player2.worms[0].position.y == 3);
+                                                            REQUIRE(state->player2.worms[1].position.y == 2);
+                                                            REQUIRE(state->player2.worms[2].position.y == 1);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {

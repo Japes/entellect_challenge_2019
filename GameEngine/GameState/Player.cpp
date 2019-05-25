@@ -31,9 +31,20 @@ Worm* Player::GetWormByIndex(int index)
 
 void Player::UpdateCurrentWorm()
 {
+    if(std::none_of(worms.begin(), worms.end(), [](Worm& w){return !w.IsDead();})) {
+        return;
+    }
+
     ++currentWormId;
     if(currentWormId > static_cast<int>(worms.size())) {
         currentWormId = 1;
+    }
+
+    while(worms[currentWormId-1].IsDead()) {
+        ++currentWormId;
+        if(currentWormId > static_cast<int>(worms.size())) {
+            currentWormId = 1;
+        }
     }
 }
 
