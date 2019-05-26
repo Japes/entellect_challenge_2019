@@ -1,8 +1,6 @@
 #include "GameEngine.hpp"
 #include <algorithm>
 
-std::vector<std::shared_ptr<Command>> GameEngine::_player1Shoots;
-std::vector<std::shared_ptr<Command>> GameEngine::_player2Shoots;
 std::vector<Position> GameEngine::_surroundingWormSpaces;
 
 GameEngine::GameEngine()

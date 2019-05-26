@@ -44,8 +44,9 @@ class GameEngine
 
     std::shared_ptr<pcg32> _rng;
 
-    static std::vector<std::shared_ptr<Command>> _player1Shoots;
-    static std::vector<std::shared_ptr<Command>> _player2Shoots;
+    std::vector<std::shared_ptr<Command>> _player1Shoots;
+    std::vector<std::shared_ptr<Command>> _player2Shoots;
+
     static std::vector<Position> _surroundingWormSpaces;
 
 };
