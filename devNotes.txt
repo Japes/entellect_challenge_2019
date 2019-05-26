@@ -1,21 +1,25 @@
 TODO
     optimise engine (low hanging fruit)
+        next steps:
+            return just directions, create move/dig just before advancestate
+            possibly bulk allocate list of all move/dig moves at startup
     try
-        monte carlo with evaluation
         minimax with evaluation
+        monte carlo with evaluation
         "mixed" strategy?
     ENGINE - add some edge case tests
 
 
-GetValidMovesForWorm 
-    allocating new vector
-    gamestate->
-    destructor of vector
-    destructor of vector
-    pushing back onto vector
-    pushing back onto vector
-    allocate shoot command
-    destruction of shared ptr
-
-random_device operator()
-seed random machine
+latest profiling of performance unit test:
+    GetValidMovesForWorm 
+        new
+        new
+        new
+        new
+        new
+        free
+        free
+        ?
+        ?
+        ?
+        Cell_at

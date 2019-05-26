@@ -14,7 +14,7 @@ INCLUDE+=-I$(COMMANDS_SRC_DIR)
 
 CXX=g++
 #these are the flags that I always want
-CXXFLAGS+=-Wall -std=c++14 -fPIC
+CXXFLAGS+=-Wall -std=c++14 -fPIC -O2
 
 #grab all source files of interest
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)

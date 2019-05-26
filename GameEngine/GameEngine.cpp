@@ -167,6 +167,7 @@ GameEngine::GameResult GameEngine::GetResult()
 std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1)
 {
     std::vector<std::shared_ptr<Command>> ret;
+    ret.reserve(8);
 
     Worm* worm = player1? _state->player1.GetCurrentWorm() : _state->player2.GetCurrentWorm();
 
@@ -181,7 +182,6 @@ std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool play
         } else if(_state->Cell_at(wormSpace)->type == CellType::DIRT) {
             ret.emplace_back(std::make_shared<DigCommand>(player1, _state, wormSpace) );
         }
-
     }
 
     return ret;
