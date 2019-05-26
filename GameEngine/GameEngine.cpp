@@ -1,7 +1,9 @@
 #include "GameEngine.hpp"
-#include "pcg_random.hpp"
 #include <algorithm>
-#include <random>
+
+std::vector<std::shared_ptr<Command>> GameEngine::_player1Shoots;
+std::vector<std::shared_ptr<Command>> GameEngine::_player2Shoots;
+std::vector<Position> GameEngine::_surroundingWormSpaces;
 
 GameEngine::GameEngine()
 {
@@ -10,7 +12,43 @@ GameEngine::GameEngine()
 GameEngine::GameEngine(std::shared_ptr<GameState> state) : 
     _state{state}
 {
+    // Seed with a real random value, if available
+    pcg_extras::seed_seq_from<std::random_device> seed_source;
+    // Make a random number engine 
+    _rng = std::make_shared<pcg32>(seed_source);
 
+    if(_player1Shoots.empty()) {
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::N));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::S));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::E));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::W));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::NW));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::NE));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::SW));
+        _player1Shoots.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::SE));
+    }
+
+    if(_player2Shoots.empty()) {
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::N));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::S));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::E));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::W));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::NW));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::NE));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::SW));
+        _player2Shoots.push_back(std::make_shared<ShootCommand>(false, _state, ShootCommand::ShootDirection::SE));
+    }
+
+    if(_surroundingWormSpaces.empty()) {
+        _surroundingWormSpaces.push_back(Position(-1, -1));
+        _surroundingWormSpaces.push_back(Position(0, -1));
+        _surroundingWormSpaces.push_back(Position(1, -1));
+        _surroundingWormSpaces.push_back(Position(1, 0));
+        _surroundingWormSpaces.push_back(Position(1, 1));
+        _surroundingWormSpaces.push_back(Position(0, 1));
+        _surroundingWormSpaces.push_back(Position(-1, 1));
+        _surroundingWormSpaces.push_back(Position(-1, 0));
+    }
 }
 
 void GameEngine::AdvanceState(const Command& player1_command, const Command& player2_command)
@@ -127,43 +165,23 @@ GameEngine::GameResult GameEngine::GetResult()
 
 //2 things are implied and left out from this return:
 //1. "do nothing"
+//2. "shoot" in all directions
 std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1)
 {
     std::vector<std::shared_ptr<Command>> ret;
 
-    //can always shoot
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::N));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::S));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::E));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::W));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::NW));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::NE));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::SW));
-    ret.push_back(std::make_shared<ShootCommand>(true, _state, ShootCommand::ShootDirection::SE));
-
-    //now get digs/moves
     Worm* worm = player1? _state->player1.GetCurrentWorm() : _state->player2.GetCurrentWorm();
 
-    std::vector<Position> surroundingSpaces;
-    surroundingSpaces.push_back(worm->position + Position(-1, -1));
-    surroundingSpaces.push_back(worm->position + Position(0, -1));
-    surroundingSpaces.push_back(worm->position + Position(1, -1));
-    surroundingSpaces.push_back(worm->position + Position(1, 0));
-    surroundingSpaces.push_back(worm->position + Position(1, 1));
-    surroundingSpaces.push_back(worm->position + Position(0, 1));
-    surroundingSpaces.push_back(worm->position + Position(-1, 1));
-    surroundingSpaces.push_back(worm->position + Position(-1, 0));
-
-    for(auto const & space : surroundingSpaces) {
-        if(!space.IsOnMap() ||
-         _state->Cell_at(space)->worm != nullptr) {
+    for(auto const & space : _surroundingWormSpaces) {
+        Position wormSpace = worm->position + space;
+        if(!wormSpace.IsOnMap() || _state->Cell_at(wormSpace)->worm != nullptr) {
             continue;
         }
 
-        if(_state->Cell_at(space)->type == CellType::AIR) {
-            ret.push_back(std::make_shared<TeleportCommand>(player1, _state, space) );
-        } else if(_state->Cell_at(space)->type == CellType::DIRT) {
-            ret.push_back(std::make_shared<DigCommand>(player1, _state, space) );
+        if(_state->Cell_at(wormSpace)->type == CellType::AIR) {
+            ret.emplace_back(std::make_shared<TeleportCommand>(player1, _state, wormSpace) );
+        } else if(_state->Cell_at(wormSpace)->type == CellType::DIRT) {
+            ret.emplace_back(std::make_shared<DigCommand>(player1, _state, wormSpace) );
         }
 
     }
@@ -174,14 +192,19 @@ std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool play
 std::shared_ptr<Command> GameEngine::GetRandomValidMoveForWorm(bool player1)
 {
     std::vector<std::shared_ptr<Command>> moves = GetValidMovesForWorm (player1);
+    
+    int totalNumMoves = moves.size() + _player1Shoots.size();
+    std::uniform_int_distribution<int> uniform_dist(0, totalNumMoves-1);
+    int mean = uniform_dist(*_rng.get());
 
-    // Seed with a real random value, if available
-    pcg_extras::seed_seq_from<std::random_device> seed_source;
-    // Make a random number engine 
-    pcg32 rng(seed_source);
-    // Choose a random mean between 1 and 6
-    std::uniform_int_distribution<int> uniform_dist(0, moves.size()-1);
-    int mean = uniform_dist(rng);
-
-    return moves[mean];
+    if(mean < static_cast<int>(moves.size())) {
+        return moves[mean];
+    } else {
+        int index = mean - moves.size();
+        if(player1) {
+            return _player1Shoots[index];
+        } else {
+            return _player2Shoots[index];
+        }
+    }
 }

@@ -4,6 +4,8 @@
 #include "GameState.hpp"
 #include "AllCommands.hpp"
 #include <vector>
+#include <random>
+#include "pcg_random.hpp"
 
 class GameEngine
 {
@@ -39,6 +41,12 @@ class GameEngine
 
     std::shared_ptr<GameState> _state;
     GameResult _currentResult;
+
+    std::shared_ptr<pcg32> _rng;
+
+    static std::vector<std::shared_ptr<Command>> _player1Shoots;
+    static std::vector<std::shared_ptr<Command>> _player2Shoots;
+    static std::vector<Position> _surroundingWormSpaces;
 
 };
 

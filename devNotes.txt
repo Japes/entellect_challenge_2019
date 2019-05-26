@@ -1,8 +1,21 @@
 TODO
-    ENGINE
-        the todo tests in gameEngineTests
-            worm death and cycling
-            add scores
+    optimise engine (low hanging fruit)
+    try
+        monte carlo with evaluation
+        minimax with evaluation
+        "mixed" strategy?
+    ENGINE - add some edge case tests
 
-    add some edge case tests
-    add tests from WormRoundProcessorTest.kt
+
+GetValidMovesForWorm 
+    allocating new vector
+    gamestate->
+    destructor of vector
+    destructor of vector
+    pushing back onto vector
+    pushing back onto vector
+    allocate shoot command
+    destruction of shared ptr
+
+random_device operator()
+seed random machine

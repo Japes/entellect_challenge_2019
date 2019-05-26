@@ -186,14 +186,14 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         {
             std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
             std::vector<std::shared_ptr<Command>> expected_moves;
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
             expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position(4,4)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,4})));
             expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,6})));
@@ -213,14 +213,14 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         {
             std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false);
             std::vector<std::shared_ptr<Command>> expected_moves;
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
-            expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::N));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::S));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::E));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::W));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::NW));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::NE));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::SW));
+            //expected_moves.push_back(std::make_shared<ShootCommand>(false, state, ShootCommand::ShootDirection::SE));
             expected_moves.push_back(std::make_shared<DigCommand>(false, state, Position(4,6)));
             expected_moves.push_back(std::make_shared<DigCommand>(false, state, Position(4,5)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(false, state, Position(6,6)));
@@ -244,14 +244,14 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
             {
                 std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
                 std::vector<std::shared_ptr<Command>> expected_moves;
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
-                expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::N));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::S));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::E));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::W));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NW));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::NE));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SW));
+                //expected_moves.push_back(std::make_shared<ShootCommand>(true, state, ShootCommand::ShootDirection::SE));
                 expected_moves.push_back(std::make_shared<DigCommand>(true, state, Position(5,4)));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({6,4})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(true, state, Position({7,4})));
@@ -284,6 +284,7 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
     auto start_time = Get_ns_since_epoch();
 
     while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
+//    while(true) {
         eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true).get(), *eng.GetRandomValidMoveForWorm(false).get());
         ++count;
     }
