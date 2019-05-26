@@ -21,6 +21,7 @@ struct Player
     std::vector<Worm> worms;
 
     Player(GameState* _state);
+    Player(const Player& other);
 
     Worm* GetCurrentWorm();
     Worm* GetWormByIndex(int index);

@@ -1,4 +1,6 @@
 #include "GameState.hpp"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 
 GameState::GameState() :
     player1(this),
@@ -9,11 +11,49 @@ GameState::GameState() :
     player2.id = 2;
 }
 
+//deep copy of state
+GameState::GameState(const GameState& other) :
+    player1{other.player1},
+    player2{other.player2}
+{
+    for(unsigned i = 0; i < MAP_SIZE; i++){
+        for(unsigned j = 0; j < MAP_SIZE; j++){
+            map[i][j] = other.map[i][j];
+        }
+    }
+
+    roundNumber = other.roundNumber;
+    healthPack = other.healthPack;
+
+    //update internal references
+    player1.state = this;
+    for(Worm &w : player1.worms) {
+        w.state = this;
+        Cell_at(w.position)->worm = &w;
+    }
+
+    player2.state = this;
+    for(Worm &w : player2.worms) {
+        w.state = this;
+        Cell_at(w.position)->worm = &w;
+    }
+}
+
+
 GameState::GameState(rapidjson::Document& roundJSON) : GameState()
 {
     roundNumber = roundJSON["currentRound"].GetInt();
     PopulatePlayers(roundJSON);
     PopulateMap(roundJSON);
+}
+
+void GameState::PrintJson(const rapidjson::Value& json)
+{
+    rapidjson::StringBuffer sb;
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    json.Accept(writer);
+    auto str = sb.GetString();
+    printf("%s\n", str);
 }
 
 void GameState::PopulatePlayers(rapidjson::Document& roundJSON)

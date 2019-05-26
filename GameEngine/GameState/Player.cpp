@@ -15,6 +15,19 @@ Player::Player(GameState* _state) :
     RecalculateHealth();
 }
 
+Player::Player(const Player& other)
+{
+    id = other.id;
+    command_score = other.command_score;
+    health = other.health;
+    currentWormId = other.currentWormId;
+    consecutiveDoNothingCount = other.consecutiveDoNothingCount;
+
+    for(auto& otherworm : other.worms) {
+        worms.push_back(otherworm);
+    }
+}
+
 Worm* Player::GetCurrentWorm()
 {
     unsigned wormIndex = currentWormId - 1;

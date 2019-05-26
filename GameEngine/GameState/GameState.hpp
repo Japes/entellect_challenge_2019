@@ -17,6 +17,7 @@ class GameState
     PowerUp healthPack; //just here so that cells can reference something static
 
     GameState();
+    GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
     Cell* Cell_at(Position pos);
@@ -24,6 +25,8 @@ class GameState
     void Move_worm(Worm* worm, Position pos);
 
     private:
+    void PrintJson(const rapidjson::Value& json);
+
     void PopulatePlayers(rapidjson::Document& roundJSON);
     void PopulatePlayer(Player& player, const rapidjson::Value& playerJson);
     void PopulateWorm(Worm& worm, const rapidjson::Value& wormJson);
