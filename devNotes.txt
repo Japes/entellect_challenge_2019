@@ -1,25 +1,39 @@
 TODO
-    optimise engine (low hanging fruit)
+    make monte carlo "random" moves slightly clever
+        don't shoot unless there's an (enemy) target
+        don't move into a spot you just came from
+
+    refactor so commands don't need to know about their player/state up front
+
+    unit test playthrough?
+    try
+        monte carlo with evaluation
+        minimax with evaluation
+            plug in strategies for each player
+            learn/estimate strategy while you play??
+        "mixed" strategy?
+
+    optimise engine
         next steps:
             return just directions, create move/dig just before advancestate
             possibly bulk allocate list of all move/dig moves at startup
-    try
-        minimax with evaluation
-        monte carlo with evaluation
-        "mixed" strategy?
-    ENGINE - add some edge case tests
 
 
 latest profiling of performance unit test:
+    GetRandomValidMoveForWorm 
     GetValidMovesForWorm 
         new
         new
         new
-        new
-        new
-        free
-        free
-        ?
         ?
         ?
         Cell_at
+
+
+    ApplyPowerups
+        Cell_at
+            IsOnMap
+
+    updatewincondition
+
+    ShootCommand - execute

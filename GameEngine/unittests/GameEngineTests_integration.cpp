@@ -283,20 +283,17 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
     auto roundJSON = ReadJsonFile("./Test_files/state2.json");
     auto original_state = std::make_shared<GameState>(roundJSON);
 
-//    while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
-    while(true) {
+    while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
+    //while(true) {
 
         auto state = std::make_shared<GameState>(*original_state); //no idea why it needs to be done this way
         GameEngine eng(state);
 
-        //std::cout << "w1: " << state->player1.worms[0].health << " w2: " << state->player1.worms[1].health << " w3: " << state->player1.worms[2].health << std::endl;
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
             eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true).get(), *eng.GetRandomValidMoveForWorm(false).get());
             ++turnCount;
         }
-        //std::cout << "game over.  winner: " << eng.GetResult().winningPlayer->id << " score: " << eng.GetResult().winningPlayer->GetScore() << " round: " << eng.GetResult().winningPlayer->state->roundNumber << std::endl;
         ++gameCount;
-
     }
 
     INFO("Moves per second: " << turnCount/num_seconds << ", Moves per game: " << turnCount/gameCount << " (" << turnCount << " moves in " << gameCount << " games in " << num_seconds << " seconds)");
@@ -359,6 +356,3 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
         }
     }
 }
-
-//TODO add test case for runplaythrough
-

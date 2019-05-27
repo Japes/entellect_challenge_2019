@@ -10,6 +10,16 @@ TEST_CASE( "I can make a game engine instance", "[sanity]" ) {
     REQUIRE( true );
 }
 
+TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
+    GameState state;
+    for(unsigned x = 0; x < GameConfig::mapSize; ++x) {
+        for(unsigned y = 0; y < GameConfig::mapSize; ++y) {
+            REQUIRE( state.map[x][x].worm == nullptr );
+            REQUIRE( state.map[x][x].powerup == nullptr );
+        }
+    }
+}
+
 TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
     //according to the rules:
     //move
@@ -634,6 +644,46 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
                 REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
                 REQUIRE(eng.GetResult().winningPlayer == &state->player2);
                 REQUIRE(eng.GetResult().losingPlayer == &state->player1);
+            }
+        }
+    }
+}
+
+TEST_CASE( "Playthroughs", "[playthrough]" )
+{
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        
+        place_worm(true, 1, {1,1}, state);
+        place_worm(true, 2, {1,10}, state);
+        place_worm(true, 3, {1,20}, state);
+        place_worm(false, 1, {20,5}, state);
+        place_worm(false, 2, {21,10}, state);
+        place_worm(false, 3, {22,20}, state);
+
+        WHEN("We do a playthrough to a certain depth")
+        {
+            int roundBefore = state->roundNumber;
+            int depth = 4;
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+
+            THEN("The game engine advances by that many rounds")
+            {
+                REQUIRE(state->roundNumber == roundBefore + depth);
+            }
+        }
+
+        WHEN("We do a playthrough to a depth -1")
+        {
+            int depth = -1;
+            REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+
+            THEN("The game engine advances until the end")
+            {
+                REQUIRE(eng.GetResult().result != GameEngine::ResultType::IN_PROGRESS);
             }
         }
     }

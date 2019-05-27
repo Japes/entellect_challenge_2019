@@ -151,9 +151,26 @@ void GameEngine::ApplyPowerups()
 //do a random playthrough to the end and return:
 //+1 if player wins
 //-1 if player loses
-void GameEngine::Playthrough(bool player1, const Command& command)
+//depth is how far to go before applying heuristic, -1 means play to end
+//TODO pass in strategies for each player
+//TODO pass in whether or not it should return binary or weights
+int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, int depth)
 {
+    std::shared_ptr<Command> p1Command = player1? command : GetRandomValidMoveForWorm(true);
+    std::shared_ptr<Command> p2Command = !player1? command : GetRandomValidMoveForWorm(false);
 
+    while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
+        AdvanceState(*p1Command.get(), *p2Command.get());
+        p1Command = GetRandomValidMoveForWorm(true);
+        p2Command = GetRandomValidMoveForWorm(false);
+        --depth;
+    }
+
+    bool player1won = (_currentResult.winningPlayer == &_state->player1);
+    if(player1 == player1won) {
+        return 1;
+    }
+    return -1;
 }
 
 GameEngine::GameResult GameEngine::GetResult()

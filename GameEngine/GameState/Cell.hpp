@@ -16,7 +16,7 @@ CellType strToCellType(std::string str);
 struct Cell
 {
     CellType type;
-    Worm * worm; //can be null
+    Worm * worm{nullptr}; //can be null
     PowerUp * powerup{nullptr}; //can be null
 
     Cell()
