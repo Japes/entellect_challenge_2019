@@ -73,6 +73,16 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
     }
 }
 
+TEST_CASE( "Get dig string", "[Dig_string]" ) {
+    auto state = std::make_shared<GameState>();
+    DigCommand move(true, state, {11,11});
+    REQUIRE(move.GetCommandString() == "dig 11 11");
+
+    DigCommand move1(true, state, {0,31});
+    REQUIRE(move1.GetCommandString() == "dig 0 31");
+}
+
+//Two worms digging the same cell in the same turn is a valid move
 /*
     fun processRound_digSameHole() {
         val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)

@@ -15,3 +15,8 @@ bool DoNothingCommand::IsValid() const
 {
     return true;
 }
+
+std::string DoNothingCommand::GetCommandString() const
+{
+    return "nothing";
+}

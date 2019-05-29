@@ -1,5 +1,6 @@
 #include "ShootCommand.hpp"
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 
 ShootCommand::ShootCommand(bool player1, std::shared_ptr<GameState> state, ShootCommand::ShootDirection dir) :
@@ -78,4 +79,24 @@ bool ShootCommand::operator==(const ShootCommand& other)
         _worm == other._worm &&
         _state == other._state &&
         _shootVector == other._shootVector;
+}
+
+std::string ShootCommand::GetDirectionString() const
+{
+    if(_shootVector == Position(0,-1)) { return "N";}
+    if(_shootVector == Position(1,-1)) { return "NE";}
+    if(_shootVector == Position(1,0)) { return "E";}
+    if(_shootVector == Position(1,1)) { return "SE";}
+    if(_shootVector == Position(0,1)) { return "S";}
+    if(_shootVector == Position(-1,1)) { return "SW";}
+    if(_shootVector == Position(-1,0)) { return "W";}
+    if(_shootVector == Position(-1,-1)) { return "NW";}
+    return "";
+}
+
+std::string ShootCommand::GetCommandString() const
+{
+    std::stringstream ret;
+    ret << "shoot " << GetDirectionString();
+    return ret.str();
 }

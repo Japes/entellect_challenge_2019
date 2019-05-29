@@ -1,5 +1,6 @@
 #include "TeleportCommand.hpp"
 #include <iostream>
+#include <sstream>
 
 bool TeleportCommand::_randomReturnFlipFlop;
 
@@ -87,4 +88,11 @@ bool TeleportCommand::operator==(const TeleportCommand& other)
         _state == other._state &&
         _forceRandom == other._forceRandom &&
         _pos == other._pos;
+}
+
+std::string TeleportCommand::GetCommandString() const
+{
+    std::stringstream ret;
+    ret << "move " << _pos.x << " " << _pos.y;
+    return ret.str();
 }

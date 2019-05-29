@@ -26,6 +26,7 @@ class Command
 
     virtual void Execute() const = 0;
     virtual bool IsValid() const = 0;
+    virtual std::string GetCommandString() const = 0;
 
     protected:
     Player* _player; //player this move applies to

@@ -20,10 +20,12 @@ class ShootCommand : public Command
     ShootCommand(bool player1, std::shared_ptr<GameState> state, ShootCommand::ShootDirection dir);
     void Execute() const override;
     bool IsValid() const override;
+    std::string GetCommandString() const override;
 
     bool operator==(const ShootCommand& other);
 
     private:
+    std::string GetDirectionString() const;
     Position _shootVector; //e.g. south east is {-1, 1}
 };
 

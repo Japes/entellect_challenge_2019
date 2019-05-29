@@ -1,5 +1,6 @@
 #include "DigCommand.hpp"
 #include <iostream>
+#include <sstream>
 
 DigCommand::DigCommand(bool player1, std::shared_ptr<GameState> state, Position pos) :
     Command(player1, state),
@@ -32,6 +33,13 @@ bool DigCommand::IsValid() const
     }
 
     return true;
+}
+
+std::string DigCommand::GetCommandString() const
+{
+    std::stringstream ret;
+    ret << "dig " << _pos.x << " " << _pos.y;
+    return ret.str();
 }
 
 bool DigCommand::operator==(const DigCommand& other)

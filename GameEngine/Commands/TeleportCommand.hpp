@@ -11,6 +11,7 @@ class TeleportCommand : public Command
     TeleportCommand(bool player1, std::shared_ptr<GameState> state, Position pos, bool* forceRandom = nullptr);
     void Execute() const override;
     bool IsValid() const override;
+    std::string GetCommandString() const override;
 
     bool WormMovedThisRound(const Worm* worm) const;
 

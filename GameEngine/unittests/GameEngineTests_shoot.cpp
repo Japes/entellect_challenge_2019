@@ -522,6 +522,15 @@ TEST_CASE( "Dead worms are removed correctly", "[dead_worms]" ) {
     }
 }
 
+TEST_CASE( "Get shoot string", "[Move_string]" ) {
+    auto state = std::make_shared<GameState>();
+    ShootCommand move(true, state, ShootCommand::ShootDirection::S);
+    REQUIRE(move.GetCommandString() == "shoot S");
+
+    ShootCommand move1(true, state, ShootCommand::ShootDirection::NE);
+    REQUIRE(move1.GetCommandString() == "shoot NE");
+}
+
 //TODO check correct behaviour when 2 worms shoot the same guy in the same turn
 
 /*

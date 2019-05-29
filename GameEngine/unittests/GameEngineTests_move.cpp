@@ -224,6 +224,15 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
     }
 }
 
+TEST_CASE( "Get move string", "[Move_string]" ) {
+    auto state = std::make_shared<GameState>();
+    TeleportCommand move(true, state, {12,11});
+    REQUIRE(move.GetCommandString() == "move 12 11");
+
+    TeleportCommand move1(true, state, {5,24});
+    REQUIRE(move1.GetCommandString() == "move 5 24");
+}
+
 /*
     @Test
     fun processRound_moveSameLocation() {
