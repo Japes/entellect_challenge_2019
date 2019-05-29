@@ -20,15 +20,17 @@ bool DigCommand::IsValid() const
 {
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {
+        std::cerr << "Cant dig off the map..." << _pos << std::endl;
         return false;
     }
 
     if(_state->map[_pos.x][_pos.y].type != CellType::DIRT) {
+        std::cerr << "Cant dig air..." << _pos << std::endl;
         return false;
     }
 
     if (_worm->position.MovementDistanceTo(_pos) > _worm->diggingRange) {
-        std::cerr << "Too far: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
+        std::cerr << _pos << "is too far to dig: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
         return false;
     }
 

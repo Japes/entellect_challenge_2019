@@ -45,19 +45,23 @@ bool TeleportCommand::IsValid() const
 {
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {
+        std::cerr << "Cant dig off the map..." << _pos << std::endl;
         return false;
     }
 
     if(_state->map[_pos.x][_pos.y].type != CellType::AIR) {
+        std::cerr << "Cant move through non-air..." << _pos << std::endl;
         return false;
     }
 
     if (_worm->position.MovementDistanceTo(_pos) > _worm->movementRange) {
+        std::cerr << _pos << "is too far to move: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
         return false;
     }
 
     Worm* worm_there = _state->map[_pos.x][_pos.y].worm;
     if(worm_there != nullptr && !WormMovedThisRound(worm_there)) {
+        std::cerr << "Cant move into occupied space..." << _pos << std::endl;
         return false;
     }
 
