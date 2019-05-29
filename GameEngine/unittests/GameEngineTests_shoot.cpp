@@ -518,7 +518,6 @@ TEST_CASE( "Dead worms are removed correctly", "[dead_worms]" ) {
             CHECK(state->Cell_at(shooting_worm_pos)->worm != nullptr);
             CHECK(state->Cell_at(target_worm_pos)->worm == nullptr);
         }
-
     }
 }
 

@@ -686,5 +686,37 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
                 REQUIRE(eng.GetResult().result != GameEngine::ResultType::IN_PROGRESS);
             }
         }
+
+        WHEN("We set it up so that player1 wins")
+        {
+            state->player1.command_score = 9999;
+            int depth = -1;
+            REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+
+            THEN("We get a positive result")
+            {
+                REQUIRE(ret == 1);
+                REQUIRE(eng.GetResult().result == GameEngine::ResultType::FINISHED_POINTS);
+                REQUIRE(eng.GetResult().winningPlayer == &state->player1);
+                REQUIRE(eng.GetResult().losingPlayer == &state->player2);
+            }
+        }
+
+        WHEN("We set it up so that player2 wins")
+        {
+            state->player2.command_score = 9999;
+            int depth = -1;
+            REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+
+            THEN("We get a positive result")
+            {
+                REQUIRE(ret == -1);
+                REQUIRE(eng.GetResult().result == GameEngine::ResultType::FINISHED_POINTS);
+                REQUIRE(eng.GetResult().winningPlayer == &state->player2);
+                REQUIRE(eng.GetResult().losingPlayer == &state->player1);
+            }
+        }
     }
 }
