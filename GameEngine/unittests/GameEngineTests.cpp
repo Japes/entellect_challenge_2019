@@ -45,8 +45,8 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         //Move happens before dig----------------
         WHEN("A player moves and a player digs")
         {
-            TeleportCommand player1move(true, state, {10,8});
-            DigCommand player2move(false, state, {10,10});
+            TeleportCommand player1move({10,8});
+            DigCommand player2move({10,10});
             eng.AdvanceState(player1move, player2move);
             THEN("Its fine")
             {
@@ -57,8 +57,8 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 
         WHEN("A player tries to move into something dug this round")
         {
-            TeleportCommand player1move(true, state, {10,10});
-            DigCommand player2move(false, state, {10,10});
+            TeleportCommand player1move({10,10});
+            DigCommand player2move({10,10});
             eng.AdvanceState(player1move, player2move);
             THEN("The move is evaluated before the dig")
             {
@@ -73,8 +73,8 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::commandoWorms.initialHp);
         WHEN("A player digs and a player shoots")
         {
-            DigCommand player1move(true, state, {10,10});
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            DigCommand player1move({10,10});
+            ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
             THEN("Its fine")
             {
@@ -84,8 +84,8 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 
         WHEN("A player tries to shoot through dirt")
         {
-            DigCommand player1move(true, state, {9,9});
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            DigCommand player1move({9,9});
+            ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
             THEN("It fails")
             {
@@ -98,8 +98,8 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         WHEN("A player moves away from a shot")
         {
             state->Cell_at({10, 10})->type = CellType::AIR;
-            TeleportCommand player1move(true, state, {9,9});
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            TeleportCommand player1move({9,9});
+            ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
             THEN("He doesn't get hit")
             {
@@ -111,17 +111,17 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         {
             state->Cell_at({10, 10})->type = CellType::AIR;
             //move player1 out of firing range
-            TeleportCommand player1move(true, state, {9,9});
-            DoNothingCommand player2doNothing(false, state);
+            TeleportCommand player1move({9,9});
+            DoNothingCommand player2doNothing;
             eng.AdvanceState(player1move, player2doNothing);
             //do another 2 turns so its their turn again
-            eng.AdvanceState(DoNothingCommand(true, state), DoNothingCommand(false, state));
-            eng.AdvanceState(DoNothingCommand(true, state), DoNothingCommand(false, state));
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
             //now do the test
 
-            player1move = TeleportCommand(true, state, {10,9});
-            ShootCommand player2shoot(false, state, ShootCommand::ShootDirection::N);
+            player1move = TeleportCommand({10,9});
+            ShootCommand player2shoot(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2shoot);
             THEN("He gets hit")
             {
@@ -145,8 +145,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
 
         WHEN("We advancd state with a move to the right")
         {
-            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+            TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+            TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
             eng.AdvanceState(player1move, player2move);
 
             THEN("worm 1 for each player moves")
@@ -160,8 +160,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
 
                 WHEN("We advancd state with a move to the right")
                 {
-                    TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-                    TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                    TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+                    TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
                     eng.AdvanceState(player1move, player2move);
                     
                     THEN("worm 2 for each player moves")
@@ -175,8 +175,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
 
                         WHEN("We advancd state with a move to the right")
                         {
-                            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-                            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                            TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+                            TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
                             eng.AdvanceState(player1move, player2move);
                             
                             THEN("worm 3 for each player moves")
@@ -190,8 +190,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
 
                                 WHEN("We advancd state with a move to the right")
                                 {
-                                    TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-                                    TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                                    TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+                                    TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
                                     eng.AdvanceState(player1move, player2move);
                                     
                                     THEN("worm 1 for each player moves again")
@@ -210,8 +210,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
 
                                             WHEN("We advancd state with a move to the right")
                                             {
-                                                TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-                                                TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                                                TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+                                                TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
                                                 eng.AdvanceState(player1move, player2move);
                                                 
                                                 THEN("worm 2 for each player moves again")
@@ -225,8 +225,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
 
                                                     WHEN("We advancd state with a move to the right")
                                                     {
-                                                        TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-                                                        TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+                                                        TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+                                                        TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
                                                         eng.AdvanceState(player1move, player2move);
                                                         
                                                         THEN("worm 1 for each player moves again - not worm 3 coz hes dead!")
@@ -272,14 +272,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
 
         WHEN("Player1 does nothing for 11 turns")
         {
-            DoNothingCommand player1move(true, state);
-            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+            DoNothingCommand player1move;
+            TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{1,1});
 
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
             for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
-                player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+                player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 REQUIRE(state->player1.consecutiveDoNothingCount == i);
             }
@@ -289,7 +289,7 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             }
 
             AND_THEN("Player1 does nothing for 1 more turn") {
-                player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+                player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player2 wins") {
                     REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
@@ -301,14 +301,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
 
         WHEN("Player1 does something invalid for 11 turns")
         {
-            TeleportCommand player1move(true, state, {GameConfig::mapSize + 10, GameConfig::mapSize + 10} );
-            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+            TeleportCommand player1move({GameConfig::mapSize + 10, GameConfig::mapSize + 10} );
+            TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{1,1});
 
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
             for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
-                player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+                player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 REQUIRE(state->player1.consecutiveDoNothingCount == i);
             }
@@ -318,7 +318,7 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             }
 
             AND_THEN("Player1 does nothing for 1 more turn") {
-                player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+                player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player2 wins") {
                     REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
@@ -330,14 +330,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
 
         WHEN("Player2 does nothing for 11 turns")
         {
-            DoNothingCommand player2move(false, state);
-            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+            DoNothingCommand player2move;
+            TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{1,1});
 
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
             for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
-                player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+                player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 REQUIRE(state->player2.consecutiveDoNothingCount == i);
             }
@@ -347,7 +347,7 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             }
 
             AND_THEN("Player2 does nothing for 1 more turn") {
-                player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+                player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player1 wins") {
                     REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
@@ -359,14 +359,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
 
         WHEN("Player2 does something invalid for 11 turns")
         {
-            TeleportCommand player2move(false, state, {GameConfig::mapSize + 10, GameConfig::mapSize + 10} );
-            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+            TeleportCommand player2move({GameConfig::mapSize + 10, GameConfig::mapSize + 10} );
+            TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{1,1});
 
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
             for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
-                player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+                player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 REQUIRE(state->player2.consecutiveDoNothingCount == i);
             }
@@ -376,7 +376,7 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             }
 
             AND_THEN("Player2 does nothing for 1 more turn") {
-                player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
+                player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player1 wins") {
                     REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
@@ -420,8 +420,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
         WHEN("both players do nothing")
         {
-            DoNothingCommand player1move(true, state);
-            DoNothingCommand player2move(false, state);
+            DoNothingCommand player1move;
+            DoNothingCommand player2move;
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -433,8 +433,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
         WHEN("both players just move")
         {
-            TeleportCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{1,0});
-            TeleportCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{1,0});
+            TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{1,0});
+            TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{1,0});
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -446,8 +446,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
         WHEN("both players just shoot")
         {
-            ShootCommand player1move(true, state, ShootCommand::ShootDirection::E);
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::E);
+            ShootCommand player1move(ShootCommand::ShootDirection::E);
+            ShootCommand player2move(ShootCommand::ShootDirection::E);
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -459,8 +459,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
         WHEN("both players just dig")
         {
-            DigCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{0,1});
-            DigCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{0,1});
+            DigCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
+            DigCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -473,8 +473,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
         WHEN("both players do an invalid command")
         {
-            DigCommand player1move(true, state, state->player1.GetCurrentWorm()->position + Position{1,0});
-            DigCommand player2move(false, state, state->player2.GetCurrentWorm()->position + Position{1,0});
+            DigCommand player1move(state->player1.GetCurrentWorm()->position + Position{1,0});
+            DigCommand player2move(state->player2.GetCurrentWorm()->position + Position{1,0});
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -486,8 +486,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
         WHEN("player1 shoots a friendly, player2 shoots an enemy")
         {
-            ShootCommand player1move(true, state, ShootCommand::ShootDirection::SE);
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            ShootCommand player1move(ShootCommand::ShootDirection::SE);
+            ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -504,8 +504,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
         {
             state->player1.worms[1].health = 1;
             state->player1.worms[2].health = 1;
-            ShootCommand player1move(true, state, ShootCommand::ShootDirection::SE);
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::N);
+            ShootCommand player1move(ShootCommand::ShootDirection::SE);
+            ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
 
             THEN("points are as expected")
@@ -535,8 +535,8 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
         place_worm(false, 2, {21,10}, state);
         place_worm(false, 3, {22,20}, state);
 
-        TeleportCommand player1move(true, state, {0,0});
-        TeleportCommand player2move(false, state, {0,0});
+        TeleportCommand player1move({0,0});
+        TeleportCommand player2move({0,0});
 
         using resType = GameEngine::ResultType;
 
@@ -548,11 +548,11 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
             for(unsigned i = 1; i < GameConfig::maxRounds; i++) {
                 //make sure moves are valid
                 if(flipflop) {
-                    player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{1,1});
-                    player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{1,1});
+                    player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
+                    player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 } else {
-                    player1move = TeleportCommand(true, state, state->player1.GetCurrentWorm()->position + Position{-1,-1});
-                    player2move = TeleportCommand(false, state, state->player2.GetCurrentWorm()->position + Position{-1,-1});
+                    player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{-1,-1});
+                    player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{-1,-1});
                 }
                 eng.AdvanceState(player1move, player2move);
                 flipflop = !flipflop;
@@ -587,8 +587,8 @@ TEST_CASE( "Game goes to score if both players die in the same round", "[double_
         worm1->health = 1;
         worm2->health = 1;
 
-        ShootCommand player1move(true, state, ShootCommand::ShootDirection::E);
-        ShootCommand player2move(false, state, ShootCommand::ShootDirection::W);
+        ShootCommand player1move(ShootCommand::ShootDirection::E);
+        ShootCommand player2move(ShootCommand::ShootDirection::W);
 
         using resType = GameEngine::ResultType;
 
@@ -621,8 +621,8 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
 
         WHEN("Player1 knocks out player2")
         {
-            ShootCommand player1move(true, state, ShootCommand::ShootDirection::E);
-            DoNothingCommand player2move(false, state);
+            ShootCommand player1move(ShootCommand::ShootDirection::E);
+            DoNothingCommand player2move;
 
             eng.AdvanceState(player1move, player2move);
 
@@ -635,8 +635,8 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
 
         WHEN("Player2 knocks out player1")
         {
-            DoNothingCommand player1move(true, state);
-            ShootCommand player2move(false, state, ShootCommand::ShootDirection::W);
+            DoNothingCommand player1move;
+            ShootCommand player2move(ShootCommand::ShootDirection::W);
 
             eng.AdvanceState(player1move, player2move);
 
@@ -667,7 +667,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         {
             int roundBefore = state->roundNumber;
             int depth = 4;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
 
             THEN("The game engine advances by that many rounds")
             {
@@ -679,7 +679,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         {
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
 
             THEN("The game engine advances until the end")
             {
@@ -692,7 +692,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             state->player1.command_score = 9999;
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
 
             THEN("We get a positive result")
             {
@@ -708,7 +708,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             state->player2.command_score = 9999;
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(true, state), depth);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
 
             THEN("We get a positive result")
             {

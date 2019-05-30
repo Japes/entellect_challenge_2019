@@ -6,9 +6,9 @@
 class DoNothingCommand : public Command
 {
 	public:
-    DoNothingCommand(bool player1, std::shared_ptr<GameState> state);
-    void Execute() const override;
-    bool IsValid() const override;
+    DoNothingCommand();
+    void Execute(bool player1, std::shared_ptr<GameState> state) const override;
+    bool IsValid(bool player1, std::shared_ptr<GameState> state) const override;
     std::string GetCommandString() const override;
 };
 

@@ -1,17 +1,16 @@
 #include "DoNothingCommand.hpp"
 
-DoNothingCommand::DoNothingCommand(bool player1, std::shared_ptr<GameState> state) :
-    Command(player1, state)
+DoNothingCommand::DoNothingCommand()
 {
     _order = 0; //this is also used to identify a command of this type
 }
 
-void DoNothingCommand::Execute() const
+void DoNothingCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     //lol
 }
 
-bool DoNothingCommand::IsValid() const
+bool DoNothingCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
     return true;
 }

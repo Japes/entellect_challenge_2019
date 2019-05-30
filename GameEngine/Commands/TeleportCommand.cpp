@@ -4,8 +4,7 @@
 
 bool TeleportCommand::_randomReturnFlipFlop;
 
-TeleportCommand::TeleportCommand(bool player1, std::shared_ptr<GameState> state, Position pos, bool* forceRandom) :
-    Command(player1, state),
+TeleportCommand::TeleportCommand(Position pos, bool* forceRandom) :
     _pos{pos},
     _forceRandom{forceRandom}
 {
@@ -13,53 +12,59 @@ TeleportCommand::TeleportCommand(bool player1, std::shared_ptr<GameState> state,
 }
 
 //note: assumes move is valid.
-void TeleportCommand::Execute() const
+void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
-    Worm* worm_there = _state->map[_pos.x][_pos.y].worm;
+    Player* player = player1 ? &state->player1 : &state->player2;
+    Worm* worm = &player->worms[player->currentWormId-1];
+
+    Worm* worm_there = state->map[_pos.x][_pos.y].worm;
     if(worm_there == nullptr) {
-        _state->Move_worm(_worm, _pos);
+        state->Move_worm(worm, _pos);
     } else if ( WormMovedThisRound (worm_there)) {
 
         // 50% chance to pushback or swap positions
         if (FiftyFiftyChance()) {
             //pushback worms
-            _state->Move_worm(_worm, _worm->position);
+            state->Move_worm(worm, worm->position);
 
             auto other_worms_previous_pos = worm_there->previous_position;
-            _state->Move_worm(worm_there, other_worms_previous_pos);
-            _state->Move_worm(worm_there, other_worms_previous_pos); //hacky...so that previous position doesn't show the space he tried to move to
+            state->Move_worm(worm_there, other_worms_previous_pos);
+            state->Move_worm(worm_there, other_worms_previous_pos); //hacky...so that previous position doesn't show the space he tried to move to
         } else {
             //swap worms
-            _state->Move_worm(_worm, worm_there->previous_position);
-            _state->Move_worm(worm_there, _worm->previous_position);
+            state->Move_worm(worm, worm_there->previous_position);
+            state->Move_worm(worm_there, worm->previous_position);
         }
 
-        _worm->TakeDamage(GameConfig::pushbackDamage);
+        worm->TakeDamage(GameConfig::pushbackDamage);
         worm_there->TakeDamage(GameConfig::pushbackDamage);
     }
 
-    _player->command_score += GameConfig::scores.move;
+    player->command_score += GameConfig::scores.move;
 }
 
-bool TeleportCommand::IsValid() const
+bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
+    Player* player = player1 ? &state->player1 : &state->player2;
+    Worm* worm = &player->worms[player->currentWormId-1];
+
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {
         std::cerr << "Cant dig off the map..." << _pos << std::endl;
         return false;
     }
 
-    if(_state->map[_pos.x][_pos.y].type != CellType::AIR) {
+    if(state->map[_pos.x][_pos.y].type != CellType::AIR) {
         std::cerr << "Cant move through non-air..." << _pos << std::endl;
         return false;
     }
 
-    if (_worm->position.MovementDistanceTo(_pos) > _worm->movementRange) {
-        std::cerr << _pos << "is too far to move: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
+    if (worm->position.MovementDistanceTo(_pos) > worm->movementRange) {
+        std::cerr << _pos << "is too far to move: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->diggingRange << std::endl;
         return false;
     }
 
-    Worm* worm_there = _state->map[_pos.x][_pos.y].worm;
+    Worm* worm_there = state->map[_pos.x][_pos.y].worm;
     if(worm_there != nullptr && !WormMovedThisRound(worm_there)) {
         std::cerr << "Cant move into occupied space..." << _pos << std::endl;
         return false;
@@ -87,9 +92,6 @@ bool TeleportCommand::FiftyFiftyChance() const
 bool TeleportCommand::operator==(const TeleportCommand& other)
 {
         return
-        _player == other._player &&
-        _worm == other._worm &&
-        _state == other._state &&
         _forceRandom == other._forceRandom &&
         _pos == other._pos;
 }

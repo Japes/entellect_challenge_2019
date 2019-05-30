@@ -18,8 +18,8 @@ TEST_CASE( "Healthpack", "[powerup]" ) {
         THEN("A healthpack can resurrect a worm that is still on the map (i.e. it died in this round")
         {
             worm->health = 0;
-            TeleportCommand player1move(true, state, powerup_pos);
-            DoNothingCommand player2move(false, state);
+            TeleportCommand player1move(powerup_pos);
+            DoNothingCommand player2move;
             eng.AdvanceState(player1move, player2move);
 
             REQUIRE(worm->health == GameConfig::healthPackHp);

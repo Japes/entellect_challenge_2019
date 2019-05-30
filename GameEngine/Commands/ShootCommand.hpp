@@ -17,9 +17,9 @@ class ShootCommand : public Command
         NW  //UP_LEFT   (-1, -1);
     };
 
-    ShootCommand(bool player1, std::shared_ptr<GameState> state, ShootCommand::ShootDirection dir);
-    void Execute() const override;
-    bool IsValid() const override;
+    ShootCommand(ShootCommand::ShootDirection dir);
+    void Execute(bool player1, std::shared_ptr<GameState> state) const override;
+    bool IsValid(bool player1, std::shared_ptr<GameState> state) const override;
     std::string GetCommandString() const override;
 
     bool operator==(const ShootCommand& other);

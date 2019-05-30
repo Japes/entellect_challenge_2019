@@ -2,35 +2,39 @@
 #include <iostream>
 #include <sstream>
 
-DigCommand::DigCommand(bool player1, std::shared_ptr<GameState> state, Position pos) :
-    Command(player1, state),
-    _pos{pos}
+DigCommand::DigCommand(Position pos) : _pos{pos}
 {
     _order = 2;
 }
 
 //NOTE this assumes move is valid
-void DigCommand::Execute() const
+void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
-    _state->map[_pos.x][_pos.y].type = CellType::AIR;
-    _player->command_score += GameConfig::scores.dig;
+    Player* player = player1 ? &state->player1 : &state->player2;
+    Worm* worm = &player->worms[player->currentWormId-1];
+
+    state->map[_pos.x][_pos.y].type = CellType::AIR;
+    player->command_score += GameConfig::scores.dig;
 }
 
-bool DigCommand::IsValid() const
+bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
+    Player* player = player1 ? &state->player1 : &state->player2;
+    Worm* worm = &player->worms[player->currentWormId-1];
+
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {
         std::cerr << "Cant dig off the map..." << _pos << std::endl;
         return false;
     }
 
-    if(_state->map[_pos.x][_pos.y].type != CellType::DIRT) {
+    if(state->map[_pos.x][_pos.y].type != CellType::DIRT) {
         std::cerr << "Cant dig air..." << _pos << std::endl;
         return false;
     }
 
-    if (_worm->position.MovementDistanceTo(_pos) > _worm->diggingRange) {
-        std::cerr << _pos << "is too far to dig: " << _worm->position.MovementDistanceTo(_pos) << " > " << _worm->diggingRange << std::endl;
+    if (worm->position.MovementDistanceTo(_pos) > worm->diggingRange) {
+        std::cerr << _pos << "is too far to dig: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->diggingRange << std::endl;
         return false;
     }
 
@@ -46,9 +50,5 @@ std::string DigCommand::GetCommandString() const
 
 bool DigCommand::operator==(const DigCommand& other)
 {
-        return
-        _player == other._player &&
-        _worm == other._worm &&
-        _state == other._state &&
-        _pos == other._pos;
+    return _pos == other._pos;
 }

@@ -13,8 +13,8 @@ bool shot_hits(std::shared_ptr<GameState> state, int targetWormNumber, ShootComm
     int targetWormStartingHealth = target_worm->health;
     int player1StartingDoNothing = state->player1.consecutiveDoNothingCount;
 
-    ShootCommand player1move(true, state, dir);
-    DoNothingCommand player2move(false, state);
+    ShootCommand player1move(dir);
+    DoNothingCommand player2move;
 
     GameEngine eng(state);
     eng.AdvanceState(player1move,player2move);
@@ -46,8 +46,8 @@ void check_shot_missed(std::shared_ptr<GameState> state,ShootCommand::ShootDirec
     int player1StartingHealth = state->player2.health;
     int player1StartingDoNothing = state->player1.consecutiveDoNothingCount;
 
-    ShootCommand player1move(true, state, dir);
-    DoNothingCommand player2move(false, state);
+    ShootCommand player1move(dir);
+    DoNothingCommand player2move;
 
     GameEngine eng(state);
     eng.AdvanceState(player1move,player2move);
@@ -507,8 +507,8 @@ TEST_CASE( "Dead worms are removed correctly", "[dead_worms]" ) {
 
         THEN("Shooting him kills him")
         {
-            ShootCommand player1move(true, state, ShootCommand::ShootDirection::S);
-            DoNothingCommand player2move(false, state);
+            ShootCommand player1move(ShootCommand::ShootDirection::S);
+            DoNothingCommand player2move;
 
             GameEngine eng(state);
             eng.AdvanceState(player1move,player2move);
@@ -523,10 +523,10 @@ TEST_CASE( "Dead worms are removed correctly", "[dead_worms]" ) {
 
 TEST_CASE( "Get shoot string", "[Move_string]" ) {
     auto state = std::make_shared<GameState>();
-    ShootCommand move(true, state, ShootCommand::ShootDirection::S);
+    ShootCommand move(ShootCommand::ShootDirection::S);
     REQUIRE(move.GetCommandString() == "shoot S");
 
-    ShootCommand move1(true, state, ShootCommand::ShootDirection::NE);
+    ShootCommand move1(ShootCommand::ShootDirection::NE);
     REQUIRE(move1.GetCommandString() == "shoot NE");
 }
 
