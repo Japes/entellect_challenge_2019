@@ -50,23 +50,23 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
 
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {
-        std::cerr << "Cant dig off the map..." << _pos << std::endl;
+        std::cerr << "------Cant move off the map..." << _pos << std::endl;
         return false;
     }
 
     if(state->map[_pos.x][_pos.y].type != CellType::AIR) {
-        std::cerr << "Cant move through non-air..." << _pos << std::endl;
+        std::cerr << "------Cant move through non-air..." << _pos << std::endl;
         return false;
     }
 
     if (worm->position.MovementDistanceTo(_pos) > worm->movementRange) {
-        std::cerr << _pos << "is too far to move: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->diggingRange << std::endl;
+        std::cerr << _pos << "------is too far to move: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->movementRange << ". Worm is at pos " << worm->position << std::endl;
         return false;
     }
 
     Worm* worm_there = state->map[_pos.x][_pos.y].worm;
     if(worm_there != nullptr && !WormMovedThisRound(worm_there)) {
-        std::cerr << "Cant move into occupied space..." << _pos << std::endl;
+        std::cerr << "------Cant move into occupied space..." << _pos << std::endl;
         return false;
     }
 

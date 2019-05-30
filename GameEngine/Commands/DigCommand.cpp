@@ -11,7 +11,6 @@ DigCommand::DigCommand(Position pos) : _pos{pos}
 void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
 
     state->map[_pos.x][_pos.y].type = CellType::AIR;
     player->command_score += GameConfig::scores.dig;

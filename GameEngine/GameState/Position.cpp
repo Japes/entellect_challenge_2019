@@ -26,7 +26,7 @@ int Position::MovementDistanceTo(Position other)
 
 bool Position::IsOnMap() const
 {
-    return x >= 0 && x >= 0 && x < GameConfig::mapSize && y < GameConfig::mapSize;
+    return x >= 0 && y >= 0 && x < GameConfig::mapSize && y < GameConfig::mapSize;
 }
 
 //to help with debugging...

@@ -159,6 +159,7 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, int 
     std::shared_ptr<Command> p2Command = !player1? command : GetRandomValidMoveForWorm(false);
 
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
+        //std::cerr << "Advancing state with moves P1: " << p1Command->GetCommandString() << " and P2: " << p2Command->GetCommandString() << std::endl;
         AdvanceState(*p1Command.get(), *p2Command.get());
         p1Command = GetRandomValidMoveForWorm(true);
         p2Command = GetRandomValidMoveForWorm(false);

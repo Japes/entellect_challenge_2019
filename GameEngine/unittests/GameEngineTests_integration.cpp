@@ -392,3 +392,19 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
         }
     }
 }
+
+TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
+{
+    GIVEN("A realistic game state and engine")
+    {
+        auto roundJSON = ReadJsonFile("./Test_files/state2.json");
+        auto state = std::make_shared<GameState>(roundJSON);
+        GameEngine eng(state);
+        
+        WHEN("We do a playthrough to a depth -1")
+        {
+            int depth = -1;
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
+        }
+    }
+}
