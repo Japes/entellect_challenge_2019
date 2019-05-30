@@ -269,7 +269,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         AND_THEN("Moving a dude, and cycling to his turn again")
         {
-            eng.AdvanceState(TeleportCommand({-1,-1}), DoNothingCommand());
+            eng.AdvanceState(TeleportCommand({4,4}), DoNothingCommand());
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
@@ -289,7 +289,6 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,3})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,3})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,3})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,5})));
