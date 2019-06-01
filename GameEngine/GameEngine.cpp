@@ -92,7 +92,7 @@ bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
         return false;
     }
 
-        command.Execute(player1, _state);
+    command.Execute(player1, _state);
 
     return true;
 }
@@ -185,7 +185,7 @@ GameEngine::GameResult GameEngine::GetResult()
 //2 things are implied and left out from this return:
 //1. "do nothing"
 //2. "shoot" in all directions
-std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1)
+std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1, bool trimStupidMoves)
 {
     std::vector<std::shared_ptr<Command>> ret;
     ret.reserve(8);
@@ -198,8 +198,12 @@ std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool play
             continue;
         }
 
+        if(trimStupidMoves && wormSpace == worm->previous_position) {
+            continue;
+        }
+
         if(_state->Cell_at(wormSpace)->type == CellType::AIR) {
-            ret.emplace_back(std::make_shared<TeleportCommand>(wormSpace) );
+            ret.emplace_back(std::make_shared<TeleportCommand>(wormSpace));
         } else if(_state->Cell_at(wormSpace)->type == CellType::DIRT) {
             ret.emplace_back(std::make_shared<DigCommand>(wormSpace) );
         }
@@ -208,22 +212,50 @@ std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool play
     return ret;
 }
 
-std::shared_ptr<Command> GameEngine::GetRandomValidMoveForWorm(bool player1)
+std::vector<std::shared_ptr<Command>> GameEngine::GetSensibleShootsForWorm(bool player1)
 {
-    std::vector<std::shared_ptr<Command>> moves = GetValidMovesForWorm (player1);
-    
-    int totalNumMoves = moves.size() + _player1Shoots.size();
+    std::vector<std::shared_ptr<Command>> ret;
+    ret.reserve(3);
+
+    Player* player = player1 ? &_state->player1 : &_state->player2;
+    Worm* worm = player->GetCurrentWorm();
+
+    for(auto const & space : _surroundingWormSpaces) {
+        auto shoot = std::make_shared<ShootCommand>(space);
+        Worm* hitworm = shoot->WormOnTarget(player1, _state);
+        if(hitworm != nullptr && std::none_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
+            ret.push_back(shoot);
+        }
+    }
+
+    return ret;
+}
+
+std::shared_ptr<Command> GameEngine::GetRandomValidMoveForWorm(bool player1, bool trimStupidMoves)
+{
+    std::shared_ptr<Command> ret;
+
+    //get random moves (teleport/dig) and shoots
+    std::vector<std::shared_ptr<Command>> moves = GetValidMovesForWorm (player1, trimStupidMoves);
+    std::vector<std::shared_ptr<Command>> shoots = trimStupidMoves? (GetSensibleShootsForWorm(player1)):(player1? _player1Shoots : _player2Shoots);
+
+    //choose random one
+    int totalNumMoves = moves.size() + shoots.size();
     std::uniform_int_distribution<int> uniform_dist(0, totalNumMoves-1);
     int mean = uniform_dist(*_rng.get());
 
     if(mean < static_cast<int>(moves.size())) {
-        return moves[mean];
+        ret = moves[mean];
     } else {
         int index = mean - moves.size();
         if(player1) {
-            return _player1Shoots[index];
+            ret = shoots[index];
         } else {
-            return _player2Shoots[index];
+            ret = shoots[index];
         }
     }
+
+    //std::cerr << "GameEngine::GetRandomValidMoveForWorm returning " << ret->GetCommandString() << std::endl;
+
+    return ret;
 }

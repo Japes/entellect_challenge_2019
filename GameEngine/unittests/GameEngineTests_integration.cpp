@@ -159,24 +159,25 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
     GIVEN("A semi realistic game state and engine")
     {
         /*
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   .   .   .
-        .   .   .   .   .   D   .   .
-        .   .   .   .   D   11  12  S
-        .   .   .   .   D   21  .   .
-        .   .   .   .   .   .   .   .            
+        0   1   2   3   4   5   6   7
+    0   .   .   .   .   .   .   .   .
+    1   .   .   .   .   22  .   .   .
+    2   .   .   .   .   .   .   .   .
+    3   .   .   .   13  .   23  .   .
+    4   .   .   .   .   .   D   .   .
+    5   .   .   .   .   D   11  12  S
+    6   .   .   .   .   D   21  .   .
+    7   .   .   .   .   .   .   .   .            
         */
 
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 1, {5,5}, state);
         place_worm(true, 2, {6,5}, state);
-        place_worm(true, 3, {20,20}, state);
+        place_worm(true, 3, {3,3}, state);
         place_worm(false, 1, {5,6}, state);
-        place_worm(false, 2, {25,25}, state);
-        place_worm(false, 3, {32,0}, state);
+        place_worm(false, 2, {4,1}, state);
+        place_worm(false, 3, {5,3}, state);
         state->Cell_at({4, 5})->type = CellType::DIRT;
         state->Cell_at({5, 4})->type = CellType::DIRT;
         state->Cell_at({4, 6})->type = CellType::DIRT;
@@ -186,14 +187,6 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         {
             std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
             std::vector<std::shared_ptr<Command>> expected_moves;
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position(4,4)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,6})));
@@ -213,14 +206,6 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         {
             std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false);
             std::vector<std::shared_ptr<Command>> expected_moves;
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-            //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,6)));
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position(6,6)));
@@ -244,14 +229,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
             {
                 std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
                 std::vector<std::shared_ptr<Command>> expected_moves;
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
+
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({7,4})));
@@ -277,27 +255,37 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
             {
                 std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
                 std::vector<std::shared_ptr<Command>> expected_moves;
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-                //expected_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,3})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,3})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,5})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,5})));
 
                 REQUIRE(moves.size() == expected_moves.size());
 
                 for(unsigned i = 0; i < expected_moves.size(); i++) {
                     bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
+                    CHECK(containsExactlyOne);
+                }
+            }
+
+            THEN("Valid moves for player 1 are as expected if we ask to trim")
+            {
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, true);
+                std::vector<std::shared_ptr<Command>> expected_moves;
+                expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
+                expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,5})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
+                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
+                //expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,5}))); NOTE THIS IS EXCLUDED (place i just came from)
+
+                CHECK(moves.size() == expected_moves.size());
+
+                for(unsigned i = 0; i < expected_moves.size(); i++) {
+                    bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
+                    INFO("Don't have expected move " << i << "(" << expected_moves[i]->GetCommandString() << ")" );
                     CHECK(containsExactlyOne);
                 }
             }

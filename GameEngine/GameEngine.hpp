@@ -30,8 +30,9 @@ class GameEngine
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
     int Playthrough(bool player1, std::shared_ptr<Command> command, int depth = -1);
-    std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1);
-    std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1);
+    std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1, bool trimStupidMoves = false);
+    std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, bool trimStupidMoves = false);
+    std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1);
     GameResult GetResult();
 
     private:

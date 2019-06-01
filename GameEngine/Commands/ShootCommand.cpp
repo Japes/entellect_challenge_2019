@@ -19,6 +19,26 @@ ShootCommand::ShootCommand(ShootCommand::ShootDirection dir)
     }
 }
 
+ShootCommand::ShootCommand(Position dir)
+{
+    _order = 3;
+
+    //normalise
+    if(dir.x > 0) {
+        dir.x = 1;
+    } else if(dir.x < 0) {
+        dir.x = -1;
+    }
+
+    if(dir.y > 0) {
+        dir.y = 1;
+    } else if(dir.y < 0) {
+        dir.y = -1;
+    }
+
+    _shootVector = dir;
+}
+
 void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = player1 ? &state->player1 : &state->player2;
@@ -26,49 +46,59 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     player->consecutiveDoNothingCount = 0;
 
+    Worm* hitworm = WormOnTarget(player1, state);
+
+    if(hitworm == nullptr) {
+        player->command_score += GameConfig::scores.missedAttack;
+        return;
+    }
+
+    hitworm->TakeDamage(worm->weapon.damage);
+
+    if(hitworm->IsDead()) {
+        player->command_score += GameConfig::scores.killShot;
+    } else {
+        if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
+            player->command_score += GameConfig::scores.friendlyFire;
+        } else {
+            player->command_score += GameConfig::scores.attack;
+        }
+    }
+}
+
+Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> state) const
+{
+    Player* player = player1 ? &state->player1 : &state->player2;
+    Worm* worm = &player->worms[player->currentWormId-1];
+
     Position pos = worm->position + _shootVector;
 
     while (pos.IsOnMap() && worm->position.MovementDistanceTo(pos) <= worm->weapon.range) {
 
         //check diag
         if( (pos.x != worm->position.x && pos.y != worm->position.y) && //i.e. we are shooting diagonally
-            worm->position.MovementDistanceTo(pos) > worm->weapon.diagRange) {
             //std::cerr << "OUT OF RANGE! (" <<worm->position.MovementDistanceTo(pos) << " > " << worm->weapon.diagRange << ")" << std::endl;
-            player->command_score += GameConfig::scores.missedAttack;
-            return;
+            worm->position.MovementDistanceTo(pos) > worm->weapon.diagRange) {
+            return nullptr;
         }
 
         Cell* cell = state->Cell_at(pos);
 
         if (cell->type != CellType::AIR) {
             //std::cerr << "HIT DIRT!" << std::endl;
-            player->command_score += GameConfig::scores.missedAttack;
-            return;
+            return nullptr;
         }
 
         if (cell->worm != nullptr) {
             //std::cerr << "HIT A WORM!" << std::endl;
-            auto wormRef = cell->worm;
-            wormRef->TakeDamage(worm->weapon.damage);
-
-            if(wormRef->IsDead()) {
-                player->command_score += GameConfig::scores.killShot;
-            } else {
-                if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == wormRef;})) {
-                    player->command_score += GameConfig::scores.friendlyFire;
-                } else {
-                    player->command_score += GameConfig::scores.attack;
-                }
-            }
-
-            return;
+            return  cell->worm;
         }
 
         pos += _shootVector;
     }
 
     //if we get this far, shot didn't hit anything
-    player->command_score += GameConfig::scores.missedAttack;
+    return nullptr;
 }
 
 bool ShootCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const

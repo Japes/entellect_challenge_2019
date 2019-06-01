@@ -720,3 +720,33 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         }
     }
 }
+
+TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
+{
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        
+        place_worm(true, 1, {10,10}, state);
+        place_worm(true, 2, {11,10}, state); //friendly E of us
+        place_worm(true, 3, {8,10}, state); //friendly W of us
+        place_worm(false, 1, {11,9}, state); //enemy NE 1 step
+        place_worm(false, 2, {13,13}, state); //enemy SE 2 step
+        place_worm(false, 3, {10,15}, state); //just out of range
+
+        THEN("GetSensibleShootsForWorm returns correct")
+        {
+            auto ret = eng.GetSensibleShootsForWorm(true);
+            REQUIRE(ret.size() == 2);
+            auto expected_move = std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE);
+
+            INFO(ret[0]->GetCommandString());
+            INFO(ret[1]->GetCommandString());
+
+            REQUIRE( ( (ret[0]->GetCommandString() == "shoot NE") || (ret[0]->GetCommandString() == "shoot SE") ) );
+            REQUIRE( ( (ret[1]->GetCommandString() == "shoot NE") || (ret[1]->GetCommandString() == "shoot SE") ) );
+            REQUIRE( ret[0]->GetCommandString() != ret[1]->GetCommandString() );
+        }
+    }
+}
