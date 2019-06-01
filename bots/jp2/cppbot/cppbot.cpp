@@ -101,48 +101,6 @@ int euclideanDistance(POINT positionA, POINT positionB) {
         std::sqrt(std::pow(positionA.x - positionB.x, 2) + std::pow(positionA.y - positionB.y, 2))));
 }
 
-/**
- * Get any opponent worm that is in range and can be shot without being blocked
- */
-std::pair<POINT, int>getShootableOpponent(rapidjson::Document& roundJSON)
-{
-    POINT currentWorm = GetMyCurrentWormPoint(roundJSON);
-    const int weaponRange = roundJSON["myPlayer"].GetObject()["worms"].GetArray()[roundJSON["currentWormId"].GetInt() - 1].GetObject()["weapon"].GetObject()["range"].GetInt();
-
-    auto shootTemplates = getShootTemplates(roundJSON);
-
-    for (int i = E; i < SE; i++)
-    {
-        for(auto& deltaCoordinate : shootTemplates[i])
-        {
-            const POINT coordinateToCheck = sumCoordinates(currentWorm, deltaCoordinate);
-            if (coordinateIsOutOfBounds(coordinateToCheck, roundJSON["mapSize"].GetInt())
-                || euclideanDistance(coordinateToCheck, currentWorm) > weaponRange)
-            {
-                break;
-            }
-            
-            auto cellToInspect = roundJSON["map"].GetArray()[coordinateToCheck.y].GetArray()[coordinateToCheck.x].GetObject();
-            if (!std::strcmp(cellToInspect["type"].GetString(), dirt.c_str())
-                || !std::strcmp(cellToInspect["type"].GetString(), space.c_str())
-                || cellToInspect.HasMember("occupier") && cellToInspect["occupier"].GetObject()["playerId"].GetInt() == roundJSON["myPlayer"].GetObject()["id"].GetInt()
-                ) 
-            {
-                break;
-            }
-
-            const auto isOccupiedByOpponentWorm = cellToInspect.HasMember("occupier") && cellToInspect["occupier"].GetObject()["playerId"].GetInt() != roundJSON["myPlayer"].GetObject()["id"].GetInt();
-            if (isOccupiedByOpponentWorm) 
-            {
-                POINT pt = { cellToInspect["x"].GetInt(), cellToInspect["y"].GetInt() };
-                return std::make_pair(pt, i);
-            }
-        }
-    }
-    POINT pt = { -1,-1 };
-    return std::make_pair(pt, -1);
-}
-
 std::string RandomStrategy(rapidjson::Document& roundJSON)
 {
     std::random_device rd;    //Will be used to obtain a seed for the random number engine
@@ -198,7 +156,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     std::vector<int> movescores(possible_moves.size(), 0);
 
-    while(Get_ns_since_epoch() < (startTime + 500000000)) { //900ms
+    while(Get_ns_since_epoch() < (startTime + 900000000)) { //900ms
         for(unsigned i = 0; i < movescores.size(); ++i) {
             //load the state
             auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
