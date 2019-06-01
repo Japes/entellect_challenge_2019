@@ -2,6 +2,7 @@
 #include "../GameEngine.hpp"
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
+#include "GameEngineTestUtils.hpp"
 
 TEST_CASE( "Dig command", "[Dig_command]" ) {
 
@@ -9,7 +10,8 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
     {
         auto state = std::make_shared<GameState>();
 
-        state->player1.GetCurrentWorm()->position = {10,10};
+        place_worm(true, 1, {10,10}, state);
+        place_worm(false, 1, {12,12}, state);
         state->map[11][10].type = CellType::DIRT;
         state->map[11][11].type = CellType::DIRT;
         state->map[10][11].type = CellType::DEEP_SPACE;
@@ -70,6 +72,17 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
             REQUIRE(state->map[11][11].type == CellType::AIR);
         }
+
+        THEN("Both worms digging same hole is valid")
+        {
+            player1move = DigCommand({11,11});    
+            player2move = DigCommand({11,11});    
+            eng.AdvanceState(player1move,player2move);    
+            //++expectedDoNothings;
+            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state->player2.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state->map[11][11].type == CellType::AIR);
+        }
     }
 }
 
@@ -82,19 +95,7 @@ TEST_CASE( "Get dig string", "[Dig_string]" ) {
     REQUIRE(move1.GetCommandString() == "dig 0 31");
 }
 
-//Two worms digging the same cell in the same turn is a valid move
 /*
-    fun processRound_digSameHole() {
-        val player1 = WormsPlayer.build(1, listOf(CommandoWorm.build(0, config, Point(0, 0))), config)
-        val player2 = WormsPlayer.build(2, listOf(CommandoWorm.build(0, config, Point(2, 2))), config)
-        val map = buildMapWithCellType(listOf(player1, player2), 3, CellType.DIRT)
-        val command = DigCommand(1, 1, TEST_CONFIG)
-
-        val commandMap = mapOf(Pair(player1, command), Pair(player2, command))
-        roundProcessor.processRound(map, commandMap)
-
-        assertEquals(CellType.AIR, map[1, 1].type)
-    }
 
     @Test
     fun processRound_moveDigSameLocation() {

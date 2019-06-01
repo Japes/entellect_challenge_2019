@@ -24,6 +24,8 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
     Player* player = player1 ? &state->player1 : &state->player2;
     Worm* worm = &player->worms[player->currentWormId-1];
 
+    player->consecutiveDoNothingCount = 0;
+
     Position pos = worm->position + _shootVector;
 
     while (pos.IsOnMap() && worm->position.MovementDistanceTo(pos) <= worm->weapon.range) {

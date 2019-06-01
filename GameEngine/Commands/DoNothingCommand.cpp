@@ -7,7 +7,8 @@ DoNothingCommand::DoNothingCommand()
 
 void DoNothingCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
-    //lol
+    Player* player = player1 ? &state->player1 : &state->player2;
+    ++player->consecutiveDoNothingCount;
 }
 
 bool DoNothingCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const

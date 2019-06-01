@@ -35,7 +35,7 @@ class GameEngine
     GameResult GetResult();
 
     private:
-    void DoCommand(const Command& command, bool player1);
+    bool DoCommand(const Command& command, bool player1, bool valid);
     void ApplyPowerups();
     void UpdateWinCondition();
 

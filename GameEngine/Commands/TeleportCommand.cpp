@@ -17,6 +17,8 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     Player* player = player1 ? &state->player1 : &state->player2;
     Worm* worm = &player->worms[player->currentWormId-1];
 
+    player->consecutiveDoNothingCount = 0;
+    
     Worm* worm_there = state->map[_pos.x][_pos.y].worm;
     if(worm_there == nullptr) {
         state->Move_worm(worm, _pos);

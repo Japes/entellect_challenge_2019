@@ -12,6 +12,8 @@ void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = player1 ? &state->player1 : &state->player2;
 
+    player->consecutiveDoNothingCount = 0;
+
     state->map[_pos.x][_pos.y].type = CellType::AIR;
     player->command_score += GameConfig::scores.dig;
 }
@@ -28,7 +30,7 @@ bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
     }
 
     if(state->map[_pos.x][_pos.y].type != CellType::DIRT) {
-        std::cerr << "Cant dig air..." << _pos << std::endl;
+        std::cerr << "Cant dig air..." << _pos << " (round " << state->roundNumber << " worm " << player->id << worm->id <<  ")" << std::endl;
         return false;
     }
 
