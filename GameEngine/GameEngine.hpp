@@ -36,6 +36,8 @@ class GameEngine
     static std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1, std::shared_ptr<GameState> state);
     GameResult GetResult();
 
+    static std::vector<std::shared_ptr<Command>> _playerShoots;
+    
     private:
     bool DoCommand(const Command& command, bool player1, bool valid);
     void ApplyPowerups();
@@ -45,9 +47,6 @@ class GameEngine
     GameResult _currentResult;
 
     static std::shared_ptr<pcg32> _rng;
-
-    static std::vector<std::shared_ptr<Command>> _player1Shoots;
-    static std::vector<std::shared_ptr<Command>> _player2Shoots;
 
     static std::vector<Position> _surroundingWormSpaces;
 
