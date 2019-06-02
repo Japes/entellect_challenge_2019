@@ -46,7 +46,7 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     player->consecutiveDoNothingCount = 0;
 
-    Worm* hitworm = WormOnTarget(player1, state);
+    Worm* hitworm = WormOnTarget(player1, state, _shootVector);
 
     if(hitworm == nullptr) {
         player->command_score += GameConfig::scores.missedAttack;
@@ -66,26 +66,27 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
     }
 }
 
-Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> state) const
+Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> state, const Position& shootvector)
 {
     Player* player = player1 ? &state->player1 : &state->player2;
     Worm* worm = &player->worms[player->currentWormId-1];
 
-    Position pos = worm->position + _shootVector;
+    Position pos = worm->position + shootvector;
+
+    bool diag = shootvector.x != 0 && shootvector.y != 0;
 
     while (pos.IsOnMap() && worm->position.MovementDistanceTo(pos) <= worm->weapon.range) {
 
         //check diag
-        if( (pos.x != worm->position.x && pos.y != worm->position.y) && //i.e. we are shooting diagonally
+        if( diag && worm->position.MovementDistanceTo(pos) > worm->weapon.diagRange) {
             //std::cerr << "OUT OF RANGE! (" <<worm->position.MovementDistanceTo(pos) << " > " << worm->weapon.diagRange << ")" << std::endl;
-            worm->position.MovementDistanceTo(pos) > worm->weapon.diagRange) {
             return nullptr;
         }
 
         Cell* cell = state->Cell_at(pos);
 
         if (cell->type != CellType::AIR) {
-            //std::cerr << "HIT DIRT!" << std::endl;
+            //std::cerr << "HIT DIRT (or deep space)!" << std::endl;
             return nullptr;
         }
 
@@ -94,7 +95,7 @@ Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> 
             return  cell->worm;
         }
 
-        pos += _shootVector;
+        pos += shootvector;
     }
 
     //if we get this far, shot didn't hit anything

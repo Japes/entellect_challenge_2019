@@ -5,6 +5,7 @@
 #include "AllCommands.hpp"
 #include <vector>
 #include <random>
+#include <functional>
 #include "pcg_random.hpp"
 
 class GameEngine
@@ -29,10 +30,10 @@ class GameEngine
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
-    int Playthrough(bool player1, std::shared_ptr<Command> command, int depth = -1);
-    std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1, bool trimStupidMoves = false);
-    std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, bool trimStupidMoves = false);
-    std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1);
+    int Playthrough(bool player1, std::shared_ptr<Command> command, std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, int depth = -1);
+    static std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
+    static std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
+    static std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1, std::shared_ptr<GameState> state);
     GameResult GetResult();
 
     private:
@@ -43,10 +44,10 @@ class GameEngine
     std::shared_ptr<GameState> _state;
     GameResult _currentResult;
 
-    std::shared_ptr<pcg32> _rng;
+    static std::shared_ptr<pcg32> _rng;
 
-    std::vector<std::shared_ptr<Command>> _player1Shoots;
-    std::vector<std::shared_ptr<Command>> _player2Shoots;
+    static std::vector<std::shared_ptr<Command>> _player1Shoots;
+    static std::vector<std::shared_ptr<Command>> _player2Shoots;
 
     static std::vector<Position> _surroundingWormSpaces;
 

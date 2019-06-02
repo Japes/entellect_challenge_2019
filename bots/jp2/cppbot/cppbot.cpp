@@ -8,6 +8,7 @@
 #include <cmath>
 #include <chrono>
 #include <random>
+#include <limits>
 #include "GameEngine.hpp"
 #include "AllCommands.hpp"
 
@@ -134,6 +135,23 @@ std::string RandomStrategy(rapidjson::Document& roundJSON)
     return "nothing";
 }
 
+//a monte carlo node
+struct MCNode
+{
+    std::shared_ptr<Command> command;
+    float w;
+    float n;
+    int score;
+    float UCT;
+
+};
+
+std::ostream & operator << (std::ostream &out, const MCNode &move)
+{
+    out << move.command->GetCommandString() << ", " <<  move.w << "/" << move.n << ", " << move.score << ", " << move.UCT << std::endl;
+    return out;
+}
+
 //expects command string to be returned e.g. "dig 5 6"
 std::string runStrategy(rapidjson::Document& roundJSON)
 {
@@ -141,42 +159,55 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
 
-    //TODO only consider sensible moves
     auto state1 = std::make_shared<GameState>(roundJSON);
     GameEngine eng1(state1);
-    auto possible_moves = eng1.GetValidMovesForWorm (ImPlayer1);
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-    possible_moves.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
 
-    std::vector<int> movescores(possible_moves.size(), 0);
+    std::vector<MCNode> nodes;
+    auto possible_moves = eng1.GetValidMovesForWorm (ImPlayer1, state1, true);
+    for(auto const &move : possible_moves ) {
+        nodes.push_back({move, 0, 0, 0});
+    }
+    int N = 0;
+    float c = std::sqrt(2);
 
     while(Get_ns_since_epoch() < (startTime + 900000000)) { //900ms
-        for(unsigned i = 0; i < movescores.size(); ++i) {
-            //load the state
-            auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-            GameEngine eng(state);
-            //TODO use the selection formula here
-            movescores[i] += eng.Playthrough(ImPlayer1, possible_moves[i], 20);
+        //choose next node
+//        std::cerr << "UCT values:" << std::endl;
+        for(auto & node:  nodes) {
+            if(node.n == 0) {
+                node.UCT = std::numeric_limits<decltype(node.UCT)>::max();
+            } else {
+                node.UCT = (node.w / node.n) + c*std::sqrt(std::log(N)/node.n );
+            }
+//            std::cerr << node.UCT << std::endl; 
         }
+        auto next_node = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return lhs.UCT < rhs.UCT; });
+//        std::cerr << "choosing node with value : " << next_node->UCT << std::endl;
+
+        //load the state
+        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
+        GameEngine eng(state);
+
+        auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, 20);
+
+        next_node->score += thisScore;
+        next_node->w += thisScore > 0? 1 : 0;
+        ++next_node->n;
+        ++N;
     }
 
     //choose the best move and do it
-    auto best_move_it = std::max_element(std::begin(movescores), std::end(movescores));
-    unsigned best_move_index = best_move_it - std::begin(movescores);
+    auto best_move_it = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return (lhs.w/lhs.n) < (rhs.w/rhs.n); });
 
-    std::cerr << "move scores: ";
-    for(auto const & move : movescores) {
-        std::cerr << move << ", ";
+    std::cerr << "MC results: ";
+    for(auto const & move : nodes) {
+        std::cerr << move << std::endl;
     }
-    std::cerr << " best move is at index: " << best_move_index << ": " << possible_moves[best_move_index]->GetCommandString() << std::endl;
+    std::cerr << " best move is " << best_move_it->command->GetCommandString() << std::endl;
+    std::cerr << "N: " << N << std::endl;
 
-    return possible_moves[best_move_index]->GetCommandString();
+    return best_move_it->command->GetCommandString();
 }
 
 std::string executeRound(std::string& roundNumber)

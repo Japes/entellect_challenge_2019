@@ -23,7 +23,7 @@ class ShootCommand : public Command
     bool IsValid(bool player1, std::shared_ptr<GameState> state) const override;
     std::string GetCommandString() const override;
     
-    Worm* WormOnTarget(bool player1, const std::shared_ptr<GameState> state) const;
+    static Worm* WormOnTarget(bool player1, const std::shared_ptr<GameState> state, const Position& shootvector);
 
     bool operator==(const ShootCommand& other);
 

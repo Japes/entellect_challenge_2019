@@ -663,11 +663,13 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         place_worm(false, 2, {21,10}, state);
         place_worm(false, 3, {22,20}, state);
 
+        auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
+
         WHEN("We do a playthrough to a certain depth")
         {
             int roundBefore = state->roundNumber;
             int depth = 4;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
 
             THEN("The game engine advances by that many rounds")
             {
@@ -679,7 +681,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         {
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
 
             THEN("The game engine advances until the end")
             {
@@ -692,7 +694,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             state->player1.command_score = 9999;
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
 
             THEN("We get a positive result")
             {
@@ -708,7 +710,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             state->player2.command_score = 9999;
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
 
             THEN("We get a positive result")
             {
@@ -737,7 +739,7 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
 
         THEN("GetSensibleShootsForWorm returns correct")
         {
-            auto ret = eng.GetSensibleShootsForWorm(true);
+            auto ret = eng.GetSensibleShootsForWorm(true, state);
             REQUIRE(ret.size() == 2);
             auto expected_move = std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE);
 

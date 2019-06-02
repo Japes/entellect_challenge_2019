@@ -185,7 +185,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         THEN("Valid moves for player 1 are as expected")
         {
-            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
+            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state);
             std::vector<std::shared_ptr<Command>> expected_moves;
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position(4,4)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
@@ -204,7 +204,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         THEN("Valid moves for player 2 are as expected")
         {
-            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false);
+            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false, state);
             std::vector<std::shared_ptr<Command>> expected_moves;
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,6)));
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -227,7 +227,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state);
                 std::vector<std::shared_ptr<Command>> expected_moves;
 
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
@@ -253,7 +253,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true);
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state);
                 std::vector<std::shared_ptr<Command>> expected_moves;
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -272,7 +272,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected if we ask to trim")
             {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, true);
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state, true);
                 std::vector<std::shared_ptr<Command>> expected_moves;
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -314,7 +314,34 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
         GameEngine eng(state);
 
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true).get(), *eng.GetRandomValidMoveForWorm(false).get());
+            eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true, state).get(), *eng.GetRandomValidMoveForWorm(false, state).get());
+            ++turnCount;
+        }
+        ++gameCount;
+    }
+
+    INFO("Moves per second: " << turnCount/num_seconds << ", Moves per game: " << turnCount/gameCount << " (" << turnCount << " moves in " << gameCount << " games in " << num_seconds << " seconds)");
+    CHECK(false);
+}
+
+TEST_CASE( "Performance tests - trim moves", "[.performance][trim]" ) {
+
+    unsigned gameCount = 0;
+    unsigned turnCount = 0;
+    unsigned num_seconds = 3;
+    auto start_time = Get_ns_since_epoch();
+
+    auto roundJSON = ReadJsonFile("./Test_files/state2.json");
+    auto original_state = std::make_shared<GameState>(roundJSON);
+
+    while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
+    //while(true) {
+
+        auto state = std::make_shared<GameState>(*original_state); //no idea why it needs to be done this way
+        GameEngine eng(state);
+
+        while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
+            eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true, state, true).get(), *eng.GetRandomValidMoveForWorm(false, state, true).get());
             ++turnCount;
         }
         ++gameCount;
@@ -391,8 +418,9 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
         
         WHEN("We do a playthrough to a depth -1")
         {
+            auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
         }
     }
 }

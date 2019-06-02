@@ -1,15 +1,11 @@
 TODO
     if theres a tie choose random
-    
-    make monte carlo "random" moves slightly clever
-        don't shoot unless there's an (enemy) target
-        don't move into a spot you just came from
 
-    refactor so commands don't need to know about their player/state up front
-
-    unit test playthrough?
     try
         monte carlo with evaluation
+            why is it never shooting!?
+            specify win state
+            returns scores from playthroughs (not just +/-1)
         minimax with evaluation
             plug in strategies for each player
             learn/estimate strategy while you play??
