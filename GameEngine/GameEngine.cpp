@@ -2,8 +2,7 @@
 #include <algorithm>
 
 std::shared_ptr<pcg32> GameEngine::_rng;
-std::vector<std::shared_ptr<Command>> GameEngine::_player1Shoots;
-std::vector<std::shared_ptr<Command>> GameEngine::_player2Shoots;
+std::vector<std::shared_ptr<Command>> GameEngine::_playerShoots;
 std::vector<Position> GameEngine::_surroundingWormSpaces;
     
 GameEngine::GameEngine()
@@ -13,31 +12,20 @@ GameEngine::GameEngine()
 GameEngine::GameEngine(std::shared_ptr<GameState> state) : 
     _state{state}
 {
-    if(_player1Shoots.empty()) {
+    if(_playerShoots.empty()) {
         // Seed with a real random value, if available
         pcg_extras::seed_seq_from<std::random_device> seed_source;
         // Make a random number engine 
         _rng = std::make_shared<pcg32>(seed_source);
 
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-        _player1Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
-    }
-
-    if(_player2Shoots.empty()) {
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
-        _player2Shoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::N));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::E));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::W));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SW));
+        _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::SE));
     }
 
     if(_surroundingWormSpaces.empty()) {
@@ -255,7 +243,7 @@ std::shared_ptr<Command> GameEngine::GetRandomValidMoveForWorm(bool player1, std
 
     //get random moves (teleport/dig) and shoots
     std::vector<std::shared_ptr<Command>> moves = GetValidTeleportDigsForWorm (player1, state, trimStupidMoves);
-    std::vector<std::shared_ptr<Command>> shoots = trimStupidMoves? (GetSensibleShootsForWorm(player1, state)):(player1? _player1Shoots : _player2Shoots);
+    std::vector<std::shared_ptr<Command>> shoots = trimStupidMoves? (GetSensibleShootsForWorm(player1, state)):_playerShoots;
 
     //choose random one
     int totalNumMoves = moves.size() + shoots.size();
