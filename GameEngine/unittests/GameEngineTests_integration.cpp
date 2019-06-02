@@ -185,7 +185,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         THEN("Valid moves for player 1 are as expected")
         {
-            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state);
+            std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state);
             std::vector<std::shared_ptr<Command>> expected_moves;
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position(4,4)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
@@ -204,7 +204,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         THEN("Valid moves for player 2 are as expected")
         {
-            std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(false, state);
+            std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(false, state);
             std::vector<std::shared_ptr<Command>> expected_moves;
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,6)));
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -227,7 +227,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state);
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state);
                 std::vector<std::shared_ptr<Command>> expected_moves;
 
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
@@ -253,7 +253,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state);
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state);
                 std::vector<std::shared_ptr<Command>> expected_moves;
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -272,7 +272,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected if we ask to trim")
             {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidMovesForWorm(true, state, true);
+                std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state, true);
                 std::vector<std::shared_ptr<Command>> expected_moves;
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -421,6 +421,24 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
             auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
             eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
+        }
+    }
+}
+
+
+TEST_CASE( "Debugging aid...", "[.debug]" )
+{
+    GIVEN("A realistic game state and engine")
+    {
+        for(unsigned i = 0; i < 30000; i++)
+        {
+            auto roundJSON = ReadJsonFile("./Test_files/state_move_occupied1.json");
+            auto state = std::make_shared<GameState>(roundJSON);
+            GameEngine eng(state);
+
+            auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
+            int depth = 20;
+            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, false, depth);
         }
     }
 }

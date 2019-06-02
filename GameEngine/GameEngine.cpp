@@ -161,7 +161,8 @@ void GameEngine::ApplyPowerups()
 //TODO pass in strategies for each player
 //TODO pass in whether or not it should return binary or weights
 int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, 
-                            std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, 
+                            std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn,
+                            bool hardWin,
                             int depth)
 {
     Player* myPlayer = player1 ? &_state->player1 : &_state->player2;
@@ -170,7 +171,7 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
     std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
 
-    //int pointDiffBefore = myPlayer->GetScore() - otherPlayer->GetScore();
+    int pointDiffBefore = myPlayer->GetScore() - otherPlayer->GetScore();
 
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
         //std::cerr << "Advancing state with moves P1: " << p1Command->GetCommandString() << " and P2: " << p2Command->GetCommandString() << std::endl;
@@ -180,10 +181,14 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
         --depth;
     }
 
-    //int pointDiffAfter = myPlayer->GetScore() - otherPlayer->GetScore();
+    int pointDiffAfter = myPlayer->GetScore() - otherPlayer->GetScore();
 
-    bool won = (_currentResult.winningPlayer == myPlayer);
-    //bool won = (pointDiffAfter > pointDiffBefore);
+    bool won = false;
+    if(hardWin) {
+        won = (_currentResult.winningPlayer == myPlayer);
+    } else {
+        won = (pointDiffAfter > pointDiffBefore);
+    }
 
     if(won) {
         return 1;
@@ -199,7 +204,7 @@ GameEngine::GameResult GameEngine::GetResult()
 //2 things are implied and left out from this return:
 //1. "do nothing"
 //2. "shoot" in all directions
-std::vector<std::shared_ptr<Command>> GameEngine::GetValidMovesForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::vector<std::shared_ptr<Command>> GameEngine::GetValidTeleportDigsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
     std::vector<std::shared_ptr<Command>> ret;
     ret.reserve(8);
@@ -249,7 +254,7 @@ std::shared_ptr<Command> GameEngine::GetRandomValidMoveForWorm(bool player1, std
     std::shared_ptr<Command> ret;
 
     //get random moves (teleport/dig) and shoots
-    std::vector<std::shared_ptr<Command>> moves = GetValidMovesForWorm (player1, state, trimStupidMoves);
+    std::vector<std::shared_ptr<Command>> moves = GetValidTeleportDigsForWorm (player1, state, trimStupidMoves);
     std::vector<std::shared_ptr<Command>> shoots = trimStupidMoves? (GetSensibleShootsForWorm(player1, state)):(player1? _player1Shoots : _player2Shoots);
 
     //choose random one

@@ -163,10 +163,15 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     GameEngine eng1(state1);
 
     std::vector<MCNode> nodes;
-    auto possible_moves = eng1.GetValidMovesForWorm (ImPlayer1, state1, true);
+    auto possible_moves = eng1.GetValidTeleportDigsForWorm (ImPlayer1, state1, true);
     for(auto const &move : possible_moves ) {
         nodes.push_back({move, 0, 0, 0});
     }
+    auto possible_shoots = eng1.GetSensibleShootsForWorm (ImPlayer1, state1);
+    for(auto const &move : possible_shoots ) {
+        nodes.push_back({move, 0, 0, 0});
+    }
+
     int N = 0;
     float c = std::sqrt(2);
 
@@ -189,7 +194,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
         GameEngine eng(state);
 
         auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, 20);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, false, 20);
 
         next_node->score += thisScore;
         next_node->w += thisScore > 0? 1 : 0;

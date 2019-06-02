@@ -30,8 +30,8 @@ class GameEngine
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
-    int Playthrough(bool player1, std::shared_ptr<Command> command, std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, int depth = -1);
-    static std::vector<std::shared_ptr<Command>> GetValidMovesForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
+    int Playthrough(bool player1, std::shared_ptr<Command> command, std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, bool hardWin, int depth);
+    static std::vector<std::shared_ptr<Command>> GetValidTeleportDigsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
     static std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
     static std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1, std::shared_ptr<GameState> state);
     GameResult GetResult();

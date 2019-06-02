@@ -3,9 +3,11 @@ TODO
 
     try
         monte carlo with evaluation
-            why is it never shooting!?
+            getting invalid moves
+            check which one is better, trim or no
             specify win state
             returns scores from playthroughs (not just +/-1)
+            run sims on a per worm basis
         minimax with evaluation
             plug in strategies for each player
             learn/estimate strategy while you play??
