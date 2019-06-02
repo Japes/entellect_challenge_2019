@@ -420,7 +420,7 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
         {
             auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, false, depth);
         }
     }
 }
