@@ -2,7 +2,7 @@
 #define CELL_H
 
 #include "Player.hpp"
-#include "Powerup.hpp"
+#include "PowerUp.hpp"
 #include <stdint.h>
 
 enum class CellType : uint8_t {
@@ -11,7 +11,6 @@ enum class CellType : uint8_t {
     DEEP_SPACE
 };
 
-CellType strToCellType(std::string str);
 
 struct Cell
 {
@@ -25,6 +24,8 @@ struct Cell
         worm = nullptr;
         powerup = nullptr;
     }
+
+    static CellType strToCellType(std::string str);
 };
 
 #endif

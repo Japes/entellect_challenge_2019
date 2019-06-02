@@ -107,7 +107,8 @@ void GameState::PopulateWeapon(Weapon& weapon, const rapidjson::Value& wJson)
     auto weaponJson = wJson.GetObject();
     weapon.damage = wJson["damage"].GetInt();
     weapon.range = wJson["range"].GetInt();
-    weapon.diagRange = std::ceil(std::sqrt((weapon.range*weapon.range)/2)); //inverse of euclidian
+    //weapon.diagRange = std::ceil(std::sqrt((weapon.range*weapon.range)/2)); //inverse of euclidian SEEMS TO BE A PROBLEM WITH THIS WHEN i SUBMIT...
+    weapon.diagRange = 3;
 }
 
 void GameState::PopulatePosition(Position& pos, const rapidjson::Value& posJson)
@@ -129,7 +130,7 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
         for (rapidjson::Value::ConstValueIterator colItr = (*rowItr).Begin(); colItr != (*rowItr).End(); ++colItr) {
             int x = (*colItr)["x"].GetInt();
             int y = (*colItr)["y"].GetInt();
-            CellType type = strToCellType((*colItr)["type"].GetString());
+            CellType type =  Cell::strToCellType((*colItr)["type"].GetString());
 
             Cell& thisCell = map[x][y];
             thisCell.type = type;

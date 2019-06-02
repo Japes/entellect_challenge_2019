@@ -1,6 +1,6 @@
 #include "Cell.hpp"
 
-CellType strToCellType(std::string str)
+CellType Cell::strToCellType(std::string str)
 {
     if(str == "DEEP_SPACE") {
         return CellType::DEEP_SPACE;
