@@ -1,13 +1,43 @@
 TODO
-    if theres a tie choose random
+
+    update runmatch script to do tournaments and tuning
+
+    add new rules to engine
+
+    sort out deployment
+        known issue: with cell.cpp (global method)
+        known issue: with std::ceil line
+        known issue: incorrect case in header includes
+        copy bot folder
+        drag in gameengine and random lib
+        remove bin/rounds
+        get rid of all cerr?
+
+    insights from replays
+        bots can get "lost" if they are in wide open spaces
+            check confidence of next move, use heuristics if not sure?
+            happened against nico beukes
+        reference bot strategy is quite popular
+
+    spreadsheet profile of opponents
+
+    add verifier test for engine
+
+    sometimes getting errors in my playthroughs
+
+    Need to take KOs into account when evaluating!  not just score
 
     try
+        if theres a tie choose random
         monte carlo with evaluation
+            bias moves in favour of continuing in the same direction
             getting invalid moves
             check which one is better, trim or no
-            specify win state
             returns scores from playthroughs (not just +/-1)
             run sims on a per worm basis
+            run matches with extended play time
+                confirm that longer playtime makes smarter bot
+                check if bot wins sooner with longer play time?
         minimax with evaluation
             plug in strategies for each player
             learn/estimate strategy while you play??
@@ -18,6 +48,8 @@ TODO
             return just directions, create move/dig just before advancestate
             possibly bulk allocate list of all move/dig moves at startup
 
+
+--------------------------------------------------------------------------------------
 
 latest profiling of performance unit test:
     GetRandomValidMoveForWorm 
