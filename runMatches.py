@@ -18,6 +18,7 @@ _startingPath = "" #path script is run from
 #global vars #################################
 _verbosity = 2 #verbosity 0 = fast as possible; 1 = show only game map; 2 = show as much as possible
 _bots = []
+_numRounds = 2 #how many times to run tournament
 
 #function defs################################
 def showUsage():
@@ -132,6 +133,8 @@ def getLatestMatchResult(matchLogsPath):
             ret["matchSeed"] = int(line[12:])
         if("The winner is: " in line):
             ret["winner"] = line[15]
+        if("The game ended in a tie" in line):
+            ret["winner"] = "tie"
         if(line.startswith("A - ")):
             splitLineName = line.split('-')
             ret["playerAName"] = splitLineName[1][1:]
@@ -195,6 +198,30 @@ def runMatch(bot1, bot2):
 _startingPath = os.getcwd()
 parseArgs()
 
+results = {}
 for i in range(0, len(_bots)):
-    for j in range(i + 1, len(_bots)):
-        matchResult = runMatch(_bots[i], _bots[j])
+    results[_bots[i] + " played"] = 0
+    results[_bots[i] + " wins"] = 0
+    results[_bots[i] + " draws"] = 0
+    results[_bots[i] + " losses"] = 0
+
+for rounds in range(0, _numRounds):
+    for i in range(0, len(_bots)):
+        for j in range(i + 1, len(_bots)):
+            matchResult = runMatch(_bots[i], _bots[j])
+            results[_bots[i] + " played"] += 1#results[_bots[i] + " played"] + 1
+            results[_bots[j] + " played"] += 1# results[_bots[j] + " played"] + 1
+            if matchResult["winner"] == 'A':
+                results[_bots[i] + " wins"] += 1# results[_bots[i] + " wins"] + 1
+                results[_bots[j] + " losses"] += 1# results[_bots[j] + " losses"] + 1
+            elif matchResult["winner"] == 'B':
+                results[_bots[j] + " wins"] += 1# results[_bots[j] + " wins"] + 1
+                results[_bots[i] + " losses"] += 1# results[_bots[i] + " losses"] + 1
+            elif matchResult["winner"] == 'tie':
+                results[_bots[i] + " draws"] += 1# results[_bots[j] + " wins"] + 1
+                results[_bots[j] + " draws"] += 1# results[_bots[j] + " wins"] + 1
+    
+            print(str(results))
+
+print("All done:")
+print(str(results))
