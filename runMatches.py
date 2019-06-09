@@ -197,31 +197,47 @@ def runMatch(bot1, bot2):
 
 _startingPath = os.getcwd()
 parseArgs()
+print("BOTS: " + str(_bots))
 
-results = {}
+played_results = {}
+win_results = {}
+draw_results = {}
+loss_results = {}
 for i in range(0, len(_bots)):
-    results[_bots[i] + " played"] = 0
-    results[_bots[i] + " wins"] = 0
-    results[_bots[i] + " draws"] = 0
-    results[_bots[i] + " losses"] = 0
+    played_results[_bots[i]]    = 0
+    win_results[_bots[i]]       = 0
+    draw_results[_bots[i]]      = 0
+    loss_results[_bots[i]]      = 0
 
 for rounds in range(0, _numRounds):
-    for i in range(0, len(_bots)):
+    for i in range(0, len(_bots)-1):
         for j in range(i + 1, len(_bots)):
+            print(_bots[i] + " " + _bots[j])
             matchResult = runMatch(_bots[i], _bots[j])
-            results[_bots[i] + " played"] += 1#results[_bots[i] + " played"] + 1
-            results[_bots[j] + " played"] += 1# results[_bots[j] + " played"] + 1
+            played_results[_bots[i]] += 1
+            played_results[_bots[j]] += 1
             if matchResult["winner"] == 'A':
-                results[_bots[i] + " wins"] += 1# results[_bots[i] + " wins"] + 1
-                results[_bots[j] + " losses"] += 1# results[_bots[j] + " losses"] + 1
+                win_results[_bots[i]] += 1
+                loss_results[_bots[j]] += 1
             elif matchResult["winner"] == 'B':
-                results[_bots[j] + " wins"] += 1# results[_bots[j] + " wins"] + 1
-                results[_bots[i] + " losses"] += 1# results[_bots[i] + " losses"] + 1
+                win_results[_bots[j]] += 1
+                loss_results[_bots[i]] += 1
             elif matchResult["winner"] == 'tie':
-                results[_bots[i] + " draws"] += 1# results[_bots[j] + " wins"] + 1
-                results[_bots[j] + " draws"] += 1# results[_bots[j] + " wins"] + 1
-    
-            print(str(results))
+                draw_results[_bots[i]] += 1
+                draw_results[_bots[j]] += 1
+
+            for k in range(0, len(_bots)):
+                print(_bots[k] + ":")
+                print("\t played:" + str(played_results[_bots[k]]))
+                print("\t won:" + str(win_results[_bots[k]]))
+                print("\t lost:" + str(loss_results[_bots[k]]))
+                print("\t drew:" + str(draw_results[_bots[k]]))
 
 print("All done:")
-print(str(results))
+
+for i, bot in enumerate(_bots):
+    print(bot + ":")
+    print("\t played:" + str(played_results[bot]))
+    print("\t won:" + str(win_results[bot]))
+    print("\t lost:" + str(loss_results[bot]))
+    print("\t drew:" + str(draw_results[bot]))
