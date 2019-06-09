@@ -11,6 +11,7 @@ TODO
         copy bot folder
         drag in gameengine and random lib
         remove bin/rounds
+        make changes to makefile (folders)
         get rid of all cerr?
 
     insights from replays
