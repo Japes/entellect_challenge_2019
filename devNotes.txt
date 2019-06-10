@@ -1,32 +1,40 @@
+remember to upload regularly!
+
 TODO
 
-    update runmatch script to do tournaments and tuning
+    finish runmatch script update
+       store and display proper grid
+       allow for infinite run
+       look at using same seed for all matches?
+       
+   low hanging fruit improvements (update and then compare against previous bot and ref bot)
+      Need to take KOs into account when evaluating!  not just score
+         can i try to reproduce this and confirm it works 
+            (maybe reference bot with specific seed)
+            or just reference bot with my health real low
+      Need to avoid getting lost
+         one solution - bias towards moving in a direction
+         another solution - low confidence, go for heuristic 
+            aim for big clump of dirt if health looking bad
+            go for enemies if health looking good
+            run away if at a points advantage
+      
+    Tuning
+       make bot tunable via config file
+       update tournament script
 
-    add new rules to engine
-
-    sort out deployment
-        known issue: with cell.cpp (global method)
-        known issue: with std::ceil line
-        known issue: incorrect case in header includes
-        copy bot folder
-        drag in gameengine and random lib
-        remove bin/rounds
-        make changes to makefile (folders)
-        get rid of all cerr?
-
-    insights from replays
-        bots can get "lost" if they are in wide open spaces
-            check confidence of next move, use heuristics if not sure?
-            happened against nico beukes
-        reference bot strategy is quite popular
-
-    spreadsheet profile of opponents
+    add new rules to engine 
+       compare with previous bots after doing this
 
     add verifier test for engine
+       compare with previous bots after doing this (and of course fixing any issues that arose)
+       
+    spreadsheet profile of opponents
 
+   
     sometimes getting errors in my playthroughs
 
-    Need to take KOs into account when evaluating!  not just score
+    
 
     try
         if theres a tie choose random
@@ -49,9 +57,24 @@ TODO
             return just directions, create move/dig just before advancestate
             possibly bulk allocate list of all move/dig moves at startup
 
+    sort out deployment
+        known issue: with cell.cpp (global method)
+        known issue: with std::ceil line
+        known issue: incorrect case in header includes
+        copy bot folder
+        drag in gameengine and random lib
+        remove bin/rounds
+        make changes to makefile (folders)
+        get rid of all cerr?
 
 --------------------------------------------------------------------------------------
 
+insights from replays
+        bots can get "lost" if they are in wide open spaces
+            check confidence of next move, use heuristics if not sure?
+            happened against nico beukes
+        reference bot strategy is quite popular
+        
 latest profiling of performance unit test:
     GetRandomValidMoveForWorm 
     GetValidMovesForWorm 
