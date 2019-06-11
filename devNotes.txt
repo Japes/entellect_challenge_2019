@@ -1,5 +1,3 @@
-remember to upload regularly!
-
 TODO
 
     finish runmatch script update
@@ -13,30 +11,53 @@ TODO
             (maybe reference bot with specific seed)
             or just reference bot with my health real low
       Need to avoid getting lost
+         try using seed/jippo'd game state to reproduce this
          one solution - bias towards moving in a direction
          another solution - low confidence, go for heuristic 
             aim for big clump of dirt if health looking bad
             go for enemies if health looking good
             run away if at a points advantage
+      upload after doing this if better
       
     Tuning
        make bot tunable via config file
        update tournament script
+       upload after doing this if better
 
     add new rules to engine 
        compare with previous bots after doing this
+       upload after doing this if better
 
     add verifier test for engine
        compare with previous bots after doing this (and of course fixing any issues that arose)
+       upload after doing this if better
        
     spreadsheet profile of opponents
-
+       scrape logs to find their output
    
     sometimes getting errors in my playthroughs
 
-    
+    optimise engine
+        next steps:
+            return just directions, create move/dig just before advancestate
+            possibly bulk allocate list of all move/dig moves at startup
+
+    sort out deployment
+        known issue: with cell.cpp (global method)
+        known issue: with std::ceil line
+           c++ std?
+        known issue: incorrect case in header includes
+        copy bot folder
+        drag in gameengine and random lib
+        remove bin/rounds
+        make changes to makefile (folders)
+        get rid of all cerr?
+           use a log wrapper function that can be disabled
+
+BRAINSTORMING---------------------------------------------------------------------------------------
 
     try
+       playthroughs considering only nearby worms
         if theres a tie choose random
         monte carlo with evaluation
             bias moves in favour of continuing in the same direction
@@ -52,30 +73,13 @@ TODO
             learn/estimate strategy while you play??
         "mixed" strategy?
 
-    optimise engine
-        next steps:
-            return just directions, create move/dig just before advancestate
-            possibly bulk allocate list of all move/dig moves at startup
-
-    sort out deployment
-        known issue: with cell.cpp (global method)
-        known issue: with std::ceil line
-        known issue: incorrect case in header includes
-        copy bot folder
-        drag in gameengine and random lib
-        remove bin/rounds
-        make changes to makefile (folders)
-        get rid of all cerr?
-
---------------------------------------------------------------------------------------
-
-insights from replays
+insights from replays-----------------------------------------------------------------
         bots can get "lost" if they are in wide open spaces
             check confidence of next move, use heuristics if not sure?
             happened against nico beukes
         reference bot strategy is quite popular
         
-latest profiling of performance unit test:
+latest profiling of performance unit test:--------------------------------------------
     GetRandomValidMoveForWorm 
     GetValidMovesForWorm 
         new
