@@ -5,6 +5,7 @@ import os
 import sys
 import shutil
 import time
+import datetime
 
 #script for running matches/tournaments using the official runner/scripts.
 #goal is to mimic actual tournament running conditions as closely as possible
@@ -14,6 +15,7 @@ _botsPath = "./bots/" #relative path to bots from script position
 _staterPackPath = "./starter-pack" #relative path to starterpack from script position
 _matchLogsPath = "./match-logs" #relative path to match logs FROM STARTER PACK (this gets put in the game runner config)
 _startingPath = "" #path script is run from
+_resultsFolder = "runMatchesResults"
 
 #global vars #################################
 _verbosity = 2 #verbosity 0 = fast as possible; 1 = show only game map; 2 = show as much as possible
@@ -193,51 +195,99 @@ def runMatch(bot1, bot2):
 
     return matchResult
 
+def GetOutputPaths():
+    if not os.path.exists(_resultsFolder):
+        os.makedirs(_resultsFolder)
+    dateString = datetime.datetime.now().strftime("%Y_%B_%d__%I_%M_%S")
+    os.makedirs(_resultsFolder + "/" + dateString)
+    allMatchesFilePath = _resultsFolder + "/" + dateString + "/" + "AllMatches.txt"
+    summaryFilePath = _resultsFolder + "/" + dateString + "/" + "Summary.txt"
+    return allMatchesFilePath, summaryFilePath 
+
+def GetSummaryGrid():
+    grid_summary = {}
+    for i in range(0, len(_bots)):
+        grid_summary[_bots[i]] = {}
+        for j in range(0, len(_bots)):
+            grid_summary[_bots[i]][_bots[j]] = {}
+            grid_summary[_bots[i]][_bots[j]]["wins"] = 0
+            grid_summary[_bots[i]][_bots[j]]["draws"] = 0
+            grid_summary[_bots[i]][_bots[j]]["losses"] = 0
+    return grid_summary
+
+#pad a string so that its length is a multiple of numChars
+def PadToNext(numChars, line):
+    for i in range(0, numChars - (len(line) % numChars)):
+        line += ' '
+    return line
+        
+
+def WriteSummary(grid, bots, summaryFilePath):
+    maxBotNameLength = 25
+    file = open(summaryFilePath, "a+")
+
+    summary = ''
+    header = '(wins/draws/losses):'
+    header = PadToNext(maxBotNameLength, header)
+    for bot in _bots:
+        if(len(bot) > maxBotNameLength):
+            file.writelines("One of these bots has a long name, it might cock up the formatting here :/\n")
+        header += bot
+        header = PadToNext(maxBotNameLength, header)
+    summary += header + "\n"
+
+    for bot in _bots:
+        line = bot + ':'
+        line = PadToNext(maxBotNameLength, line)
+        totalWins = 0
+        totalDraws = 0
+        totalLosses = 0
+        for opponent in _bots:
+            numWins = grid[bot][opponent]["wins"]
+            numDraws = grid[bot][opponent]["draws"]
+            numLosses = grid[bot][opponent]["losses"]
+            totalWins += numWins
+            totalDraws += numDraws
+            totalLosses += numLosses
+            line += str(numWins) + '/' + str(numDraws) + '/' + str(numLosses)
+            line = PadToNext(maxBotNameLength, line)
+        line += "(" + str(totalWins) + '/' + str(totalDraws) + '/' + str(totalLosses) + ")"
+        summary += line + "\n"
+
+    file.writelines(summary + "\n")
+    file.close()
+    print(summary)
+
 #the script  ###############################################################################
 
 _startingPath = os.getcwd()
 parseArgs()
 print("BOTS: " + str(_bots))
 
-played_results = {}
-win_results = {}
-draw_results = {}
-loss_results = {}
-for i in range(0, len(_bots)):
-    played_results[_bots[i]]    = 0
-    win_results[_bots[i]]       = 0
-    draw_results[_bots[i]]      = 0
-    loss_results[_bots[i]]      = 0
+allMatchesFilePath, summaryFilePath = GetOutputPaths()
 
-for rounds in range(0, _numRounds):
+#run matches
+grid_summary = GetSummaryGrid()
+
+#for rounds in range(0, _numRounds):
+while True:
     for i in range(0, len(_bots)-1):
         for j in range(i + 1, len(_bots)):
+    
             print(_bots[i] + " " + _bots[j])
             matchResult = runMatch(_bots[i], _bots[j])
-            played_results[_bots[i]] += 1
-            played_results[_bots[j]] += 1
+            file = open(allMatchesFilePath, "a+")
+            file.writelines(str(matchResult) + "\n")
+            file.close()  
+    
             if matchResult["winner"] == 'A':
-                win_results[_bots[i]] += 1
-                loss_results[_bots[j]] += 1
+                grid_summary[_bots[i]][_bots[j]]["wins"] += 1
+                grid_summary[_bots[j]][_bots[i]]["losses"] += 1
             elif matchResult["winner"] == 'B':
-                win_results[_bots[j]] += 1
-                loss_results[_bots[i]] += 1
+                grid_summary[_bots[i]][_bots[j]]["losses"] += 1
+                grid_summary[_bots[j]][_bots[i]]["wins"] += 1
             elif matchResult["winner"] == 'tie':
-                draw_results[_bots[i]] += 1
-                draw_results[_bots[j]] += 1
+                grid_summary[_bots[i]][_bots[j]]["draws"] += 1
+                grid_summary[_bots[j]][_bots[i]]["draws"] += 1
 
-            for k in range(0, len(_bots)):
-                print(_bots[k] + ":")
-                print("\t played:" + str(played_results[_bots[k]]))
-                print("\t won:" + str(win_results[_bots[k]]))
-                print("\t lost:" + str(loss_results[_bots[k]]))
-                print("\t drew:" + str(draw_results[_bots[k]]))
-
-print("All done:")
-
-for i, bot in enumerate(_bots):
-    print(bot + ":")
-    print("\t played:" + str(played_results[bot]))
-    print("\t won:" + str(win_results[bot]))
-    print("\t lost:" + str(loss_results[bot]))
-    print("\t drew:" + str(draw_results[bot]))
+    WriteSummary(grid_summary, _bots, summaryFilePath)

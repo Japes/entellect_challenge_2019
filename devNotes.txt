@@ -1,10 +1,5 @@
 TODO
 
-    finish runmatch script update
-       store and display proper grid
-       allow for infinite run
-       look at using same seed for all matches?
-       
    low hanging fruit improvements (update and then compare against previous bot and ref bot)
       Need to take KOs into account when evaluating!  not just score
          can i try to reproduce this and confirm it works 
@@ -41,6 +36,9 @@ TODO
         next steps:
             return just directions, create move/dig just before advancestate
             possibly bulk allocate list of all move/dig moves at startup
+
+    finish runmatch script update
+       look at using same seed for all matches?
 
     sort out deployment
         known issue: with cell.cpp (global method)

@@ -194,7 +194,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
         GameEngine eng(state);
 
         auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, false, 20);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, false, 24);
 
         next_node->score += thisScore;
         next_node->w += thisScore > 0? 1 : 0;
