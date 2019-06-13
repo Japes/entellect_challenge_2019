@@ -3,6 +3,8 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
+#include "NextTurn.hpp"
+#include "EvaluationFunctions.hpp"
 #include <fstream>
 #include <sstream>
 #include <chrono>
@@ -119,180 +121,6 @@ TEST_CASE( "Load GameState from rapidJSON object", "[IO]" ) {
     CheckCellEmpty(state.Cell_at({12, 24}), CellType::DIRT);
 }
 
-bool Contains_one(std::vector<std::shared_ptr<Command>>& haystack, std::shared_ptr<Command> needle)
-{
-    int num_found = 0;
-    for(unsigned i = 0; i < haystack.size(); i++) {
-
-        {
-            ShootCommand* hay_ptr = dynamic_cast<ShootCommand*>(haystack[i].get());
-            ShootCommand* needle_ptr = dynamic_cast<ShootCommand*>(needle.get());
-            if(hay_ptr != nullptr && needle_ptr != nullptr &&
-                *hay_ptr == *needle_ptr) {
-                num_found++;
-            }
-        }
-
-        {
-            TeleportCommand* hay_ptr = dynamic_cast<TeleportCommand*>(haystack[i].get());
-            TeleportCommand* needle_ptr = dynamic_cast<TeleportCommand*>(needle.get());
-            if(hay_ptr != nullptr && needle_ptr != nullptr &&
-                *hay_ptr == *needle_ptr) {
-                num_found++;
-            }
-        }
-
-        {
-            DigCommand* hay_ptr = dynamic_cast<DigCommand*>(haystack[i].get());
-            DigCommand* needle_ptr = dynamic_cast<DigCommand*>(needle.get());
-            if(hay_ptr != nullptr && needle_ptr != nullptr &&
-                *hay_ptr == *needle_ptr) {
-                num_found++;
-            }
-        }
-    }
-
-    return num_found == 1;
-}
-
-TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
-    GIVEN("A semi realistic game state and engine")
-    {
-        /*
-        0   1   2   3   4   5   6   7
-    0   .   .   .   .   .   .   .   .
-    1   .   .   .   .   22  .   .   .
-    2   .   .   .   .   .   .   .   .
-    3   .   .   .   13  .   23  .   .
-    4   .   .   .   .   .   D   .   .
-    5   .   .   .   .   D   11  12  S
-    6   .   .   .   .   D   21  .   .
-    7   .   .   .   .   .   .   .   .            
-        */
-
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
-        place_worm(true, 1, {5,5}, state);
-        place_worm(true, 2, {6,5}, state);
-        place_worm(true, 3, {3,3}, state);
-        place_worm(false, 1, {5,6}, state);
-        place_worm(false, 2, {4,1}, state);
-        place_worm(false, 3, {5,3}, state);
-        state->Cell_at({4, 5})->type = CellType::DIRT;
-        state->Cell_at({5, 4})->type = CellType::DIRT;
-        state->Cell_at({4, 6})->type = CellType::DIRT;
-        state->Cell_at({7, 5})->type = CellType::DEEP_SPACE;
-
-        THEN("Valid moves for player 1 are as expected")
-        {
-            std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state);
-            std::vector<std::shared_ptr<Command>> expected_moves;
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position(4,4)));
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,6})));
-            expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
-            expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
-            expected_moves.push_back(std::make_shared<DigCommand>(Position(4,6)));
-
-            REQUIRE(moves.size() == expected_moves.size());
-
-            for(unsigned i = 0; i < expected_moves.size(); i++) {
-                bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
-                CHECK(containsExactlyOne);
-            }
-        }
-
-        THEN("Valid moves for player 2 are as expected")
-        {
-            std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(false, state);
-            std::vector<std::shared_ptr<Command>> expected_moves;
-            expected_moves.push_back(std::make_shared<DigCommand>(Position(4,6)));
-            expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position(6,6)));
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,7})));
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,7})));
-            expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,7})));
-
-            REQUIRE(moves.size() == expected_moves.size());
-
-            for(unsigned i = 0; i < expected_moves.size(); i++) {
-                bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
-                CHECK(containsExactlyOne);
-            }
-        }
-
-        AND_THEN("Progressing the game forward 1 turn")
-        {
-            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-
-            THEN("Valid moves for player 1 are as expected")
-            {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state);
-                std::vector<std::shared_ptr<Command>> expected_moves;
-
-                expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({7,4})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({7,6})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,6})));
-
-                REQUIRE(moves.size() == expected_moves.size());
-
-                for(unsigned i = 0; i < expected_moves.size(); i++) {
-                    bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
-                    CHECK(containsExactlyOne);
-                }
-            }
-        }
-
-        AND_THEN("Moving a dude, and cycling to his turn again")
-        {
-            eng.AdvanceState(TeleportCommand({4,4}), DoNothingCommand());
-            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-
-            THEN("Valid moves for player 1 are as expected")
-            {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state);
-                std::vector<std::shared_ptr<Command>> expected_moves;
-                expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
-                expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,5})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,5})));
-
-                REQUIRE(moves.size() == expected_moves.size());
-
-                for(unsigned i = 0; i < expected_moves.size(); i++) {
-                    bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
-                    CHECK(containsExactlyOne);
-                }
-            }
-
-            THEN("Valid moves for player 1 are as expected if we ask to trim")
-            {
-                std::vector<std::shared_ptr<Command>> moves = eng.GetValidTeleportDigsForWorm(true, state, true);
-                std::vector<std::shared_ptr<Command>> expected_moves;
-                expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
-                expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,5})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
-                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
-                //expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,5}))); NOTE THIS IS EXCLUDED (place i just came from)
-
-                CHECK(moves.size() == expected_moves.size());
-
-                for(unsigned i = 0; i < expected_moves.size(); i++) {
-                    bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
-                    INFO("Don't have expected move " << i << "(" << expected_moves[i]->GetCommandString() << ")" );
-                    CHECK(containsExactlyOne);
-                }
-            }
-        }
-    }
-}
-
 uint64_t Get_ns_since_epoch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
 }
@@ -314,7 +142,7 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
         GameEngine eng(state);
 
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true, state).get(), *eng.GetRandomValidMoveForWorm(false, state).get());
+            eng.AdvanceState(*NextTurn::GetRandomValidMoveForWorm(true, state).get(), *NextTurn::GetRandomValidMoveForWorm(false, state).get());
             ++turnCount;
         }
         ++gameCount;
@@ -341,7 +169,7 @@ TEST_CASE( "Performance tests - trim moves", "[.performance][trim]" ) {
         GameEngine eng(state);
 
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*eng.GetRandomValidMoveForWorm(true, state, true).get(), *eng.GetRandomValidMoveForWorm(false, state, true).get());
+            eng.AdvanceState(*NextTurn::GetRandomValidMoveForWorm(true, state, true).get(), *NextTurn::GetRandomValidMoveForWorm(false, state, true).get());
             ++turnCount;
         }
         ++gameCount;
@@ -418,9 +246,9 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
         
         WHEN("We do a playthrough to a depth -1")
         {
-            auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
+            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, false, depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
         }
     }
 }
@@ -436,9 +264,9 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
             auto state = std::make_shared<GameState>(roundJSON);
             GameEngine eng(state);
 
-            auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
+            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
             int depth = 20;
-            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, false, depth);
+            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
         }
     }
 }

@@ -3,6 +3,8 @@
 #include "../GameEngine.hpp"
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
+#include "NextTurn.hpp"
+#include "EvaluationFunctions.hpp"
 #include "GameEngineTestUtils.hpp"
 
 TEST_CASE( "I can make a game engine instance", "[sanity]" ) {
@@ -663,13 +665,13 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         place_worm(false, 2, {21,10}, state);
         place_worm(false, 3, {22,20}, state);
 
-        auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
 
         WHEN("We do a playthrough to a certain depth")
         {
             int roundBefore = state->roundNumber;
             int depth = 4;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, false, depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
 
             THEN("The game engine advances by that many rounds")
             {
@@ -681,7 +683,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         {
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, false, depth);
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
 
             THEN("The game engine advances until the end")
             {
@@ -689,112 +691,48 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             }
         }
 
-        WHEN("We set it up so that player1 wins - hardWin")
+
+        int depth = 3;
+        WHEN("We set it up so that player1 wins - (points diff improves)")
         {
-            state->player1.command_score = 9999;
-            int depth = -1;
+            auto fakeNextMoveFn = [](bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> { 
+                if(player1) {
+                    return std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S);
+                } else {
+                    return std::make_shared<DoNothingCommand>();
+                }
+            };
+
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, true, depth);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
 
             THEN("We get a positive result")
             {
                 REQUIRE(ret == 1);
-                REQUIRE(eng.GetResult().result == GameEngine::ResultType::FINISHED_POINTS);
                 REQUIRE(eng.GetResult().winningPlayer == &state->player1);
                 REQUIRE(eng.GetResult().losingPlayer == &state->player2);
             }
         }
 
-        WHEN("We set it up so that player2 wins - hardWin")
+        WHEN("We set it up so that player2 wins - (points diff improves)")
         {
-            state->player2.command_score = 9999;
-            int depth = -1;
+            auto fakeNextMoveFn = [](bool player1, std::shared_ptr<GameState> state)  -> std::shared_ptr<Command> { 
+                if(!player1) {
+                    return std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S);
+                } else {
+                    return std::make_shared<DoNothingCommand>();
+                }
+            };
+
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, true, depth);
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
 
             THEN("We get a negative result")
             {
                 REQUIRE(ret == -1);
-                REQUIRE(eng.GetResult().result == GameEngine::ResultType::FINISHED_POINTS);
                 REQUIRE(eng.GetResult().winningPlayer == &state->player2);
                 REQUIRE(eng.GetResult().losingPlayer == &state->player1);
             }
-        }
-
-        WHEN("We test softwins")
-        {
-            int depth = 3;
-            WHEN("We set it up so that player1 wins - (points diff improves)")
-            {
-                auto fakeNextMoveFn = [](bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> { 
-                    if(player1) {
-                        return std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S);
-                    } else {
-                        return std::make_shared<DoNothingCommand>();
-                    }
-                };
-
-                REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-                int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, false, depth);
-
-                THEN("We get a positive result")
-                {
-                    REQUIRE(ret == 1);
-                    REQUIRE(eng.GetResult().winningPlayer == &state->player1);
-                    REQUIRE(eng.GetResult().losingPlayer == &state->player2);
-                }
-            }
-
-            WHEN("We set it up so that player2 wins - (points diff improves)")
-            {
-                auto fakeNextMoveFn = [](bool player1, std::shared_ptr<GameState> state)  -> std::shared_ptr<Command> { 
-                    if(!player1) {
-                        return std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S);
-                    } else {
-                        return std::make_shared<DoNothingCommand>();
-                    }
-                };
-
-                REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-                int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, false, depth);
-
-                THEN("We get a negative result")
-                {
-                    REQUIRE(ret == -1);
-                    REQUIRE(eng.GetResult().winningPlayer == &state->player2);
-                    REQUIRE(eng.GetResult().losingPlayer == &state->player1);
-                }
-            }
-        }
-    }
-}
-
-TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
-{
-    GIVEN("A semi realistic game state and engine")
-    {
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
-        
-        place_worm(true, 1, {10,10}, state);
-        place_worm(true, 2, {11,10}, state); //friendly E of us
-        place_worm(true, 3, {8,10}, state); //friendly W of us
-        place_worm(false, 1, {11,9}, state); //enemy NE 1 step
-        place_worm(false, 2, {13,13}, state); //enemy SE 2 step
-        place_worm(false, 3, {10,15}, state); //just out of range
-
-        THEN("GetSensibleShootsForWorm returns correct")
-        {
-            auto ret = eng.GetSensibleShootsForWorm(true, state);
-            REQUIRE(ret.size() == 2);
-            auto expected_move = std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE);
-
-            INFO(ret[0]->GetCommandString());
-            INFO(ret[1]->GetCommandString());
-
-            REQUIRE( ( (ret[0]->GetCommandString() == "shoot NE") || (ret[0]->GetCommandString() == "shoot SE") ) );
-            REQUIRE( ( (ret[1]->GetCommandString() == "shoot NE") || (ret[1]->GetCommandString() == "shoot SE") ) );
-            REQUIRE( ret[0]->GetCommandString() != ret[1]->GetCommandString() );
         }
     }
 }

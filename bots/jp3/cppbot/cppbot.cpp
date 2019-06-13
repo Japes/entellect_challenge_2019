@@ -11,6 +11,8 @@
 #include <limits>
 #include "GameEngine.hpp"
 #include "AllCommands.hpp"
+#include "NextTurn.hpp"
+#include "EvaluationFunctions.hpp"
 
 static std::string dirt = "DIRT";
 static std::string air = "AIR";
@@ -163,11 +165,11 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     GameEngine eng1(state1);
 
     std::vector<MCNode> nodes;
-    auto possible_moves = eng1.GetValidTeleportDigsForWorm (ImPlayer1, state1, true);
+    auto possible_moves = NextTurn::GetValidTeleportDigsForWorm (ImPlayer1, state1, true);
     for(auto const &move : possible_moves ) {
         nodes.push_back({move, 0, 0, 0});
     }
-    auto possible_shoots = eng1.GetSensibleShootsForWorm (ImPlayer1, state1);
+    auto possible_shoots = NextTurn::GetSensibleShootsForWorm (ImPlayer1, state1);
     for(auto const &move : possible_shoots ) {
         nodes.push_back({move, 0, 0, 0});
     }
@@ -193,8 +195,8 @@ std::string runStrategy(rapidjson::Document& roundJSON)
         auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
         GameEngine eng(state);
 
-        auto nextMoveFn = std::bind(GameEngine::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, false, 24);
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, 24);
 
         next_node->score += thisScore;
         next_node->w += thisScore > 0? 1 : 0;
@@ -203,7 +205,8 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     }
 
     //choose the best move and do it
-    auto best_move_it = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return (lhs.w/lhs.n) < (rhs.w/rhs.n); });
+    auto best_move_it = std::max_element(std::begin(nodes), std::end(nodes), 
+        [] (MCNode const lhs, MCNode const rhs) -> bool { return (lhs.w/lhs.n) < (rhs.w/rhs.n); });
 
     std::cerr << "MC results: ";
     for(auto const & move : nodes) {

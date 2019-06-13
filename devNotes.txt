@@ -1,5 +1,11 @@
 TODO
 
+    add verifier test for engine
+       compare with previous bots after doing this (and of course fixing any issues that arose)
+       upload after doing this if better
+
+    sometimes getting errors in my playthroughs
+
    low hanging fruit improvements (update and then compare against previous bot and ref bot)
       Need to take KOs into account when evaluating!  not just score
          can i try to reproduce this and confirm it works 
@@ -22,22 +28,16 @@ TODO
     add new rules to engine 
        compare with previous bots after doing this
        upload after doing this if better
-
-    add verifier test for engine
-       compare with previous bots after doing this (and of course fixing any issues that arose)
-       upload after doing this if better
        
     spreadsheet profile of opponents
        scrape logs to find their output
    
-    sometimes getting errors in my playthroughs
-
     optimise engine
         next steps:
             return just directions, create move/dig just before advancestate
             possibly bulk allocate list of all move/dig moves at startup
 
-    finish runmatch script update
+    runmatch script update
        look at using same seed for all matches?
 
     sort out deployment
@@ -70,6 +70,15 @@ BRAINSTORMING-------------------------------------------------------------------
             plug in strategies for each player
             learn/estimate strategy while you play??
         "mixed" strategy?
+
+        if you don't use select early on you've wasted it
+         check if im just using +-1 for playthroughs - should prob add bias there
+         disregard moves that would result in instant loss...
+         penalise playthroughs that result in loss heavily
+         do the move-in-a-line bias for yourself and the other worms
+
+         (the opponent worms, during the playthrough)
+         Prune the search tree by recognising symmetries
 
 insights from replays-----------------------------------------------------------------
         bots can get "lost" if they are in wide open spaces

@@ -30,14 +30,13 @@ class GameEngine
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
-    int Playthrough(bool player1, std::shared_ptr<Command> command, std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, bool hardWin, int depth);
-    static std::vector<std::shared_ptr<Command>> GetValidTeleportDigsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
-    static std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves = false);
-    static std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1, std::shared_ptr<GameState> state);
+    int Playthrough(bool player1, std::shared_ptr<Command> command, 
+        std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, 
+        std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
+        int radiusToConsider,
+        int depth);
     GameResult GetResult();
 
-    static std::vector<std::shared_ptr<Command>> _playerShoots;
-    
     private:
     bool DoCommand(const Command& command, bool player1, bool valid);
     void ApplyPowerups();
@@ -45,11 +44,6 @@ class GameEngine
 
     std::shared_ptr<GameState> _state;
     GameResult _currentResult;
-
-    static std::shared_ptr<pcg32> _rng;
-
-    static std::vector<Position> _surroundingWormSpaces;
-
 };
 
 #endif
