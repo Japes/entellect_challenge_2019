@@ -12,16 +12,6 @@ TEST_CASE( "I can make a game engine instance", "[sanity]" ) {
     REQUIRE( true );
 }
 
-TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
-    GameState state;
-    for(unsigned x = 0; x < GameConfig::mapSize; ++x) {
-        for(unsigned y = 0; y < GameConfig::mapSize; ++y) {
-            REQUIRE( state.map[x][x].worm == nullptr );
-            REQUIRE( state.map[x][x].powerup == nullptr );
-        }
-    }
-}
-
 TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
     //according to the rules:
     //move

@@ -112,7 +112,7 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
 
 void Check_valid_move(GameEngine& eng, std::shared_ptr<GameState> state, Position startPos, Position destPos)
 {
-    REQUIRE(state->Cell_at(startPos)->worm == state->player1.GetWormByIndex(1));
+    REQUIRE(state->Cell_at(startPos)->worm == state->player1.GetWormById(1));
     REQUIRE(state->Cell_at(destPos)->worm == nullptr);
 
     TeleportCommand player2move({0,0});
@@ -120,11 +120,11 @@ void Check_valid_move(GameEngine& eng, std::shared_ptr<GameState> state, Positio
     eng.AdvanceState(player1move,player2move);
 
     REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-    bool happy = state->player1.GetWormByIndex(1)->position == destPos;
+    bool happy = state->player1.GetWormById(1)->position == destPos;
     REQUIRE(happy);
 
     REQUIRE(state->Cell_at(startPos)->worm == nullptr);
-    REQUIRE(state->Cell_at(destPos)->worm == state->player1.GetWormByIndex(1));
+    REQUIRE(state->Cell_at(destPos)->worm == state->player1.GetWormById(1));
 }
 
 TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
@@ -179,8 +179,8 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 
         THEN("Worm collision works - pushback")
         {
-            auto healthBefore1 = state->player1.GetWormByIndex(1)->health;
-            auto healthBefore2 = state->player2.GetWormByIndex(1)->health;
+            auto healthBefore1 = state->player1.GetWormById(1)->health;
+            auto healthBefore2 = state->player2.GetWormById(1)->health;
 
             bool forcePushback = true;
             player1move = TeleportCommand(air_pos3, &forcePushback);
@@ -188,19 +188,19 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             eng.AdvanceState(player1move,player2move);
 
             CHECK(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            bool happy = state->player1.GetWormByIndex(1)->position == worm_under_test_pos;
+            bool happy = state->player1.GetWormById(1)->position == worm_under_test_pos;
             CHECK(happy);
-            happy = state->player2.GetWormByIndex(1)->position == enemy_worm_pos;
+            happy = state->player2.GetWormById(1)->position == enemy_worm_pos;
             CHECK(happy);
 
-            CHECK(state->player1.GetWormByIndex(1)->health == healthBefore1 - GameConfig::pushbackDamage);
-            CHECK(state->player1.GetWormByIndex(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
+            CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
         }
 
         THEN("Worm collision works - swap")
         {
-            auto healthBefore1 = state->player1.GetWormByIndex(1)->health;
-            auto healthBefore2 = state->player2.GetWormByIndex(1)->health;
+            auto healthBefore1 = state->player1.GetWormById(1)->health;
+            auto healthBefore2 = state->player2.GetWormById(1)->health;
 
             bool forcePushback = false; //force swap
             player1move = TeleportCommand(air_pos3, &forcePushback);
@@ -208,13 +208,13 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             eng.AdvanceState(player1move,player2move);
 
             CHECK(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            bool happy = state->player1.GetWormByIndex(1)->position == enemy_worm_pos;
+            bool happy = state->player1.GetWormById(1)->position == enemy_worm_pos;
             CHECK(happy);
-            happy = state->player2.GetWormByIndex(1)->position == worm_under_test_pos;
+            happy = state->player2.GetWormById(1)->position == worm_under_test_pos;
             CHECK(happy);
 
-            CHECK(state->player1.GetWormByIndex(1)->health == healthBefore1 - GameConfig::pushbackDamage);
-            CHECK(state->player2.GetWormByIndex(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
+            CHECK(state->player2.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
         }
 
 

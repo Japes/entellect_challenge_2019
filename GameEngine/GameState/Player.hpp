@@ -24,7 +24,7 @@ struct Player
     Player(const Player& other);
 
     Worm* GetCurrentWorm();
-    Worm* GetWormByIndex(int index);
+    Worm* GetWormById(int index);
     void UpdateCurrentWorm();
     void RecalculateHealth();
     int GetAverageWormHealth();

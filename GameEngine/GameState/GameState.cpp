@@ -29,7 +29,9 @@ GameState::GameState(const GameState& other) :
     player1.state = this;
     for(Worm &w : player1.worms) {
         w.state = this;
-        Cell_at(w.position)->worm = &w;
+        if(w.health > 0) {
+            Cell_at(w.position)->worm = &w;
+        }
     }
 
     player2.state = this;
@@ -39,6 +41,24 @@ GameState::GameState(const GameState& other) :
     }
 }
 
+void GameState::UpdateRefs()
+{
+    player1.state = this;
+    UpdateRefs(player1);
+
+    player2.state = this;
+    UpdateRefs(player2);
+}
+
+void GameState::UpdateRefs(Player& player)
+{
+    for(Worm &w : player.worms) {
+        w.state = this;
+        if(w.health > 0) {
+            Cell_at(w.position)->worm = &w;
+        }
+    }
+}
 
 GameState::GameState(rapidjson::Document& roundJSON) : GameState()
 {
@@ -94,7 +114,7 @@ void GameState::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)
     worm.health = wormJson["health"].GetInt();
     worm.movementRange = wormJson["movementRange"].GetInt();
     worm.diggingRange = wormJson["diggingRange"].GetInt();
-    PopulatePosition(worm.position, wormJson["position"]);
+    PopulatePosition(worm.position, wormJson["position"]);  
     worm.previous_position = worm.position;
 
     if(wormJson.HasMember("weapon")) {

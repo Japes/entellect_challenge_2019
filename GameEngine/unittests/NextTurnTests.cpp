@@ -220,7 +220,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,5})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({3,4})));
                 expected_moves.push_back(std::make_shared<TeleportCommand>(Position({4,3})));
-                //expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,5}))); NOTE THIS IS EXCLUDED (place i just came from)
+                expected_moves.push_back(std::make_shared<TeleportCommand>(Position({5,5})));
 
                 CHECK(moves.size() == expected_moves.size());
 

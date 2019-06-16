@@ -52,10 +52,6 @@ std::vector<std::shared_ptr<Command>> NextTurn::GetValidTeleportDigsForWorm(bool
             continue;
         }
 
-        if(trimStupidMoves && wormSpace == worm->previous_position) {
-            continue;
-        }
-
         if(state->Cell_at(wormSpace)->type == CellType::AIR) {
             ret.emplace_back(std::make_shared<TeleportCommand>(wormSpace));
         } else if(state->Cell_at(wormSpace)->type == CellType::DIRT) {

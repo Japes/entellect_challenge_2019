@@ -1,16 +1,17 @@
 TODO
 
-    add verifier test for engine
-       compare with previous bots after doing this (and of course fixing any issues that arose)
-       upload after doing this if better
-
-    sometimes getting errors in my playthroughs
-
-   low hanging fruit improvements (update and then compare against previous bot and ref bot)
+   why does dodging not always work
       Need to take KOs into account when evaluating!  not just score
          can i try to reproduce this and confirm it works 
             (maybe reference bot with specific seed)
             or just reference bot with my health real low
+
+    add verifier test for engine
+       compare with previous bots after doing this (and of course fixing any issues that arose)
+       upload after doing this if better
+
+
+   low hanging fruit improvements (update and then compare against previous bot and ref bot)
       Need to avoid getting lost
          try using seed/jippo'd game state to reproduce this
          one solution - bias towards moving in a direction

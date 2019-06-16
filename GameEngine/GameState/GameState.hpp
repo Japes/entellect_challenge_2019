@@ -25,6 +25,9 @@ class GameState
     void Move_worm(Worm* worm, Position pos);
 
     private:
+    void UpdateRefs();
+    void UpdateRefs(Player& player);
+
     void PrintJson(const rapidjson::Value& json);
 
     void PopulatePlayers(rapidjson::Document& roundJSON);

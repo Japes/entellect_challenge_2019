@@ -5,25 +5,8 @@
 #include "GameEngineTestUtils.hpp"
 #include "NextTurn.hpp"
 #include "EvaluationFunctions.hpp"
-#include <fstream>
 #include <sstream>
 #include <chrono>
-
-rapidjson::Document ReadJsonFile(std::string filePath)
-{
-    std::ifstream dataIn;
-    dataIn.open(filePath, std::ifstream::in);
-    REQUIRE(dataIn.is_open());
-
-    std::stringstream buffer;
-    buffer << dataIn.rdbuf();
-    std::string stateJson = buffer.str();
-    rapidjson::Document roundJSON;
-    const bool parsed = !roundJSON.Parse(stateJson.c_str()).HasParseError();
-    REQUIRE(parsed);
-
-    return roundJSON;
-}
 
 void CheckWorm(Worm* worm, int id, int health, Position pos, Position last_pos, int moveRange, int digRange, int weaponDmg, int weaponRange)
 {

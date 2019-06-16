@@ -150,7 +150,7 @@ struct MCNode
 
 std::ostream & operator << (std::ostream &out, const MCNode &move)
 {
-    out << move.command->GetCommandString() << ", " <<  move.w << "/" << move.n << ", " << move.score << ", " << move.UCT << std::endl;
+    out << move.command->GetCommandString() << ", " <<  move.w << "/" << move.n << ", " << move.score << ", " << move.UCT;
     return out;
 }
 
@@ -162,7 +162,8 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
 
     auto state1 = std::make_shared<GameState>(roundJSON);
-    GameEngine eng1(state1);
+
+    NextTurn::Initialise();
 
     std::vector<MCNode> nodes;
     auto possible_moves = NextTurn::GetValidTeleportDigsForWorm (ImPlayer1, state1, true);
@@ -179,17 +180,14 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     while(Get_ns_since_epoch() < (startTime + 950000000)) { //900ms
         //choose next node
-//        std::cerr << "UCT values:" << std::endl;
         for(auto & node:  nodes) {
             if(node.n == 0) {
                 node.UCT = std::numeric_limits<decltype(node.UCT)>::max();
             } else {
                 node.UCT = (node.w / node.n) + c*std::sqrt(std::log(N)/node.n );
             }
-//            std::cerr << node.UCT << std::endl; 
         }
         auto next_node = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return lhs.UCT < rhs.UCT; });
-//        std::cerr << "choosing node with value : " << next_node->UCT << std::endl;
 
         //load the state
         auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
@@ -208,7 +206,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     auto best_move_it = std::max_element(std::begin(nodes), std::end(nodes), 
         [] (MCNode const lhs, MCNode const rhs) -> bool { return (lhs.w/lhs.n) < (rhs.w/rhs.n); });
 
-    std::cerr << "MC results: ";
+    std::cerr << "MC results: " << std::endl;
     for(auto const & move : nodes) {
         std::cerr << move << std::endl;
     }

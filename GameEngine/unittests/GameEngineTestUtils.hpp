@@ -7,5 +7,6 @@
 
 Worm* place_worm(bool player1, int wormNumber, Position pos, std::shared_ptr<GameState> state);
 void place_powerup(Position pos, std::shared_ptr<GameState> state);
+rapidjson::Document ReadJsonFile(std::string filePath);
 
 #endif

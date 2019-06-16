@@ -37,9 +37,9 @@ Worm* Player::GetCurrentWorm()
     return &worms[wormIndex];
 }
 
-Worm* Player::GetWormByIndex(int index)
+Worm* Player::GetWormById(int id)
 {
-    return &worms[index - 1];
+    return &worms[id - 1];
 }
 
 void Player::UpdateCurrentWorm()
