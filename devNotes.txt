@@ -1,5 +1,7 @@
 TODO
 
+   make proper unit test for deep copy
+
    why does dodging not always work
       Need to take KOs into account when evaluating!  not just score
          can i try to reproduce this and confirm it works 
@@ -115,4 +117,5 @@ increasing depth to 24 - no noticable improvement
 using scorediff, and modifying c to 4, putting playthrough depth back to 24
    lost every game think i did it wrong....
    looking at UCT scores, looks like it converges too quickly, so try raising c to 8
+   Need to get back to this after bug fixes
 

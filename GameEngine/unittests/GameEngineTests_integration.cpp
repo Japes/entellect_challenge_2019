@@ -125,7 +125,7 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
         GameEngine eng(state);
 
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*NextTurn::GetRandomValidMoveForWorm(true, state).get(), *NextTurn::GetRandomValidMoveForWorm(false, state).get());
+            eng.AdvanceState(*NextTurn::GetRandomValidMoveForWorm(true, state, false).get(), *NextTurn::GetRandomValidMoveForWorm(false, state, false).get());
             ++turnCount;
         }
         ++gameCount;

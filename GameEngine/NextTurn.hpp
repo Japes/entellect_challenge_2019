@@ -14,11 +14,11 @@ class NextTurn
     static void Initialise();
 
     static std::vector<std::shared_ptr<Command>> GetValidTeleportDigsForWorm(bool player1, 
-                                                    std::shared_ptr<GameState> state, bool trimStupidMoves = false);
+                                                    std::shared_ptr<GameState> state, bool trimStupidMoves);
     static std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, 
-                                                    std::shared_ptr<GameState> state, bool trimStupidMoves = false);
-    static std::vector<std::shared_ptr<Command>> GetSensibleShootsForWorm(bool player1, 
-                                                    std::shared_ptr<GameState> state);
+                                                    std::shared_ptr<GameState> state, bool trimStupidMoves);
+    static std::vector<std::shared_ptr<Command>> GetShootsForWorm(bool player1, 
+                                                    std::shared_ptr<GameState> state, bool trimStupidMoves);
     static std::vector<std::shared_ptr<Command>> _playerShoots;
     
     private:

@@ -170,7 +170,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     for(auto const &move : possible_moves ) {
         nodes.push_back({move, 0, 0, 0});
     }
-    auto possible_shoots = NextTurn::GetSensibleShootsForWorm (ImPlayer1, state1);
+    auto possible_shoots = NextTurn::GetShootsForWorm (ImPlayer1, state1, true);
     for(auto const &move : possible_shoots ) {
         nodes.push_back({move, 0, 0, 0});
     }

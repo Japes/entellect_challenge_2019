@@ -36,9 +36,6 @@ void NextTurn::Initialise()
     }
 }
 
-//2 things are implied and left out from this return:
-//1. "do nothing"
-//2. "shoot" in all directions
 std::vector<std::shared_ptr<Command>> NextTurn::GetValidTeleportDigsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
     std::vector<std::shared_ptr<Command>> ret;
@@ -62,8 +59,12 @@ std::vector<std::shared_ptr<Command>> NextTurn::GetValidTeleportDigsForWorm(bool
     return ret;
 }
 
-std::vector<std::shared_ptr<Command>> NextTurn::GetSensibleShootsForWorm(bool player1, std::shared_ptr<GameState> state)
+std::vector<std::shared_ptr<Command>> NextTurn::GetShootsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
+    if (!trimStupidMoves) {
+        return _playerShoots;
+    }
+
     std::vector<std::shared_ptr<Command>> ret;
     ret.reserve(3);
 
@@ -86,7 +87,7 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForWorm(bool player1, std::
 
     //get random moves (teleport/dig) and shoots
     std::vector<std::shared_ptr<Command>> moves = GetValidTeleportDigsForWorm (player1, state, trimStupidMoves);
-    std::vector<std::shared_ptr<Command>> shoots = trimStupidMoves? (GetSensibleShootsForWorm(player1, state)):_playerShoots;
+    std::vector<std::shared_ptr<Command>> shoots = GetShootsForWorm(player1, state, trimStupidMoves);
 
     //choose random one
     int totalNumMoves = moves.size() + shoots.size();

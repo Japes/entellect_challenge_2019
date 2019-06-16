@@ -18,9 +18,9 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
         place_worm(false, 2, {13,13}, state); //enemy SE 2 step
         place_worm(false, 3, {10,15}, state); //just out of range
 
-        THEN("GetSensibleShootsForWorm returns correct")
+        THEN("GetShootsForWorm returns correct")
         {
-            auto ret = NextTurn::GetSensibleShootsForWorm(true, state);
+            auto ret = NextTurn::GetShootsForWorm(true, state, true);
             REQUIRE(ret.size() == 2);
             auto expected_move = std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE);
 
@@ -125,7 +125,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         THEN("Valid moves for player 1 are as expected")
         {
-            std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(true, state);
+            std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(true, state, false);
             std::vector<std::shared_ptr<Command>> expected_moves;
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position(4,4)));
             expected_moves.push_back(std::make_shared<TeleportCommand>(Position({6,4})));
@@ -145,7 +145,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
         THEN("Valid moves for player 2 are as expected")
         {
-            std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(false, state);
+            std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(false, state, false);
             std::vector<std::shared_ptr<Command>> expected_moves;
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,6)));
             expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
@@ -168,7 +168,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(true, state);
+                std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(true, state, false);
                 std::vector<std::shared_ptr<Command>> expected_moves;
 
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
@@ -194,7 +194,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(true, state);
+                std::vector<std::shared_ptr<Command>> moves = NextTurn::GetValidTeleportDigsForWorm(true, state, false);
                 std::vector<std::shared_ptr<Command>> expected_moves;
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(5,4)));
                 expected_moves.push_back(std::make_shared<DigCommand>(Position(4,5)));
