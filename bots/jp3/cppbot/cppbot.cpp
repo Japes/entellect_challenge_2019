@@ -178,7 +178,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     int N = 0;
     float c = std::sqrt(2);
 
-    while(Get_ns_since_epoch() < (startTime + 950000000)) { //900ms
+    while(Get_ns_since_epoch() < (startTime + 900000000)) { //900ms
         //choose next node
         for(auto & node:  nodes) {
             if(node.n == 0) {
