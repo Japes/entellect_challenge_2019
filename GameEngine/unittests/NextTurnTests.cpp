@@ -34,6 +34,31 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
     }
 }
 
+TEST_CASE( "Handle no available moves", "[no_available_moves]" )
+{
+    GIVEN("A game state where the worm has no valid moves")
+    {
+        auto state = std::make_shared<GameState>();
+        
+        place_worm(true, 1, {10,10}, state);
+        state->Cell_at({9, 9})->type = CellType::DEEP_SPACE;
+        state->Cell_at({9, 10})->type = CellType::DEEP_SPACE;
+        state->Cell_at({9, 11})->type = CellType::DEEP_SPACE;
+        state->Cell_at({10, 9})->type = CellType::DEEP_SPACE;
+        state->Cell_at({11, 9})->type = CellType::DEEP_SPACE;
+        state->Cell_at({11, 10})->type = CellType::DEEP_SPACE;
+        state->Cell_at({11, 11})->type = CellType::DEEP_SPACE;
+        state->Cell_at({10, 11})->type = CellType::DEEP_SPACE;
+
+
+        THEN("We return the donothing command (if we trim stupid shoots)")
+        {
+            auto ret = NextTurn::GetRandomValidMoveForWorm(true, state, true);
+            REQUIRE(ret->GetCommandString() == "nothing");
+        }
+    }
+}
+
 bool Contains_one(std::vector<std::shared_ptr<Command>>& haystack, std::shared_ptr<Command> needle)
 {
     int num_found = 0;
@@ -93,8 +118,8 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
         place_worm(false, 1, {5,6}, state);
         place_worm(false, 2, {4,1}, state);
         place_worm(false, 3, {5,3}, state);
-        state->Cell_at({4, 5})->type = CellType::DIRT;
         state->Cell_at({5, 4})->type = CellType::DIRT;
+        state->Cell_at({4, 5})->type = CellType::DIRT;
         state->Cell_at({4, 6})->type = CellType::DIRT;
         state->Cell_at({7, 5})->type = CellType::DEEP_SPACE;
 
@@ -113,6 +138,7 @@ TEST_CASE( "Get valid moves for a worm", "[valid_moves_for_worm]" ) {
 
             for(unsigned i = 0; i < expected_moves.size(); i++) {
                 bool containsExactlyOne = Contains_one(moves, expected_moves[i]);
+                INFO("Don't have expected move " << i << " (" << expected_moves[i]->GetCommandString() << ")" );
                 CHECK(containsExactlyOne);
             }
         }

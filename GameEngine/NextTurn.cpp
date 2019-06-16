@@ -94,6 +94,11 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForWorm(bool player1, std::
 
     //choose random one
     int totalNumMoves = moves.size() + shoots.size();
+
+    if(totalNumMoves == 0) {
+        return std::make_shared<DoNothingCommand>();
+    }
+
     std::uniform_int_distribution<int> uniform_dist(0, totalNumMoves-1);
     int mean = uniform_dist(*_rng.get());
 
@@ -101,11 +106,7 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForWorm(bool player1, std::
         ret = moves[mean];
     } else {
         int index = mean - moves.size();
-        if(player1) {
-            ret = shoots[index];
-        } else {
-            ret = shoots[index];
-        }
+        ret = shoots[index];
     }
 
     //std::cerr << "GameEngine::GetRandomValidMoveForWorm returning " << ret->GetCommandString() << std::endl;
