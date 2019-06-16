@@ -51,6 +51,7 @@ TODO
         make changes to makefile (folders)
         get rid of all cerr?
            use a log wrapper function that can be disabled
+         make sure its not a debug build
 
 BRAINSTORMING---------------------------------------------------------------------------------------
 
@@ -104,3 +105,13 @@ latest profiling of performance unit test:--------------------------------------
     updatewincondition
 
     ShootCommand - execute
+
+results analysis --------------------------------------------------------------------
+increasing depth to 24 - no noticable improvement
+   reducing to 15 - seems to actually be a bit worse
+   reducing to 7 - noticably better than jp2, and does better against reference bot
+
+using scorediff, and modifying c to 4, putting playthrough depth back to 24
+   lost every game think i did it wrong....
+   looking at UCT scores, looks like it converges too quickly, so try raising c to 8
+
