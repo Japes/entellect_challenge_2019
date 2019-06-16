@@ -101,7 +101,7 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
     std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
 
-    int evaluationBefore = evaluationFn(player1, _state);
+    auto evaluationBefore = evaluationFn(player1, _state);
 
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
         //std::cerr << "Advancing state with moves P1: " << p1Command->GetCommandString() << " and P2: " << p2Command->GetCommandString() << std::endl;
@@ -111,7 +111,7 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
         --depth;
     }
 
-    int evaluationAfter = evaluationFn(player1, _state);
+    auto evaluationAfter = evaluationFn(player1, _state);
 
     bool won = (evaluationAfter > evaluationBefore);
 
