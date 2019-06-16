@@ -12,7 +12,7 @@ float EvaluationFunctions::ScoreComparison (bool player1, std::shared_ptr<GameSt
         if(currentRes.winningPlayer == myPlayer) {
             return std::numeric_limits<float>::max();
         } else if(currentRes.winningPlayer == otherPlayer) {
-            return std::numeric_limits<float>::min();
+            return -std::numeric_limits<float>::max();
         }
     }
 

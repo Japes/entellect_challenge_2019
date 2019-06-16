@@ -125,7 +125,7 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
         GameEngine eng(state);
 
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*NextTurn::GetRandomValidMoveForWorm(true, state, false).get(), *NextTurn::GetRandomValidMoveForWorm(false, state, false).get());
+            eng.AdvanceState(*NextTurn::GetRandomValidMoveForPlayer(true, state, false).get(), *NextTurn::GetRandomValidMoveForPlayer(false, state, false).get());
             ++turnCount;
         }
         ++gameCount;
@@ -152,7 +152,7 @@ TEST_CASE( "Performance tests - trim moves", "[.performance][trim]" ) {
         GameEngine eng(state);
 
         while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*NextTurn::GetRandomValidMoveForWorm(true, state, true).get(), *NextTurn::GetRandomValidMoveForWorm(false, state, true).get());
+            eng.AdvanceState(*NextTurn::GetRandomValidMoveForPlayer(true, state, true).get(), *NextTurn::GetRandomValidMoveForPlayer(false, state, true).get());
             ++turnCount;
         }
         ++gameCount;
@@ -229,7 +229,7 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
         
         WHEN("We do a playthrough to a depth -1")
         {
-            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
+            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
             eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
         }
@@ -247,7 +247,7 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
             auto state = std::make_shared<GameState>(roundJSON);
             GameEngine eng(state);
 
-            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
+            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int depth = 20;
             eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
         }

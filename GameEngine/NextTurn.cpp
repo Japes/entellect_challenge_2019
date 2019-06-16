@@ -81,7 +81,7 @@ std::vector<std::shared_ptr<Command>> NextTurn::GetShootsForWorm(bool player1, s
     return ret;
 }
 
-std::shared_ptr<Command> NextTurn::GetRandomValidMoveForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
     std::shared_ptr<Command> ret;
 
@@ -106,7 +106,7 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForWorm(bool player1, std::
         ret = shoots[index];
     }
 
-    //std::cerr << "GameEngine::GetRandomValidMoveForWorm returning " << ret->GetCommandString() << std::endl;
+    //std::cerr << "GameEngine::GetRandomValidMoveForPlayer returning " << ret->GetCommandString() << std::endl;
 
     return ret;
 }

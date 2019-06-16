@@ -193,7 +193,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
         auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
         GameEngine eng(state);
 
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, true);
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
         int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, 24);
 
         next_node->score += thisScore;

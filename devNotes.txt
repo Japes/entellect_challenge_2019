@@ -91,7 +91,7 @@ insights from replays-----------------------------------------------------------
         reference bot strategy is quite popular
         
 latest profiling of performance unit test:--------------------------------------------
-    GetRandomValidMoveForWorm 
+    GetRandomValidMoveForPlayer 
     GetValidMovesForWorm 
         new
         new

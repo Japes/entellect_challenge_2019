@@ -15,7 +15,7 @@ class NextTurn
 
     static std::vector<std::shared_ptr<Command>> GetValidTeleportDigsForWorm(bool player1, 
                                                     std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetRandomValidMoveForWorm(bool player1, 
+    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, 
                                                     std::shared_ptr<GameState> state, bool trimStupidMoves);
     static std::vector<std::shared_ptr<Command>> GetShootsForWorm(bool player1, 
                                                     std::shared_ptr<GameState> state, bool trimStupidMoves);

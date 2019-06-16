@@ -655,7 +655,7 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         place_worm(false, 2, {21,10}, state);
         place_worm(false, 3, {22,20}, state);
 
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForWorm, std::placeholders::_1, std::placeholders::_2, false);
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, false);
 
         WHEN("We do a playthrough to a certain depth")
         {

@@ -53,7 +53,7 @@ TEST_CASE( "Handle no available moves", "[no_available_moves]" )
 
         THEN("We return the donothing command (if we trim stupid shoots)")
         {
-            auto ret = NextTurn::GetRandomValidMoveForWorm(true, state, true);
+            auto ret = NextTurn::GetRandomValidMoveForPlayer(true, state, true);
             REQUIRE(ret->GetCommandString() == "nothing");
         }
     }
