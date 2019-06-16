@@ -128,7 +128,6 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
                             int depth)
 {
     Player* myPlayer = player1 ? &_state->player1 : &_state->player2;
-    Player* otherPlayer = myPlayer == &_state->player1 ? &_state->player2 : &_state->player1;
 
     std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
     std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
