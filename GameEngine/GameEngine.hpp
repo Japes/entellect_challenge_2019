@@ -36,6 +36,7 @@ class GameEngine
         int radiusToConsider,
         int depth);
     GameResult GetResult();
+    static GameResult GetResult(const std::shared_ptr<GameState> state);
 
     private:
     bool DoCommand(const Command& command, bool player1, bool valid);
