@@ -284,30 +284,35 @@ unsigned GetNumRounds(std::string roundFolder)
 TEST_CASE( "Comparison with java engine", "[comparison]" ) {
 
     std::string match = "../../starter-pack/match-logs/2019.06.15.13.50.08/";
-    unsigned round = 1;
     std::string botAFolder, botBFolder;
-    GetBotFolders(match + GetRoundFolder(round), botAFolder, botBFolder);
+    GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
     unsigned numRounds = GetNumRounds(match);
 
-    for(unsigned i = 0; i < numRounds; i++) {
-        auto roundJSON = ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-        auto original_state = std::make_shared<GameState>(roundJSON);
+    unsigned round = 1;
+    auto roundJSON = ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
+    auto original_state = std::make_shared<GameState>(roundJSON);
+    GameEngine eng(original_state);
+
+    while(round <= numRounds) {
 
         std::shared_ptr<Command> p1Command = GetCommandFromFile(match + GetRoundFolder(round) + botAFolder + "PlayerCommand.txt");
         std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
 
-        GameEngine eng(original_state);
         std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << 
         " p2Command: " << p2Command->GetCommandString() << std::endl;
         eng.AdvanceState(*p1Command, *p2Command);
 
-        ++round;
-        auto round2JSON = ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-        auto next_state = std::make_shared<GameState>(round2JSON);
+        if(round > numRounds) {
 
-        REQUIRE(original_state->player1 == next_state->player1);
-        REQUIRE(original_state->player2 == next_state->player2);
-        REQUIRE(*original_state == *next_state);
+        } else {
+            ++round;
+            auto round2JSON = ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
+            auto next_state = std::make_shared<GameState>(round2JSON);
+
+            REQUIRE(original_state->player1 == next_state->player1);
+            REQUIRE(original_state->player2 == next_state->player2);
+            REQUIRE(*original_state == *next_state);
+        }
     }
 
 }

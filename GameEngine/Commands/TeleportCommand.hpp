@@ -13,8 +13,6 @@ class TeleportCommand : public Command
     bool IsValid(bool player1, std::shared_ptr<GameState> state) const override;
     std::string GetCommandString() const override;
 
-    bool WormMovedThisRound(const Worm* worm) const;
-
     bool FiftyFiftyChance() const;
 
     bool operator==(const TeleportCommand& other);

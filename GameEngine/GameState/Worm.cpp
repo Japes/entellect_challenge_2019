@@ -1,7 +1,7 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state) : state{_state}, id{0}
+Worm::Worm(GameState* _state) : state{_state}, id{0}, movedThisRound{0}
 {
     health = GameConfig::commandoWorms.initialHp;
     diggingRange = GameConfig::commandoWorms.diggingRange;

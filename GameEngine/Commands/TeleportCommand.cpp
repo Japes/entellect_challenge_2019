@@ -22,7 +22,7 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     Worm* worm_there = state->map[_pos.x][_pos.y].worm;
     if(worm_there == nullptr) {
         state->Move_worm(worm, _pos);
-    } else if ( WormMovedThisRound (worm_there)) {
+    } else if ( worm_there->movedThisRound ) {
 
         // 50% chance to pushback or swap positions
         if (FiftyFiftyChance()) {
@@ -43,6 +43,7 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     }
 
     player->command_score += GameConfig::scores.move;
+    worm->movedThisRound = true;
 }
 
 bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
@@ -67,17 +68,12 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
     }
 
     Worm* worm_there = state->map[_pos.x][_pos.y].worm;
-    if(worm_there != nullptr && !WormMovedThisRound(worm_there)) {
+    if(worm_there != nullptr && !worm_there->movedThisRound) {
         std::cerr << "------Cant move into space " << _pos << ", occupied by worm " << worm_there->id << std::endl;
         return false;
     }
 
     return true;
-}
-
-bool TeleportCommand::WormMovedThisRound(const Worm* worm) const
-{
-    return worm->previous_position != worm->position;
 }
 
 //returns true 50% of the time, false otherwise

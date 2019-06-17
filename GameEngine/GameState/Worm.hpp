@@ -19,6 +19,7 @@ struct Worm
     Weapon weapon;
     int diggingRange;
     int movementRange;
+    bool movedThisRound;
 
     Worm(GameState* _state);
 

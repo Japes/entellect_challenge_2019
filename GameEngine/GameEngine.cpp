@@ -34,6 +34,9 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
         std::cerr << "Invalid move found.  Player1 move: " << player1_command.GetCommandString() << " Player2 move: " << player2_command.GetCommandString() << std::endl;
     }
 
+    _state->player1.GetCurrentWorm()->movedThisRound = false;
+    _state->player2.GetCurrentWorm()->movedThisRound = false;
+
     _state->player1.UpdateCurrentWorm();
     _state->player2.UpdateCurrentWorm();
 
