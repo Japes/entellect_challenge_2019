@@ -167,6 +167,7 @@ TEST_CASE( "Performance tests - trim moves", "[.performance][trim]" ) {
 std::shared_ptr<Command> GetCommandFromString(std::string cmd)
 {
     std::size_t firstSpace = cmd.find(" ");
+    std::size_t endLine = cmd.find("\n");
     std::string moveType = cmd.substr(0, firstSpace);
 
     if(moveType == "move") {
@@ -180,7 +181,7 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
         int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
         return std::make_shared<DigCommand>(Position(x,y));
     } else if (moveType == "shoot") {
-        std::string dirString = cmd.substr(firstSpace, cmd.length() - firstSpace);
+        std::string dirString = cmd.substr(firstSpace + 1, (endLine - firstSpace));
         ShootCommand::ShootDirection dir;
 
         if(dirString == "N") { dir = ShootCommand::ShootDirection::N;}
@@ -191,8 +192,10 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
         else if(dirString == "SW") { dir = ShootCommand::ShootDirection::SW;}
         else if(dirString == "W") { dir = ShootCommand::ShootDirection::W;}
         else if(dirString == "NW") { dir = ShootCommand::ShootDirection::NW;}
+        else {throw std::runtime_error("don't understand this shoot string");}
 
-        return std::make_shared<ShootCommand>(dir);
+        auto ret = std::make_shared<ShootCommand>(dir);
+        return ret;
 
     } else if (moveType == "nothing") {
         return std::make_shared<DoNothingCommand>();
@@ -217,11 +220,11 @@ std::shared_ptr<Command> GetCommandFromFile(std::string path)
     if (firstColon == std::string::npos) {
         throw std::runtime_error("Problem loading command in unit test");
     }
-    std::size_t secondColon = fileContents.find(":", firstColon + 1);
-    if (secondColon == std::string::npos) {
+    std::size_t endOfLine = fileContents.find("\n", firstColon + 1);
+    if (endOfLine == std::string::npos) {
         throw std::runtime_error("Problem loading command in unit test");
     }
-    std::string cmdString = fileContents.substr(firstColon + 2, secondColon - firstColon);
+    std::string cmdString = fileContents.substr(firstColon + 2, endOfLine - (firstColon + 2));
 
     return GetCommandFromString(cmdString);
 }
@@ -294,10 +297,11 @@ TEST_CASE( "Comparison with java engine", "[comparison]" ) {
         std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
 
         GameEngine eng(original_state);
+        std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << 
+        " p2Command: " << p2Command->GetCommandString() << std::endl;
         eng.AdvanceState(*p1Command, *p2Command);
 
         ++round;
-        std::cerr << "(" << __FUNCTION__ << ") round: " << round << std::endl;
         auto round2JSON = ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
         auto next_state = std::make_shared<GameState>(round2JSON);
 
