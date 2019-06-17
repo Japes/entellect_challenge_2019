@@ -87,7 +87,6 @@ void GameState::PopulatePlayers(rapidjson::Document& roundJSON)
     PopulatePlayer(myPlayer, myPlayerJson);
     PopulatePlayer(otherPlayer, otherPlayerJson);
 
-    myPlayer.currentWormId = roundJSON["currentWormId"].GetInt();
     myPlayer.consecutiveDoNothingCount = roundJSON["consecutiveDoNothingCount"].GetInt();
 }
 
@@ -95,6 +94,7 @@ void GameState::PopulatePlayer(Player& player, const rapidjson::Value& playerJso
 {
     player.command_score = playerJson["score"].GetInt();
     player.health = 0; //player.health = playerJson["health"].GetInt(); only myPlayer has this
+    player.currentWormId = playerJson["currentWormId"].GetInt();
 
     auto wormsJson = playerJson.GetObject()["worms"].GetArray();
     for (rapidjson::Value::ConstValueIterator itr = wormsJson.Begin(); itr != wormsJson.End(); ++itr) {
@@ -183,4 +183,18 @@ void GameState::Move_worm(Worm* worm, Position pos)
     Cell_at(worm->position)->worm = nullptr;
     worm->position = pos;
     Cell_at(worm->position)->worm = worm;
+}
+
+bool GameState::operator==(const GameState &other) const
+{
+    bool cellsGood = true;
+    for(unsigned x = 0; x < MAP_SIZE; ++x) {
+        for(unsigned y = 0; y < MAP_SIZE; ++y) {
+            cellsGood &= map[x][y] == other.map[x][y];
+        }
+    } 
+    return cellsGood && 
+            player1 == other.player1 && 
+            player2 == other.player2 &&
+            roundNumber == other.roundNumber;
 }

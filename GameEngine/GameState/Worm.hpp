@@ -24,6 +24,9 @@ struct Worm
 
     bool IsDead();
     void TakeDamage(int dmgAmount);
+
+    bool operator==(const Worm &other) const;
+
 };
 
 #endif

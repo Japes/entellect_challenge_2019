@@ -59,9 +59,9 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
         player->command_score += GameConfig::scores.killShot;
     } else {
         if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
-            player->command_score += GameConfig::scores.friendlyFire;
+            player->command_score -= worm->weapon.damage*2;
         } else {
-            player->command_score += GameConfig::scores.attack;
+            player->command_score += worm->weapon.damage*2;
         }
     }
 }

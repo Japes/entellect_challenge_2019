@@ -73,6 +73,8 @@ void GameEngine::ApplyPowerups()
         if(powerupHere != nullptr) {
             powerupHere->ApplyTo(&worm);
             _state->Cell_at(worm.position)->powerup = nullptr;
+            _state->player1.RecalculateHealth();
+            _state->player2.RecalculateHealth();
         }
     }
 
@@ -82,6 +84,8 @@ void GameEngine::ApplyPowerups()
         if(powerupHere != nullptr) {
             powerupHere->ApplyTo(&worm);
             _state->Cell_at(worm.position)->powerup = nullptr;
+            _state->player1.RecalculateHealth();
+            _state->player2.RecalculateHealth();
         }
     }
 }

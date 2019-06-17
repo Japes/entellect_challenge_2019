@@ -26,6 +26,9 @@ struct Cell
     }
 
     static CellType strToCellType(std::string str);
+
+    bool operator==(const Cell &other) const;
+
 };
 
 #endif

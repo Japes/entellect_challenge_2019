@@ -11,3 +11,10 @@ CellType Cell::strToCellType(std::string str)
     }
     return CellType::AIR;
 }
+
+bool Cell::operator==(const Cell &other) const
+{
+    return type == other.type &&
+            (worm == other.worm || *worm == *other.worm) && 
+            (powerup == other.powerup || *powerup == *other.powerup); 
+}

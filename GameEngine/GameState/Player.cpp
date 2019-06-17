@@ -79,3 +79,27 @@ int Player::GetScore()
     //std::cerr << "(Player::GetScore) command_score: " << command_score << " GetAverageWormHealth(): " << GetAverageWormHealth() << std::endl;
     return command_score + GetAverageWormHealth();
 }
+
+bool Player::operator==(const Player &other) const
+{
+    bool wormsGood = true;
+    for(unsigned i = 0; i < worms.size(); ++i) {
+        wormsGood &= worms[i] == other.worms[i];
+    }
+
+    //std::cerr << "(" << __FUNCTION__ << ") " <<
+    //" wormsGood : " << wormsGood <<
+    //" id : " << (id == other.id) <<
+    //" command_score : " << (command_score == other.command_score) << " " << command_score << " " << other.command_score <<
+    //" health : " << (health == other.health) << " " << health << " " << other.health <<
+    //" currentWormId : " << (currentWormId == other.currentWormId) << " " << currentWormId << " " << other.currentWormId <<
+    //" consecutiveDoNothingCount : " << (consecutiveDoNothingCount == other.consecutiveDoNothingCount) <<
+    //std::endl;
+
+    return wormsGood &&
+            id == other.id &&
+            command_score == other.command_score &&
+            health == other.health &&
+            currentWormId == other.currentWormId && //1-indexed
+            consecutiveDoNothingCount == other.consecutiveDoNothingCount;
+}

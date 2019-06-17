@@ -21,15 +21,13 @@ struct CommandoWorms
 
 struct Scores
 {
-    const int missedAttack =  2;
-    const int attack =  20;
-    const int killShot =  40;
-    const int friendlyFire =  -20;
-    const int dig =  7;
-    const int move =  5;
-    const int powerup =  20;
-    const int doNothing =  0;
-    const int invalidCommand =  -4;
+    const int missedAttack = 2;
+    const int killShot = 40;
+    const int dig = 7;
+    const int move = 5;
+    const int powerup = 20;
+    const int doNothing = 0;
+    const int invalidCommand = -4;
 };
 
 

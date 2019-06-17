@@ -487,8 +487,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
                 auto player1Score = state->player1.GetScore();
                 auto player2Score = state->player2.GetScore();
                 int expectedAverageWormHealth = (GameConfig::commandoWorms.initialHp*3 - GameConfig::commandoWorms.weapon.damage*2) / 3; //he gets hit by himself and player 2
-                CHECK( player1Score == expectedAverageWormHealth + GameConfig::scores.friendlyFire);
-                CHECK( player2Score == GameConfig::commandoWorms.initialHp + GameConfig::scores.attack);
+                CHECK( player1Score == expectedAverageWormHealth - GameConfig::commandoWorms.weapon.damage*2);
+                CHECK( player2Score == GameConfig::commandoWorms.initialHp + GameConfig::commandoWorms.weapon.damage*2);
             }
         }
 

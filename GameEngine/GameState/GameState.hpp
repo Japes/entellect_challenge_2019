@@ -24,6 +24,8 @@ class GameState
 
     void Move_worm(Worm* worm, Position pos);
 
+    bool operator==(const GameState &other) const;
+
     private:
     void UpdateRefs();
     void UpdateRefs(Player& player);

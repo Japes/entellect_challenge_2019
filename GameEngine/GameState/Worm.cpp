@@ -22,3 +22,24 @@ void Worm::TakeDamage(int dmgAmount)
     state->player1.RecalculateHealth();
     state->player2.RecalculateHealth();
 }
+
+bool Worm::operator==(const Worm &other) const
+{
+    //std::cerr << "(" << __FUNCTION__ << ") " 
+    //" id: " << (id == other.id) <<
+    //" health: " << (health == other.health) <<
+    //" position: " << (position == other.position) <<
+    //" previous_position: " << (previous_position == other.previous_position) <<
+    //" weapon: " << (weapon == other.weapon) <<
+    //" diggingRange: " << (diggingRange == other.diggingRange) <<
+    //" movementRange: " << (movementRange == other.movementRange) <<
+    //std::endl;
+
+    return (id == other.id &&
+            health == other.health &&
+            position == other.position &&
+            //previous_position == other.previous_position && //not loaded from state (this operator only used for unit testing)
+            weapon == other.weapon &&
+            diggingRange == other.diggingRange &&
+            movementRange == other.movementRange);
+}

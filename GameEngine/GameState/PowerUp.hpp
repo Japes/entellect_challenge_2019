@@ -14,6 +14,12 @@ struct PowerUp
     {
         worm->health += value;
     }
+
+    bool operator==(const PowerUp &other) const
+    {
+        return value == other.value;
+    }
+
 };
 
 #endif

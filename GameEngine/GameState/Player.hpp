@@ -29,6 +29,9 @@ struct Player
     void RecalculateHealth();
     int GetAverageWormHealth();
     int GetScore();
+
+    bool operator==(const Player &other) const;
+
 };
 
 #endif

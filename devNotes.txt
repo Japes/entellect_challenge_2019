@@ -1,17 +1,25 @@
 TODO
 
-   make proper unit test for deep copy
-
-   why does dodging not always work
-      Need to take KOs into account when evaluating!  not just score
-         can i try to reproduce this and confirm it works 
-            (maybe reference bot with specific seed)
-            or just reference bot with my health real low
+   consecutivedonothing count for opponent isnt in file!
+   previousposition is wrong when loading file!
 
     add verifier test for engine
        compare with previous bots after doing this (and of course fixing any issues that arose)
        upload after doing this if better
 
+   add per-worm playthroughs
+
+   explicit exclude of potential game ending move
+      explicit exclude of all chances for opponent to shoot?
+
+   make proper unit test for deep copy
+
+   why does dodging not always work
+      i think it's just the monte carlo that is dof
+      Need to take KOs into account when evaluating!  not just score
+         can i try to reproduce this and confirm it works 
+            (maybe reference bot with specific seed)
+            or just reference bot with my health real low
 
    low hanging fruit improvements (update and then compare against previous bot and ref bot)
       Need to avoid getting lost
@@ -118,4 +126,6 @@ using scorediff, and modifying c to 4, putting playthrough depth back to 24
    lost every game think i did it wrong....
    looking at UCT scores, looks like it converges too quickly, so try raising c to 8
    Need to get back to this after bug fixes
+
+upped the time limit to 3s, improvement not great.  beats reference bot and 1s jp2 66% of the time
 

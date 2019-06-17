@@ -15,6 +15,8 @@ struct Weapon
         range = GameConfig::commandoWorms.weapon.range;
         diagRange = GameConfig::commandoWorms.weapon.diagRange;
     }
+    
+    bool operator==(const Weapon &other) const;
 };
 
 #endif
