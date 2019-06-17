@@ -55,15 +55,17 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     hitworm->TakeDamage(worm->weapon.damage);
 
+    int points = worm->weapon.damage*2;
+    
     if(hitworm->IsDead()) {
-        player->command_score += GameConfig::scores.killShot;
-    } else {
-        if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
-            player->command_score -= worm->weapon.damage*2;
-        } else {
-            player->command_score += worm->weapon.damage*2;
-        }
+        points += GameConfig::scores.killShot;
     }
+
+    if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
+        points *= -1;
+    }
+
+    player->command_score += points;
 }
 
 Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> state, const Position& shootvector)

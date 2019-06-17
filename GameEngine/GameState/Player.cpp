@@ -100,6 +100,7 @@ bool Player::operator==(const Player &other) const
             id == other.id &&
             command_score == other.command_score &&
             health == other.health &&
-            currentWormId == other.currentWormId && //1-indexed
-            consecutiveDoNothingCount == other.consecutiveDoNothingCount;
+            //this isn't in the state files, shouldn't make a difference (this operator is only for unit tests)
+            //consecutiveDoNothingCount == other.consecutiveDoNothingCount && 
+            currentWormId == other.currentWormId; //1-indexed
 }
