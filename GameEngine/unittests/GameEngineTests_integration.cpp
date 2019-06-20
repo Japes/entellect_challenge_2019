@@ -109,9 +109,44 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
     }
 }
 
-void GetEndGameState(std::string path, char& winningPlayer, int& playerAScore, int& playerAHealth, int& playerBScore, int& playerBHealth)
+void GetEndGameState(std::string path, std::string& winningPlayer, int& playerAScore, int& playerAHealth, int& playerBScore, int& playerBHealth)
 {
     std::string fileContents = Utilities::ReadFile(path);
+
+    //get the winner
+    std::size_t winnerLocation = fileContents.find("The winner is: ") + 15;
+    std::size_t playerAScoreLocation = fileContents.find("score:") + 6;
+    std::size_t playerAHealthLocation = fileContents.find("health:") + 7;
+    std::size_t playerAEndOfLine = fileContents.find("\n", playerAHealthLocation);
+    std::size_t playerBScoreLocation = fileContents.find("score:", playerAHealthLocation) + 6;
+    std::size_t playerBHealthLocation = fileContents.find("health:", playerBScoreLocation) + 7;
+    std::size_t playerBEndOfLine = fileContents.find("\n", playerBHealthLocation);
+
+    if (winnerLocation == std::string::npos || 
+            playerAScoreLocation == std::string::npos || playerAHealthLocation == std::string::npos ||
+            playerBScoreLocation == std::string::npos || playerBHealthLocation == std::string::npos ||
+            playerAEndOfLine == std::string::npos || playerBEndOfLine == std::string::npos) {
+        throw std::runtime_error("Problem loading end game state in unit test");
+    }
+
+    winningPlayer = fileContents.substr(winnerLocation, 1);
+    INFO("winningPlayer: " << winningPlayer);
+
+    std::string playerAScoreStr = fileContents.substr(playerAScoreLocation, (playerAHealthLocation - 8) - playerAScoreLocation);
+    INFO("playerAScoreStr: " << playerAScoreStr);
+    playerAScore = std::stoi(playerAScoreStr);
+
+    std::string playerAHealthStr = fileContents.substr(playerAHealthLocation, playerAEndOfLine - playerAHealthLocation);
+    INFO("playerAHealthStr: " << playerAHealthStr);
+    playerAHealth = std::stoi(playerAHealthStr);
+
+    std::string playerBScoreStr = fileContents.substr(playerBScoreLocation, (playerBHealthLocation - 8) - playerBScoreLocation);
+    INFO("playerBScoreStr: " << playerBScoreStr);
+    playerBScore = std::stoi(playerBScoreStr);
+
+    std::string playerBHealthStr = fileContents.substr(playerBHealthLocation, playerBEndOfLine - playerBHealthLocation);
+    INFO("playerBHealthStr: " << playerBHealthStr);
+    playerBHealth = std::stoi(playerBHealthStr);
 }
 
 std::shared_ptr<Command> GetCommandFromFile(std::string path)
@@ -186,7 +221,7 @@ unsigned GetNumRounds(std::string roundFolder)
 
 TEST_CASE( "Comparison with java engine", "[comparison]" ) {
 
-    std::string match = "Test_files/2019.06.15.13.50.08/";
+    std::string match = "Test_files/matches/2019.06.15.13.50.08/";
     std::string botAFolder, botBFolder;
     GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
     unsigned numRounds = GetNumRounds(match);
@@ -203,14 +238,11 @@ TEST_CASE( "Comparison with java engine", "[comparison]" ) {
         std::shared_ptr<Command> p1Command = GetCommandFromFile(match + GetRoundFolder(round) + botAFolder + "PlayerCommand.txt");
         std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
 
-        std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << 
-        " p2Command: " << p2Command->GetCommandString() << std::endl;
+        //std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << 
+        //" p2Command: " << p2Command->GetCommandString() << std::endl;
         eng.AdvanceState(*p1Command, *p2Command);
 
-        if(round == numRounds) {
-            //check end state
-            ++round;
-        } else {
+        if(round != numRounds) {
             ++round;
             auto round2JSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
             auto next_state = std::make_shared<GameState>(round2JSON);
@@ -218,6 +250,37 @@ TEST_CASE( "Comparison with java engine", "[comparison]" ) {
             REQUIRE(original_state->player1 == next_state->player1);
             REQUIRE(original_state->player2 == next_state->player2);
             REQUIRE(*original_state == *next_state);
+            
+        } else {
+            //check end state
+            std::string winningPlayer;
+            int playerAScore;            int playerAHealth;
+            int playerBScore;            int playerBHealth;
+
+            GetEndGameState(match + GetRoundFolder(round) + "endGameState.txt", winningPlayer, playerAScore, playerAHealth, playerBScore, playerBHealth);
+
+            auto result = eng.GetResult();
+
+            if(winningPlayer == "B") {
+                REQUIRE(result.winningPlayer == &original_state->player2);
+                REQUIRE(result.losingPlayer == &original_state->player1);
+            } else {
+                REQUIRE(result.winningPlayer == &original_state->player1);
+                REQUIRE(result.losingPlayer == &original_state->player2);
+            }
+
+            if(playerAHealth == 0 || playerBHealth == 0) {
+                REQUIRE(result.result == GameEngine::ResultType::FINISHED_KO);
+            } else {
+                REQUIRE(result.result == GameEngine::ResultType::FINISHED_POINTS);
+            }
+
+            REQUIRE(playerAScore == original_state->player1.GetScore());
+            REQUIRE(playerBScore == original_state->player2.GetScore());
+            REQUIRE(playerAHealth == original_state->player1.health);
+            REQUIRE(playerBHealth == original_state->player2.health);
+
+            ++round;
         }
     }
 
