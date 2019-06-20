@@ -13,6 +13,7 @@
 #include "AllCommands.hpp"
 #include "NextTurn.hpp"
 #include "EvaluationFunctions.hpp"
+#include "Utilities.hpp"
 
 static std::string dirt = "DIRT";
 static std::string air = "AIR";
@@ -178,6 +179,17 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     int N = 0;
     float c = std::sqrt(2);
 
+    //we'll adjust playthrough depth based on how many enemy worms are around us.
+    unsigned playthroughDepth = 24;
+    //Player* myPlayer = ImPlayer1? &state1->player1 : &state1->player2;
+    //Player* enemyPlayer = ImPlayer1? &state1->player2 : &state1->player1;
+    //for(auto const& enemyWorm: enemyPlayer->worms) {
+    //    if(myPlayer->GetCurrentWorm()->position.MovementDistanceTo(enemyWorm.position) < 5) {
+    //        playthroughDepth = 7;
+    //    }
+    //}
+    //std::cerr << "playthroughDepth: " << playthroughDepth << std::endl;
+
     while(Get_ns_since_epoch() < (startTime + 900000000)) { //900ms
         //choose next node
         for(auto & node:  nodes) {
@@ -194,7 +206,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
         GameEngine eng(state);
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, 24);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth);
 
         next_node->score += thisScore;
         next_node->w += thisScore > 0? 1 : 0;
@@ -218,28 +230,15 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
 std::string executeRound(std::string& roundNumber)
 {
-    std::string ret;
     const std::string filePath = "./rounds/" + roundNumber + "/state.json";
-    std::ifstream dataIn;
-    dataIn.open(filePath, std::ifstream::in);
-    if (dataIn.is_open())
-    {
-        std::stringstream buffer;
-        buffer << dataIn.rdbuf();
-        std::string stateJson = buffer.str();
-        rapidjson::Document roundJSON;
-        const bool parsed = !roundJSON.Parse(stateJson.c_str()).HasParseError();
-        if (parsed)
-        {
-            ret = "C;" + roundNumber + ";" + runStrategy(roundJSON) + "\n";
-        }
-        else
-        {
-            ret = "C;" + roundNumber + ";error executeRound \n";
-        }
-    }
+    try {
+        
+        rapidjson::Document roundJSON = Utilities::ReadJsonFile(filePath);
+        return "C;" + roundNumber + ";" + runStrategy(roundJSON) + "\n";
 
-    return ret;
+    } catch(...)        {
+        return "C;" + roundNumber + ";error executeRound \n";
+    }
 }
 
 int main(int argc, char** argv)

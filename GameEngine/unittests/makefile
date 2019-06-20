@@ -5,6 +5,7 @@ ENGINE_SRC_DIR := ..
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
 RNG_SRC_DIR := ../../pcg-cpp-0.98/include
+UTILS_SRC_DIR := ../../Utilities
 
 EXENAME=unit_tests
 
@@ -13,6 +14,7 @@ INCLUDE+=-I$(ENGINE_SRC_DIR)
 INCLUDE+=-I$(GAMESTATE_SRC_DIR)
 INCLUDE+=-I$(COMMANDS_SRC_DIR)
 INCLUDE+=-I$(RNG_SRC_DIR)
+INCLUDE+=-I$(UTILS_SRC_DIR)
 
 CXX=g++
 #these are the flags that I always want
@@ -22,6 +24,7 @@ CXXFLAGS+=-Wall -std=c++14 -fPIC -O2
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 SRC_FILES += $(wildcard $(ENGINE_SRC_DIR)/*.cpp)
 SRC_FILES += $(wildcard $(GAMESTATE_SRC_DIR)/*.cpp)
+SRC_FILES += $(wildcard $(UTILS_SRC_DIR)/*.cpp)
 SRC_FILES += $(wildcard $(COMMANDS_SRC_DIR)/*.cpp)
 
 #obj files is list of all source files (without their directories) with .o appended

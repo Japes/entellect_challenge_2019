@@ -492,7 +492,7 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
             }
         }
 
-        WHEN("player1 kills a friendly, plaer 2 kills an enemy")
+        WHEN("player1 kills a friendly, player 2 kills an enemy")
         {
             state->player1.worms[1].health = 1;
             state->player1.worms[2].health = 1;
@@ -505,8 +505,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
                 auto player1Score = state->player1.GetScore();
                 auto player2Score = state->player2.GetScore();
                 int expectedAverageWormHealth = (GameConfig::commandoWorms.initialHp) / 3; //loses a guy to himself and to player 2
-                CHECK( player1Score == expectedAverageWormHealth + GameConfig::scores.killShot);
-                CHECK( player2Score == GameConfig::commandoWorms.initialHp + GameConfig::scores.killShot);
+                CHECK( player1Score == expectedAverageWormHealth - (GameConfig::scores.killShot + GameConfig::commandoWorms.weapon.damage*2)  );
+                CHECK( player2Score == GameConfig::commandoWorms.initialHp + (GameConfig::scores.killShot + GameConfig::commandoWorms.weapon.damage*2));
             }
         }
 
