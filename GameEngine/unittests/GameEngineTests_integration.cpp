@@ -8,6 +8,7 @@
 #include <sstream>
 #include <chrono>
 #include <fstream>
+#include <bitset>
 #include <dirent.h>
 #include "Utilities.hpp"
 
@@ -15,7 +16,7 @@ uint64_t Get_ns_since_epoch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
 }
 
-TEST_CASE( "Performance tests", "[.performance]" ) {
+TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
 
     unsigned gameCount = 0;
     unsigned turnCount = 0;
@@ -42,28 +43,84 @@ TEST_CASE( "Performance tests", "[.performance]" ) {
     CHECK(false);
 }
 
-TEST_CASE( "Performance tests - trim moves", "[.performance][trim]" ) {
+
+//a monte carlo node
+struct MCNode
+{
+    std::shared_ptr<Command> command;
+    float w;
+    float n;
+    int score;
+    float UCT;
+
+};
+
+TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     unsigned gameCount = 0;
-    unsigned turnCount = 0;
+    int turnCount = 0;
     unsigned num_seconds = 3;
     auto start_time = Get_ns_since_epoch();
 
-    auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json");
-    auto original_state = std::make_shared<GameState>(roundJSON);
+    auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json"); //todo need to make sure there are bots in range
+    bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
+    auto state1 = std::make_shared<GameState>(roundJSON);
+
+    NextTurn::Initialise();
+
+
+//from the bot---------------------------------------------------------
+
+    std::vector<MCNode> nodes;
+    auto movesChar = NextTurn::GetValidTeleportDigs (ImPlayer1, state1, true);
+    std::bitset<8> moves = std::bitset<8>(movesChar);
+
+    for(unsigned i = 0; i < 8; ++i ) {
+        if(moves[i]) {
+            nodes.push_back({NextTurn::GetTeleportDig(ImPlayer1, state1, i), 0, 0, 0});
+        }
+    }
+    auto possible_shoots = NextTurn::GetShootsForWorm (ImPlayer1, state1, true);
+    for(auto const &move : possible_shoots ) {
+        nodes.push_back({move, 0, 0, 0});
+    }
+
+    int N = 0;
+    float c = std::sqrt(2);
+
+    unsigned playthroughDepth = -1;
 
     while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
     //while(true) {
 
-        auto state = std::make_shared<GameState>(*original_state); //no idea why it needs to be done this way
+        //choose next node
+        for(auto & node:  nodes) {
+            if(node.n == 0) {
+                node.UCT = std::numeric_limits<decltype(node.UCT)>::max();
+            } else {
+                node.UCT = (node.w / node.n) + c*std::sqrt(std::log(N)/node.n );
+            }
+        }
+        auto next_node = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return lhs.UCT < rhs.UCT; });
+
+        //load the state
+        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
         GameEngine eng(state);
 
-        while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*NextTurn::GetRandomValidMoveForPlayer(true, state, true).get(), *NextTurn::GetRandomValidMoveForPlayer(false, state, true).get());
-            ++turnCount;
-        }
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+        int numplies{0};
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+        turnCount += numplies;
         ++gameCount;
+
+        next_node->score += thisScore;
+        next_node->w += thisScore > 0? 1 : 0;
+        ++next_node->n;
+        ++N;
     }
+
+//from the bot---------------------------------------------------------
+
 
     INFO("Moves per second: " << turnCount/num_seconds << ", Moves per game: " << turnCount/gameCount << " (" << turnCount << " moves in " << gameCount << " games in " << num_seconds << " seconds)");
     CHECK(false);
@@ -221,7 +278,7 @@ unsigned GetNumRounds(std::string roundFolder)
 
 TEST_CASE( "Comparison with java engine", "[comparison]" ) {
 
-    std::string match = "Test_files/matches/2019.06.15.13.50.08/";
+    std::string match = "Test_files/matches/2019.06.15.13.50.08/"; //this one is not from the latest engine
     std::string botAFolder, botBFolder;
     GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
     unsigned numRounds = GetNumRounds(match);
@@ -298,7 +355,8 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
         {
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
+            int plies = 0;
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
         }
     }
 }
@@ -316,7 +374,8 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int depth = 20;
-            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
+            int plies = 0;
+            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
         }
     }
 }

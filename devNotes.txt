@@ -117,6 +117,35 @@ latest profiling of performance unit test:--------------------------------------
 
     ShootCommand - execute
 
+
+#5  std::shared_ptr<Command>::operator=(std::shared_ptr<Command>&&) (__r=<unknown type in /mnt/c/Users/jpdac/dev/entellect_challenge_2019/GameEngine/unittests/bin/unit_tests, CU 0x40b96e, DIE 0x4156e0>,             this=0x7ffffffed110) at /usr/include/c++/5/bits/shared_ptr.h:294                                                                                                              
+#6  GameEngine::Playthrough(bool, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, std::shared_ptr<GameState>)>, std::function<float (bool, std::shared_ptr<GameState>)>, int, int, int&) (     this=this@entry=0x7ffffffed2a0, player1=player1@entry=false, command=std::shared_ptr (count 3, weak 0) 0x70c940, nextMoveFn=..., evaluationFn=..., radiusToConsider=radiusToConsider@entry=-1, depth=-303,         numPlies=@0x7ffffffed20c: 302) at ../GameEngine.cpp:118 
+
+#0  0x00000000004a629e in Position::MaximumDimension (this=this@entry=0x70d620, other=...) at ../GameState/Position.cpp:18
+#1  0x00000000004a62b5 in Position::MovementDistanceTo (this=this@entry=0x70d620, other=...) at ../GameState/Position.cpp:24                                                                         #2  0x00000000004b29e2 in TeleportCommand::IsValid (this=0x70bd40, player1=<optimized out>, state=std::shared_ptr (count 3, weak 0) 0x729ef0) at ../Commands/TeleportCommand.cpp:65                  #3  0x00000000004a1f1b in GameEngine::AdvanceState (this=this@entry=0x7ffffffed2a0, player1_command=..., player2_command=...) at ../GameEngine.cpp:25                         
+
+#1  0x00000000004a3ec0 in NextTurn::GetRandomValidMoveForPlayer
+
+      #7  std::shared_ptr<TeleportCommand>::shared_ptr<std::allocator<TeleportCommand>, Position&> (__a=..., __tag=..., this=<optimized out>) at /usr/include/c++/5/bits/shared_ptr.h:319                  #8  std::allocate_shared<TeleportCommand, std::allocator<TeleportCommand>, Position&> (__a=...) at /usr/include/c++/5/bits/shared_ptr.h:620                                                          #9  std::make_shared<TeleportCommand, Position&> () at /usr/include/c++/5/bits/shared_ptr.h:636                                                                                                      #10 NextTurn::GetValidTeleportDigsForWorm (player1=player1@entry=true, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:53   
+
+      #0  0x00000000004a33c6 in NextTurn::GetValidTeleportDigsForWorm (player1=player1@entry=false, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:48  #1  0x00000000004a3ec0 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=true) at ../NextTurn.cpp:89 
+
+      #0  0x00000000004a62cf in Position::IsOnMap (this=this@entry=0x7ffffffecf90) at ../GameState/Position.cpp:29                                                                                         #1  0x00000000004a33b0 in NextTurn::GetValidTeleportDigsForWorm (player1=player1@entry=true, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:48
+
+      #9  std::make_shared<TeleportCommand, Position&> () at /usr/include/c++/5/bits/shared_ptr.h:636                                                                                                      #10 NextTurn::GetValidTeleportDigsForWorm (player1=player1@entry=false, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:53          #11 0x00000000004a3ec0 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=true) at ../NextTurn.cpp:89
+
+
+      #3  std::shared_ptr<ShootCommand>::~shared_ptr (this=<optimized out>, __in_chrg=<optimized out>) at /usr/include/c++/5/bits/shared_ptr.h:93                                                          #4  NextTurn::GetShootsForWorm (player1=player1@entry=false, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:76       
+
+      #0  ShootCommand::WormOnTarget (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x729ef0, shootvector=...) at ../Commands/ShootCommand.cpp:72                                    #1  0x00000000004a395a in NextTurn::GetShootsForWorm (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../
+
+      #0  0x00000000004b1cd4 in ShootCommand::WormOnTarget (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x729ef0, shootvector=...) at ../Commands/ShootCommand.cpp:80              #1  0x00000000004a395a in NextTurn::GetShootsForWorm (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x729ef0, trimStupidMoves=trimStupidMoves@entry=true) at ../ 
+      
+      #2  0x00000000004a3ec0 in NextTurn::GetRandomValidMoveForPlayer (player1=true, state=std::shared_ptr (count 4, weak 0) 0x729ef0, trimStupidMoves=true) at ../NextTurn.cpp:89 
+
+      #5  std::shared_ptr<Command>::~shared_ptr (this=<optimized out>, __in_chrg=<optimized out>) at /usr/include/c++/5/bits/shared_ptr.h:93                                                               #6  std::_Destroy<std::shared_ptr<Command> > (__pointer=<optimized out>) at /usr/include/c++/5/bits/stl_construct.h:93                                                                               #7  std::_Destroy_aux<false>::__destroy<std::shared_ptr<Command>*> (__last=<optimized out>, __first=0x70d750) at /usr/include/c++/5/bits/stl_construct.h:103                                         #8  std::_Destroy<std::shared_ptr<Command>*> (__last=<optimized out>, __first=<optimized out>) at /usr/include/c++/5/bits/stl_construct.h:126                                                        #9  std::_Destroy<std::shared_ptr<Command>*, std::shared_ptr<Command> > (__last=0x70d780, __first=<optimized out>) at /usr/include/c++/5/bits/stl_construct.h:151                                    #10 std::vector<std::shared_ptr<Command>, std::allocator<std::shared_ptr<Command> > >::~vector (this=0x7ffffffed020, __in_chrg=<optimized out>) at /usr/include/c++/5/bits/stl_vector.h:424          #11 NextTurn::GetRandomValidMoveForPlayer (player1=true, state=std::shared_ptr (count 3, weak 0) 0x729ef0, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:89           
+
+
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
    reducing to 15 - seems to actually be a bit worse

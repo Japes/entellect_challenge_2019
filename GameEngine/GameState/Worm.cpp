@@ -26,8 +26,8 @@ void Worm::TakeDamage(int dmgAmount)
 bool Worm::operator==(const Worm &other) const
 {
     //std::cerr << "(" << __FUNCTION__ << ") " 
-    //" id: " << (id == other.id) <<
-    //" health: " << (health == other.health) <<
+    //" id: " << (id == other.id) << "(" << id << ", " << other.id << ")" <<
+    //" health: " << (health == other.health) << "( " << health << ", " << other.health << ")" <<
     //" position: " << (position == other.position) <<
     //" previous_position: " << (previous_position == other.previous_position) <<
     //" weapon: " << (weapon == other.weapon) <<

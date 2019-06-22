@@ -661,7 +661,8 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         {
             int roundBefore = state->roundNumber;
             int depth = 4;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
+            int plies = 0;
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
 
             THEN("The game engine advances by that many rounds")
             {
@@ -673,7 +674,8 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
         {
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
+            int plies = 0;
+            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
 
             THEN("The game engine advances until the end")
             {
@@ -694,7 +696,8 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             };
 
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
+            int plies = 0;
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
 
             THEN("We get a positive result")
             {
@@ -715,7 +718,8 @@ TEST_CASE( "Playthroughs", "[playthrough]" )
             };
 
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
-            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth);
+            int plies = 0;
+            int ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
 
             THEN("We get a negative result")
             {

@@ -1,5 +1,6 @@
 #include "NextTurn.hpp"
 #include <algorithm>
+#include <bitset>
 
 std::shared_ptr<pcg32> NextTurn::_rng;
 std::vector<std::shared_ptr<Command>> NextTurn::_playerShoots;
@@ -25,40 +26,44 @@ void NextTurn::Initialise()
     }
 
     if(_surroundingWormSpaces.empty()) {
+        //the order of these guys is important (see GetValidTeleportDigs)
         _surroundingWormSpaces.push_back(Position(-1, -1));
         _surroundingWormSpaces.push_back(Position(0, -1));
         _surroundingWormSpaces.push_back(Position(1, -1));
-        _surroundingWormSpaces.push_back(Position(1, 0));
-        _surroundingWormSpaces.push_back(Position(1, 1));
-        _surroundingWormSpaces.push_back(Position(0, 1));
-        _surroundingWormSpaces.push_back(Position(-1, 1));
         _surroundingWormSpaces.push_back(Position(-1, 0));
+        _surroundingWormSpaces.push_back(Position(1, 0));
+        _surroundingWormSpaces.push_back(Position(-1, 1));
+        _surroundingWormSpaces.push_back(Position(0, 1));
+        _surroundingWormSpaces.push_back(Position(1, 1));
     }
 }
 
-std::vector<std::shared_ptr<Command>> NextTurn::GetValidTeleportDigsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+//returns a bitfield representing the valid directions to move/dig
+//bits are set as follows:
+// 0 1 2
+// 3 w 4
+// 5 6 7
+uint8_t NextTurn::GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
-    std::vector<std::shared_ptr<Command>> ret;
-    ret.reserve(8);
-
+    uint8_t ret = 0;
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
 
     for(auto const & space : _surroundingWormSpaces) {
-        Position wormSpace = worm->position + space;
-        if(!wormSpace.IsOnMap() || state->Cell_at(wormSpace)->worm != nullptr) {
-            continue;
-        }
-
-        if(state->Cell_at(wormSpace)->type == CellType::AIR) {
-            ret.emplace_back(std::make_shared<TeleportCommand>(wormSpace));
-        } else if(state->Cell_at(wormSpace)->type == CellType::DIRT) {
-            ret.emplace_back(std::make_shared<DigCommand>(wormSpace) );
+        ret <<= 1;
+        Position wormSpace{worm->position + space};
+        if(wormSpace.IsOnMap() && state->Cell_at(wormSpace)->worm == nullptr && state->Cell_at(wormSpace)->type != CellType::DEEP_SPACE) {
+            ret += 1;
         }
     }
 
     return ret;
 }
 
+//returns a bitfield representing the valid directions to shoot
+//bits are set as follows:
+// 0 1 2
+// 3 w 4
+// 5 6 7
 std::vector<std::shared_ptr<Command>> NextTurn::GetShootsForWorm(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
     if (!trimStupidMoves) {
@@ -81,16 +86,32 @@ std::vector<std::shared_ptr<Command>> NextTurn::GetShootsForWorm(bool player1, s
     return ret;
 }
 
+std::shared_ptr<Command> NextTurn::GetTeleportDig(bool player1, std::shared_ptr<GameState> state, unsigned index)
+{
+    Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
+    Position targetPos{worm->position + _surroundingWormSpaces[index]};
+
+    if(state->Cell_at(targetPos)->worm == nullptr) {
+        if(state->Cell_at(targetPos)->type == CellType::AIR) {
+            return std::make_shared<TeleportCommand>(targetPos);
+        } else if(state->Cell_at(targetPos)->type == CellType::DIRT) {
+            return std::make_shared<DigCommand>(targetPos);
+        }
+    }
+
+    std::cerr << "(" << __FUNCTION__ << ") index specified that isn't a valid teleport or dig.  Doing nothing." << std::endl;
+    return std::make_shared<DoNothingCommand>();
+}
+
 std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
-    std::shared_ptr<Command> ret;
-
     //get random moves (teleport/dig) and shoots
-    std::vector<std::shared_ptr<Command>> moves = GetValidTeleportDigsForWorm (player1, state, trimStupidMoves);
+    auto movesChar = GetValidTeleportDigs (player1, state, trimStupidMoves);
+    std::bitset<8> moves = std::bitset<8>(movesChar);
     std::vector<std::shared_ptr<Command>> shoots = GetShootsForWorm(player1, state, trimStupidMoves);
 
     //choose random one
-    int totalNumMoves = moves.size() + shoots.size();
+    int totalNumMoves = moves.count() + shoots.size();
 
     if(totalNumMoves == 0) {
         return std::make_shared<DoNothingCommand>();
@@ -99,14 +120,24 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std
     std::uniform_int_distribution<int> uniform_dist(0, totalNumMoves-1);
     int mean = uniform_dist(*_rng.get());
 
-    if(mean < static_cast<int>(moves.size())) {
-        ret = moves[mean];
+    if(mean < static_cast<int>(moves.count())) {
+        //get that set bit (TODO there are bit twiddling hacks to do this better)
+        int index = -1;
+        int numOnesSoFar = 0;
+        for(int i = 7; i > -1; --i) {
+            ++index;
+            if(moves[i]) {
+               ++numOnesSoFar;
+            }
+            if((numOnesSoFar - 1) == mean) {
+                break;
+            }
+        }
+
+        return GetTeleportDig(player1, state, index);
+
     } else {
-        int index = mean - moves.size();
-        ret = shoots[index];
+        int index = mean - moves.count();
+        return shoots[index];
     }
-
-    //std::cerr << "GameEngine::GetRandomValidMoveForPlayer returning " << ret->GetCommandString() << std::endl;
-
-    return ret;
 }

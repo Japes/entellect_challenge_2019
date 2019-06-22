@@ -104,18 +104,21 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
                             std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn,
                             std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
                             int radiusToConsider,
-                            int depth)
+                            int depth,
+                            int& numPlies)
 {
     std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
     std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
 
     auto evaluationBefore = evaluationFn(player1, _state);
 
+    numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
         AdvanceState(*p1Command.get(), *p2Command.get());
         p1Command = nextMoveFn(true, _state);
         p2Command = nextMoveFn(false, _state);
         --depth;
+        ++numPlies;
     }
 
     auto evaluationAfter = evaluationFn(player1, _state);

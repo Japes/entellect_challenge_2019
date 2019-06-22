@@ -34,7 +34,8 @@ class GameEngine
         std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, 
         std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
         int radiusToConsider,
-        int depth);
+        int depth,
+        int& numPlies);
     GameResult GetResult();
     static GameResult GetResult(const std::shared_ptr<GameState> state);
 
