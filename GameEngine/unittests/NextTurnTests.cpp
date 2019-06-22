@@ -5,35 +5,6 @@
 #include "GameEngine.hpp"
 #include "GameEngineTestUtils.hpp"
 
-TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
-{
-    GIVEN("A semi realistic game state and engine")
-    {
-        auto state = std::make_shared<GameState>();
-        
-        place_worm(true, 1, {10,10}, state);
-        place_worm(true, 2, {11,10}, state); //friendly E of us
-        place_worm(true, 3, {8,10}, state); //friendly W of us
-        place_worm(false, 1, {11,9}, state); //enemy NE 1 step
-        place_worm(false, 2, {13,13}, state); //enemy SE 2 step
-        place_worm(false, 3, {10,15}, state); //just out of range
-
-        THEN("GetShootsForWorm returns correct")
-        {
-            auto ret = NextTurn::GetShootsForWorm(true, state, true);
-            REQUIRE(ret.size() == 2);
-            auto expected_move = std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NE);
-
-            INFO(ret[0]->GetCommandString());
-            INFO(ret[1]->GetCommandString());
-
-            REQUIRE( ( (ret[0]->GetCommandString() == "shoot NE") || (ret[0]->GetCommandString() == "shoot SE") ) );
-            REQUIRE( ( (ret[1]->GetCommandString() == "shoot NE") || (ret[1]->GetCommandString() == "shoot SE") ) );
-            REQUIRE( ret[0]->GetCommandString() != ret[1]->GetCommandString() );
-        }
-    }
-}
-
 TEST_CASE( "Handle no available moves", "[no_available_moves]" )
 {
     GIVEN("A game state where the worm has no valid moves")
@@ -195,7 +166,61 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         REQUIRE(NextTurn::GetTeleportDig(true, state, 5)->GetCommandString() == "move 0 2"); //error case...
         REQUIRE(NextTurn::GetTeleportDig(true, state, 6)->GetCommandString() == "move 1 2");
         REQUIRE(NextTurn::GetTeleportDig(true, state, 7)->GetCommandString() == "nothing"); //error case...
+    }
+}
 
+TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
+    GIVEN("A semi realistic game state")
+    {
 
+        /*
+            0   1   2   3   4
+        0   D   .   D   .   .
+        1   S   11  12  .   .
+        2   .   .   .   .   .   
+        3   .   D   .   .   .
+        4   .   21  .   .   22
+        */
+
+        auto state = std::make_shared<GameState>();
+        place_worm(true, 1, {1,1}, state);
+        place_worm(true, 2, {2,1}, state);
+        place_worm(true, 2, {20,20}, state);
+        place_worm(false, 1, {1,4}, state);
+        place_worm(false, 2, {4,4}, state);
+        place_worm(false, 2, {30,30}, state);
+        state->Cell_at({0, 0})->type = CellType::DIRT;
+        state->Cell_at({2, 0})->type = CellType::DIRT;
+        state->Cell_at({1, 3})->type = CellType::DIRT;
+
+        auto shoots = NextTurn::GetValidShoots(true, state, true);
+        INFO("shoots: " << (int)shoots)
+        REQUIRE(shoots == 0b00000001);
+
+        REQUIRE(NextTurn::_playerShoots[7]->GetCommandString() == "shoot SE");
+    }
+}
+
+TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
+{
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        
+        place_worm(true, 1, {10,10}, state);
+        place_worm(true, 2, {11,10}, state); //friendly E of us
+        place_worm(true, 3, {8,10}, state); //friendly W of us
+        place_worm(false, 1, {11,9}, state); //enemy NE 1 step
+        place_worm(false, 2, {13,13}, state); //enemy SE 2 step
+        place_worm(false, 3, {10,15}, state); //just out of range
+
+        THEN("GetValidShoots returns correct")
+        {
+            auto ret = NextTurn::GetValidShoots(true, state, true);
+            INFO("shoots: " << (int)ret)
+            REQUIRE(ret == 0b00100001);
+            REQUIRE(NextTurn::_playerShoots[2]->GetCommandString() == "shoot NE");
+            REQUIRE(NextTurn::_playerShoots[7]->GetCommandString() == "shoot SE");            
+        }
     }
 }

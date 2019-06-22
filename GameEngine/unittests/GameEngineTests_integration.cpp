@@ -72,17 +72,21 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 //from the bot---------------------------------------------------------
 
     std::vector<MCNode> nodes;
+
     auto movesChar = NextTurn::GetValidTeleportDigs (ImPlayer1, state1, true);
     std::bitset<8> moves = std::bitset<8>(movesChar);
-
     for(unsigned i = 0; i < 8; ++i ) {
         if(moves[i]) {
             nodes.push_back({NextTurn::GetTeleportDig(ImPlayer1, state1, i), 0, 0, 0});
         }
     }
-    auto possible_shoots = NextTurn::GetShootsForWorm (ImPlayer1, state1, true);
-    for(auto const &move : possible_shoots ) {
-        nodes.push_back({move, 0, 0, 0});
+
+    auto possible_shootsChar = NextTurn::GetValidShoots (ImPlayer1, state1, true);
+    std::bitset<8> possible_shoots = std::bitset<8>(possible_shootsChar);
+    for(unsigned i = 0; i < 8; ++i ) {
+        if(possible_shoots[i]) {
+            nodes.push_back({NextTurn::_playerShoots[i], 0, 0, 0});
+        }
     }
 
     int N = 0;

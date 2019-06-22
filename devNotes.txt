@@ -1,5 +1,8 @@
 TODO
 
+   how did that shocking bug in getIndex not cause any unit tests to fail
+
+   
    consecutivedonothing count for opponent isnt in file!
    previousposition is wrong when loading file!
 
