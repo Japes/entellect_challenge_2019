@@ -186,7 +186,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     //}
     //std::cerr << "playthroughDepth: " << playthroughDepth << std::endl;
 
-    while(Get_ns_since_epoch() < (startTime + 900000000)) { //900ms
+    while(Get_ns_since_epoch() < (startTime + 880000000)) {
         //choose next node
         for(auto & node:  nodes) {
             if(node.n == 0) {

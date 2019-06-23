@@ -151,16 +151,14 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
 {
     std::vector<std::shared_ptr<Command>> ret;
 
-    auto movesChar = NextTurn::GetValidTeleportDigs (player1, state, true);
-    std::bitset<8> moves = std::bitset<8>(movesChar);
+    auto moves = NextTurn::GetValidTeleportDigs (player1, state, true);
     for(unsigned i = 0; i < 8; ++i ) {
         if(moves[i]) {
             ret.push_back(NextTurn::GetTeleportDig(player1, state, i));
         }
     }
 
-    auto possible_shootsChar = NextTurn::GetValidShoots (player1, state, true);
-    std::bitset<8> possible_shoots = std::bitset<8>(possible_shootsChar);
+    auto possible_shoots = NextTurn::GetValidShoots (player1, state, true);
     for(unsigned i = 0; i < 8; ++i ) {
         if(possible_shoots[i]) {
             ret.push_back(NextTurn::_playerShoots[i]);

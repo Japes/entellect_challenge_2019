@@ -3,6 +3,9 @@
 
 #define MAP_SIZE ((int)33)
 
+//if this is defined, any error will cause an exception to be thrown
+//#define EXCEPTION_ON_ERROR
+
 struct WeaponConfig
 {
     const int damage = 8;

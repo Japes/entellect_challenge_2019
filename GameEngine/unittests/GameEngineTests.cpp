@@ -245,7 +245,7 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
     }
 }
 
-TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
+TEST_CASE( "13 do nothings means disqualified", "[disqualified]" ) {
     using resType = GameEngine::ResultType;
 
     //check for player 1 and player 2
@@ -262,7 +262,7 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
 
         //TODO make a function for this
 
-        WHEN("Player1 does nothing for 11 turns")
+        WHEN("Player1 does nothing for 12 turns")
         {
             DoNothingCommand player1move;
             TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{1,1});
@@ -270,10 +270,10 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
-            for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
+            for(unsigned i = 0; i < GameConfig::maxDoNothings; i++) {
                 player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
-                REQUIRE(state->player1.consecutiveDoNothingCount == i);
+                REQUIRE(state->player1.consecutiveDoNothingCount == i+1);
             }
 
             THEN("Game is still in progress") {
@@ -284,14 +284,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
                 player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player2 wins") {
-                    REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
+                    REQUIRE(eng.GetResult().result == resType::FINISHED_POINTS);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player2);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player1);
                 }
             }
         }
 
-        WHEN("Player1 does something invalid for 11 turns")
+        WHEN("Player1 does something invalid for 12 turns")
         {
             TeleportCommand player1move({GameConfig::mapSize + 10, GameConfig::mapSize + 10} );
             TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{1,1});
@@ -299,10 +299,10 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
-            for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
+            for(unsigned i = 0; i < GameConfig::maxDoNothings; i++) {
                 player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
-                REQUIRE(state->player1.consecutiveDoNothingCount == i);
+                REQUIRE(state->player1.consecutiveDoNothingCount == i+1);
             }
 
             THEN("Game is still in progress") {
@@ -313,14 +313,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
                 player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player2 wins") {
-                    REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
+                    REQUIRE(eng.GetResult().result == resType::FINISHED_POINTS);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player2);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player1);
                 }
             }
         }
 
-        WHEN("Player2 does nothing for 11 turns")
+        WHEN("Player2 does nothing for 12 turns")
         {
             DoNothingCommand player2move;
             TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{1,1});
@@ -328,10 +328,10 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
-            for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
+            for(unsigned i = 0; i < GameConfig::maxDoNothings; i++) {
                 player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
-                REQUIRE(state->player2.consecutiveDoNothingCount == i);
+                REQUIRE(state->player2.consecutiveDoNothingCount == i+1);
             }
 
             THEN("Game is still in progress") {
@@ -342,14 +342,14 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
                 player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player1 wins") {
-                    REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
+                    REQUIRE(eng.GetResult().result == resType::FINISHED_POINTS);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player1);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player2);
                 }
             }
         }
 
-        WHEN("Player2 does something invalid for 11 turns")
+        WHEN("Player2 does something invalid for 12 turns")
         {
             TeleportCommand player2move({GameConfig::mapSize + 10, GameConfig::mapSize + 10} );
             TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{1,1});
@@ -357,10 +357,10 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
             REQUIRE(state->player1.consecutiveDoNothingCount == 0);
             REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
-            for(unsigned i = 1; i < GameConfig::maxDoNothings; i++) {
+            for(unsigned i = 0; i < GameConfig::maxDoNothings; i++) {
                 player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
-                REQUIRE(state->player2.consecutiveDoNothingCount == i);
+                REQUIRE(state->player2.consecutiveDoNothingCount == i+1);
             }
 
             THEN("Game is still in progress") {
@@ -371,7 +371,7 @@ TEST_CASE( "12 do nothings means disqualified", "[disqualified]" ) {
                 player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
                 eng.AdvanceState(player1move, player2move);
                 THEN("Game is finished, and player1 wins") {
-                    REQUIRE(eng.GetResult().result == resType::FINISHED_KO);
+                    REQUIRE(eng.GetResult().result == resType::FINISHED_POINTS);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player1);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player2);
                 }

@@ -32,6 +32,9 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
 
     if(!movesValid) {
         std::cerr << "Invalid move found.  Player1 move: " << player1_command.GetCommandString() << " Player2 move: " << player2_command.GetCommandString() << std::endl;
+#ifdef EXCEPTION_ON_ERROR
+        throw std::runtime_error("Invalid move found!");
+#endif
     }
 
     _state->player1.GetCurrentWorm()->movedThisRound = false;
@@ -153,8 +156,8 @@ GameEngine::GameResult GameEngine::GetResult(const std::shared_ptr<GameState> st
     }
 
     //check for disqualification
-    if(state->player1.consecutiveDoNothingCount >= GameConfig::maxDoNothings || state->player2.consecutiveDoNothingCount >= GameConfig::maxDoNothings) {
-        ret.result = ResultType::FINISHED_KO;
+    if(state->player1.consecutiveDoNothingCount > GameConfig::maxDoNothings || state->player2.consecutiveDoNothingCount > GameConfig::maxDoNothings) {
+        ret.result = ResultType::FINISHED_POINTS;
         ret.winningPlayer = state->player1.consecutiveDoNothingCount >= GameConfig::maxDoNothings? &state->player2 : &state->player1;
         ret.losingPlayer = (ret.winningPlayer == &state->player1) ? &state->player2 : &state->player1;
         //std::cerr << "disqualification" << std::endl;
