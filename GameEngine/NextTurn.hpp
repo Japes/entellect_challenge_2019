@@ -16,12 +16,12 @@ class NextTurn
     
     static void Initialise();
 
-    static uint8_t GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
+    static std::bitset<8> GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
     static std::shared_ptr<Command> GetTeleportDig(bool player1, std::shared_ptr<GameState> state, unsigned index);
+    static std::bitset<8> GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
 
-    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static uint8_t GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    
+    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);    
+    static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
     
     private:
     static std::shared_ptr<pcg32> _rng;

@@ -39,20 +39,20 @@ void NextTurn::Initialise()
 }
 
 //returns a bitfield representing the valid directions to move/dig
-//bits are set as follows:
+//bits are set as follows (LSB is bit[0]):
 // 0 1 2
 // 3 w 4
 // 5 6 7
-uint8_t NextTurn::GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<8> NextTurn::GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
-    uint8_t ret = 0;
+    std::bitset<8> ret(0);
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
 
     for(auto const & space : _surroundingWormSpaces) {
-        ret <<= 1;
+        ret >>= 1;
         Position wormSpace{worm->position + space};
         if(wormSpace.IsOnMap() && state->Cell_at(wormSpace)->worm == nullptr && state->Cell_at(wormSpace)->type != CellType::DEEP_SPACE) {
-            ret += 1;
+            ret.set(7);
         }
     }
 
@@ -60,27 +60,26 @@ uint8_t NextTurn::GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> 
 }
 
 //returns a bitfield representing the valid directions to shoot
-//bits are set as follows:
+//bits are set as follows (LSB is bit[0]):
 // 0 1 2
 // 3 w 4
 // 5 6 7
-uint8_t NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
     if (!trimStupidMoves) {
-        return 0xff;
+        return std::bitset<8>(255);
     }
 
-    uint8_t ret = 0;
+    std::bitset<8> ret(0);
 
     Player* player = player1 ? &state->player1 : &state->player2;
-    Player* otherPlayer = player1 ? &state->player2 : &state->player1;
 
     //TODO can rearrange this so we don't check every direction - rather check where the enemy worms are first
     for(auto const & space : _surroundingWormSpaces) {
-        ret <<= 1;
+        ret >>= 1;
         Worm* hitworm = ShootCommand::WormOnTarget(player1, state, space);
         if(hitworm != nullptr && std::none_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
-            ret += 1;
+            ret.set(7);
         }
     }
 
@@ -108,8 +107,8 @@ unsigned NextTurn::IndexOfIthSetBit(std::bitset<8> bits, unsigned i)
 {
     //get that set bit (TODO there are bit twiddling hacks to do this better)
     int index = -1;
-    int numOnesSoFar = 0;
-    for(int j = 7; j > -1; --j) {
+    unsigned numOnesSoFar = 0;
+    for(int j = 0; j < 8; ++j) {
         ++index;
         if(bits[j]) {
             ++numOnesSoFar;
@@ -146,4 +145,27 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std
         unsigned index = IndexOfIthSetBit(shoots, mean);
         return _playerShoots[index];
     }
+}
+
+std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+{
+    std::vector<std::shared_ptr<Command>> ret;
+
+    auto movesChar = NextTurn::GetValidTeleportDigs (player1, state, true);
+    std::bitset<8> moves = std::bitset<8>(movesChar);
+    for(unsigned i = 0; i < 8; ++i ) {
+        if(moves[i]) {
+            ret.push_back(NextTurn::GetTeleportDig(player1, state, i));
+        }
+    }
+
+    auto possible_shootsChar = NextTurn::GetValidShoots (player1, state, true);
+    std::bitset<8> possible_shoots = std::bitset<8>(possible_shootsChar);
+    for(unsigned i = 0; i < 8; ++i ) {
+        if(possible_shoots[i]) {
+            ret.push_back(NextTurn::_playerShoots[i]);
+        }
+    }
+
+    return ret;
 }

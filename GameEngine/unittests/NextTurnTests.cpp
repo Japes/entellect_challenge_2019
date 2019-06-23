@@ -97,15 +97,15 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
         THEN("Valid moves for player 1 are as expected")
         {
             auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-            INFO("moves: " << (int)moves);
-            REQUIRE(moves == 0b11110101);
+            INFO("moves: " << moves);
+            REQUIRE(moves == 0b10101111);
         }
 
         THEN("Valid moves for player 2 are as expected")
         {
             auto moves = NextTurn::GetValidTeleportDigs(false, state, false);
-            INFO("moves: " << (int)moves);
-            REQUIRE(moves == 0b10011111);
+            INFO("moves: " << moves);
+            REQUIRE(moves == 0b11111001);
         }
 
         AND_THEN("Progressing the game forward 1 turn")
@@ -115,8 +115,8 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
             THEN("Valid moves for player 1 are as expected")
             {
                 auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-                INFO("moves: " << (int)moves);
-                REQUIRE(moves == 0b11100011);
+                INFO("moves: " << moves);
+                REQUIRE(moves == 0b11000111);
             }
         }
 
@@ -129,8 +129,8 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
             THEN("Valid moves for player 1 are as expected")
             {
                 auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-                INFO("moves: " << (int)moves);
-                REQUIRE(moves == 0b01011111);
+                INFO("moves: " << moves);
+                REQUIRE(moves == 0b11111010);
             }
         }
     }
@@ -156,7 +156,7 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         state->Cell_at({0, 1})->type = CellType::DEEP_SPACE;
 
         auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-        REQUIRE(moves == 0b11100110);
+        REQUIRE(moves == 0b01100111);
 
         REQUIRE(NextTurn::GetTeleportDig(true, state, 0)->GetCommandString() == "dig 0 0");
         REQUIRE(NextTurn::GetTeleportDig(true, state, 1)->GetCommandString() == "move 1 0");
@@ -194,8 +194,8 @@ TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
         state->Cell_at({1, 3})->type = CellType::DIRT;
 
         auto shoots = NextTurn::GetValidShoots(true, state, true);
-        INFO("shoots: " << (int)shoots)
-        REQUIRE(shoots == 0b00000001);
+        INFO("shoots: " << shoots)
+        REQUIRE(shoots == 0b10000000);
 
         REQUIRE(NextTurn::_playerShoots[7]->GetCommandString() == "shoot SE");
     }
@@ -217,8 +217,8 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
         THEN("GetValidShoots returns correct")
         {
             auto ret = NextTurn::GetValidShoots(true, state, true);
-            INFO("shoots: " << (int)ret)
-            REQUIRE(ret == 0b00100001);
+            INFO("shoots: " << ret)
+            REQUIRE(ret == 0b10000100);
             REQUIRE(NextTurn::_playerShoots[2]->GetCommandString() == "shoot NE");
             REQUIRE(NextTurn::_playerShoots[7]->GetCommandString() == "shoot SE");            
         }
