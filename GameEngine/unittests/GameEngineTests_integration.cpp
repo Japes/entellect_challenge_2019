@@ -11,6 +11,9 @@
 #include <bitset>
 #include <dirent.h>
 #include "Utilities.hpp"
+#include "MonteCarlo.hpp"
+#include <thread>
+#include <mutex>
 
 uint64_t Get_ns_since_epoch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
@@ -43,22 +46,45 @@ TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
     CHECK(false);
 }
 
+unsigned gameCount = 0;
+int turnCount = 0;
+std::mutex mtx;
 
-//a monte carlo node
-struct MCNode
+void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
 {
-    std::shared_ptr<Command> command;
-    float w;
-    float n;
-    int score;
-    float UCT;
+    while(Get_ns_since_epoch() < stopTime) {
 
-};
+        mtx.lock();
+        //choose next node
+        auto next_node = mc->NextNode();
+        mtx.unlock();
+
+        //load the state
+        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
+        GameEngine eng(state);
+
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+        int numplies{0};
+        int thisScore = eng.Playthrough(ImPlayer1, next_node.command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+
+        mtx.lock();
+        turnCount += numplies;
+        ++gameCount;
+
+        next_node.score += thisScore;
+        next_node.w += thisScore > 0? 1 : 0;
+        ++next_node.n;
+
+        mc->UpdateNumSamples();
+        mtx.unlock();
+
+    }
+}
 
 TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
-    unsigned gameCount = 0;
-    int turnCount = 0;
+    gameCount = 0;
+    turnCount = 0;
     unsigned num_seconds = 3;
     auto start_time = Get_ns_since_epoch();
 
@@ -71,45 +97,14 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
 //from the bot---------------------------------------------------------
 
-    std::vector<MCNode> nodes;
-
-    for(auto const& move: NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true)) {
-        nodes.push_back({move, 0, 0, 0});
-    }
-
-    int N = 0;
-    float c = std::sqrt(2);
+    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), std::sqrt(2));
 
     unsigned playthroughDepth = -1;
 
-    while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
-    //while(true) {
-
-        //choose next node
-        for(auto & node:  nodes) {
-            if(node.n == 0) {
-                node.UCT = std::numeric_limits<decltype(node.UCT)>::max();
-            } else {
-                node.UCT = (node.w / node.n) + c*std::sqrt(std::log(N)/node.n );
-            }
-        }
-        auto next_node = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return lhs.UCT < rhs.UCT; });
-
-        //load the state
-        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-        GameEngine eng(state);
-
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-        int numplies{0};
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
-        turnCount += numplies;
-        ++gameCount;
-
-        next_node->score += thisScore;
-        next_node->w += thisScore > 0? 1 : 0;
-        ++next_node->n;
-        ++N;
-    }
+    std::thread t1(runMC, start_time + (num_seconds * 1000000000), mc, state1, ImPlayer1, playthroughDepth);
+    std::thread t2(runMC, start_time + (num_seconds * 1000000000), mc, state1, ImPlayer1, playthroughDepth);
+    t1.join();
+    t2.join();
 
 //from the bot---------------------------------------------------------
 

@@ -14,6 +14,9 @@
 #include "NextTurn.hpp"
 #include "EvaluationFunctions.hpp"
 #include "Utilities.hpp"
+#include "MonteCarlo.hpp"
+#include <thread>
+#include <mutex>
 
 static std::string dirt = "DIRT";
 static std::string air = "AIR";
@@ -138,27 +141,41 @@ std::string RandomStrategy(rapidjson::Document& roundJSON)
     return "nothing";
 }
 
-//a monte carlo node
-struct MCNode
-{
-    std::shared_ptr<Command> command;
-    float w;
-    float n;
-    int score;
-    float UCT;
+std::mutex mtx;
 
-};
-
-std::ostream & operator << (std::ostream &out, const MCNode &move)
+void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
 {
-    out << move.command->GetCommandString() << ", " <<  move.w << "/" << move.n << ", " << move.score << ", " << move.UCT;
-    return out;
+    while(Get_ns_since_epoch() < stopTime) {
+
+        mtx.lock();
+        //choose next node
+        auto next_node = mc->NextNode();
+        mtx.unlock();
+
+        //load the state
+        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
+        GameEngine eng(state);
+
+        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+        int numplies{0};
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+
+        mtx.lock();
+
+        next_node->score += thisScore;
+        next_node->w += thisScore > 0? 1 : 0;
+        ++next_node->n;
+
+        mc->UpdateNumSamples();
+        mtx.unlock();
+
+    }
 }
 
 //expects command string to be returned e.g. "dig 5 6"
 std::string runStrategy(rapidjson::Document& roundJSON)
 {
-    uint64_t startTime = Get_ns_since_epoch();
+    uint64_t start_time = Get_ns_since_epoch();
 
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
 
@@ -166,14 +183,8 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     NextTurn::Initialise();
 
-    std::vector<MCNode> nodes;
-    
-    for(auto const& move: NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true)) {
-        nodes.push_back({move, 0, 0, 0});
-    }
-
-    int N = 0;
     float c = std::sqrt(2);
+    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), c);
 
     //we'll adjust playthrough depth based on how many enemy worms are around us.
     unsigned playthroughDepth = 24;
@@ -186,43 +197,16 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     //}
     //std::cerr << "playthroughDepth: " << playthroughDepth << std::endl;
 
-    while(Get_ns_since_epoch() < (startTime + 880000000)) {
-        //choose next node
-        for(auto & node:  nodes) {
-            if(node.n == 0) {
-                node.UCT = std::numeric_limits<decltype(node.UCT)>::max();
-            } else {
-                node.UCT = (node.w / node.n) + c*std::sqrt(std::log(N)/node.n );
-            }
-        }
-        auto next_node = std::max_element(std::begin(nodes), std::end(nodes), [] (MCNode const lhs, MCNode const rhs) -> bool { return lhs.UCT < rhs.UCT; });
-
-        //load the state
-        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-        GameEngine eng(state);
-
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-        int numplies{0};
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
-
-        next_node->score += thisScore;
-        next_node->w += thisScore > 0? 1 : 0;
-        ++next_node->n;
-        ++N;
-    }
+    std::thread t1(runMC, start_time + 880000000, mc, state1, ImPlayer1, playthroughDepth);
+    std::thread t2(runMC, start_time + 880000000, mc, state1, ImPlayer1, playthroughDepth);
+    t1.join();
+    t2.join();
 
     //choose the best move and do it
-    auto best_move_it = std::max_element(std::begin(nodes), std::end(nodes), 
-        [] (MCNode const lhs, MCNode const rhs) -> bool { return (lhs.w/lhs.n) < (rhs.w/rhs.n); });
+    auto best_move = mc->GetBestMove();
+    mc->PrintState();
 
-    std::cerr << "MC results: " << std::endl;
-    for(auto const & move : nodes) {
-        std::cerr << move << std::endl;
-    }
-    std::cerr << " best move is " << best_move_it->command->GetCommandString() << std::endl;
-    std::cerr << "N: " << N << std::endl;
-
-    return best_move_it->command->GetCommandString();
+    return best_move->GetCommandString();
 }
 
 std::string executeRound(std::string& roundNumber)
