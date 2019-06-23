@@ -185,13 +185,14 @@ TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
         auto state = std::make_shared<GameState>();
         place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {2,1}, state);
-        place_worm(true, 2, {20,20}, state);
+        place_worm(true, 3, {20,20}, state);
         place_worm(false, 1, {1,4}, state);
         place_worm(false, 2, {4,4}, state);
-        place_worm(false, 2, {30,30}, state);
+        place_worm(false, 3, {30,30}, state);
         state->Cell_at({0, 0})->type = CellType::DIRT;
         state->Cell_at({2, 0})->type = CellType::DIRT;
         state->Cell_at({1, 3})->type = CellType::DIRT;
+        state->Cell_at({0, 1})->type = CellType::DEEP_SPACE;
 
         auto shoots = NextTurn::GetValidShoots(true, state, true);
         INFO("shoots: " << shoots)
@@ -222,5 +223,54 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
             REQUIRE(NextTurn::_playerShoots[2]->GetCommandString() == "shoot NE");
             REQUIRE(NextTurn::_playerShoots[7]->GetCommandString() == "shoot SE");            
         }
+    }
+}
+
+//just made this to confirm that random moves are actually random
+TEST_CASE( "Get random move", "[get_random_move][.statistics]" )
+{
+    GIVEN("A semi realistic game state")
+    {
+
+        /*
+            0   1   2   3   4
+        0   D   .   D   .   .
+        1   S   11  12  .   .
+        2   .   .   .   .   .   
+        3   .   D   .   .   .
+        4   .   21  .   .   22
+        */
+
+        auto state = std::make_shared<GameState>();
+        place_worm(true, 1, {1,1}, state);
+        place_worm(true, 2, {2,1}, state);
+        place_worm(true, 3, {20,20}, state);
+        place_worm(false, 1, {1,4}, state);
+        place_worm(false, 2, {4,4}, state);
+        place_worm(false, 3, {30,30}, state);
+        state->Cell_at({0, 0})->type = CellType::DIRT;
+        state->Cell_at({2, 0})->type = CellType::DIRT;
+        state->Cell_at({1, 3})->type = CellType::DIRT;
+        state->Cell_at({0, 1})->type = CellType::DEEP_SPACE;
+
+        auto cmds = NextTurn::AllValidMovesForPlayer(true, state, true);
+
+        std::vector<int> num_times_this_got_chosen(cmds.size());
+
+        for(unsigned i = 0; i < 10000; ++i) {
+            auto cmd =  NextTurn::GetRandomValidMoveForPlayer(true, state, true);
+
+            for(unsigned j = 0; j < cmds.size(); ++j) {
+                if(cmd->GetCommandString() == cmds[j]->GetCommandString()) {
+                    num_times_this_got_chosen[j] += 1;
+                }
+            }
+        }
+
+        for(unsigned i = 0; i < cmds.size(); ++i) {
+            std::cerr << "(" << __FUNCTION__ << ") " << num_times_this_got_chosen[i] << " " << cmds[i]->GetCommandString() << std::endl;
+        }
+
+        REQUIRE(false);
     }
 }
