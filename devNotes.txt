@@ -1,8 +1,8 @@
 TODO
 
    how did that shocking bug in getIndex not cause any unit tests to fail
+   maybe use bitsets everywhere so i dont get index confusion
 
-   
    consecutivedonothing count for opponent isnt in file!
    previousposition is wrong when loading file!
 

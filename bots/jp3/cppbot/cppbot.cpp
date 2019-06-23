@@ -167,13 +167,20 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     NextTurn::Initialise();
 
     std::vector<MCNode> nodes;
-    auto possible_moves = NextTurn::GetValidTeleportDigsForWorm (ImPlayer1, state1, true);
-    for(auto const &move : possible_moves ) {
-        nodes.push_back({move, 0, 0, 0});
+    auto movesChar = NextTurn::GetValidTeleportDigs (ImPlayer1, state1, true);
+    std::bitset<8> moves = std::bitset<8>(movesChar);
+    for(unsigned i = 0; i < 8; ++i ) {
+        if(moves[7-i]) {
+            nodes.push_back({NextTurn::GetTeleportDig(ImPlayer1, state1, i), 0, 0, 0});
+        }
     }
-    auto possible_shoots = NextTurn::GetShootsForWorm (ImPlayer1, state1, true);
-    for(auto const &move : possible_shoots ) {
-        nodes.push_back({move, 0, 0, 0});
+
+    auto possible_shootsChar = NextTurn::GetValidShoots (ImPlayer1, state1, true);
+    std::bitset<8> possible_shoots = std::bitset<8>(possible_shootsChar);
+    for(unsigned i = 0; i < 8; ++i ) {
+        if(possible_shoots[7-i]) {
+            nodes.push_back({NextTurn::_playerShoots[i], 0, 0, 0});
+        }
     }
 
     int N = 0;
@@ -206,7 +213,8 @@ std::string runStrategy(rapidjson::Document& roundJSON)
         GameEngine eng(state);
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth);
+        int numplies{0};
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
         next_node->score += thisScore;
         next_node->w += thisScore > 0? 1 : 0;
