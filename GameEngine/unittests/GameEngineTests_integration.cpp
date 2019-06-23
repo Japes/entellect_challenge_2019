@@ -153,7 +153,10 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
 
     } else if (moveType == "nothing") {
         return std::make_shared<DoNothingCommand>();
+    } else if (moveType == "No") { //"No Command" - invalid
+        return std::make_shared<TeleportCommand>(Position(-10,-10)); //always invalid
     } else {
+        std::cerr << moveType << std::endl;
         throw std::runtime_error("dont understand this move type");
     }
 }
@@ -273,7 +276,8 @@ TEST_CASE( "Comparison with java engine", "[comparison]" ) {
     std::vector<std::string> matches;
     matches.push_back("Test_files/matches/2019.06.15.13.50.08/"); //this one is not from the latest engine
     matches.push_back("Test_files/matches/2019.06.22.15.52.10/");
-//    matches.push_back("../../starter-pack/match-logs/2019.06.22.15.52.10/");
+    matches.push_back("Test_files/matches/2019.06.22.15.46.18/");
+    //matches.push_back("../../starter-pack/match-logs/2019.06.22.15.46.18/");
 
     for(auto const& match: matches) {
 
@@ -296,8 +300,8 @@ TEST_CASE( "Comparison with java engine", "[comparison]" ) {
             std::shared_ptr<Command> p1Command = GetCommandFromFile(match + GetRoundFolder(round) + botAFolder + "PlayerCommand.txt");
             std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
 
-            //std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << 
-            //" p2Command: " << p2Command->GetCommandString() << std::endl;
+            //std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << " p2Command: " << p2Command->GetCommandString() << 
+            //    " p1 score: " << original_state->player1.command_score  << " p2 score: " << original_state->player2.command_score << std::endl;
             eng.AdvanceState(*p1Command, *p2Command);
 
             if(round != numRounds) {
