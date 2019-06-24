@@ -65,15 +65,15 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
         int numplies{0};
-        int thisScore = eng.Playthrough(ImPlayer1, next_node.command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
         mtx.lock();
         turnCount += numplies;
         ++gameCount;
 
-        next_node.score += thisScore;
-        next_node.w += thisScore > 0? 1 : 0;
-        ++next_node.n;
+        next_node->score += thisScore;
+        next_node->w += thisScore > 0? 1 : 0;
+        ++next_node->n;
 
         mc->UpdateNumSamples();
         mtx.unlock();
@@ -266,7 +266,7 @@ unsigned GetNumRounds(std::string roundFolder)
     return ret;
 }
 
-TEST_CASE( "Comparison with java engine", "[comparison]" ) {
+TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
 
     std::vector<std::string> matches;
     matches.push_back("Test_files/matches/2019.06.15.13.50.08/"); //this one is not from the latest engine

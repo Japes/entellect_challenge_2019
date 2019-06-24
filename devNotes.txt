@@ -1,11 +1,15 @@
 TODO
 
-   consecutivedonothing count for opponent isnt in file!
-   previousposition is wrong when loading file!
+   add worm name to logs to distinguish
+   run grep on match logs
+   run compare over LOTS of matches
+   make monte carlo choose random if tie
 
    add per-worm playthroughs
+      not just for performance - other worms actually generate noise
 
-   multithread
+   consecutivedonothing count for opponent isnt in file!
+   previousposition is wrong when loading file!
 
    explicit exclude of potential game ending move
       explicit exclude of all chances for opponent to shoot?
@@ -88,6 +92,8 @@ BRAINSTORMING-------------------------------------------------------------------
             learn/estimate strategy while you play??
         "mixed" strategy?
 
+        coward worms? make the enemy waste time
+
         if you don't use select early on you've wasted it
          check if im just using +-1 for playthroughs - should prob add bias there
          disregard moves that would result in instant loss...
@@ -127,3 +133,16 @@ after fixing some edge case bugs in the engine and putting playthrough depth bac
    reference-bot:           0/0/0                    84/0/53                  70/0/67                  (154/0/120)
    jp2:                     53/0/84                  0/0/0                    17/0/120                 (70/0/204)
    jp3:                     67/0/70                  120/0/17                 0/0/0                    (187/0/87)
+
+after optimising engine and adding multithreading (depth still 24):
+(wins/draws/losses):     reference-bot            jp3                      jp2                      
+reference-bot:           0/0/0                    10/0/23                  17/0/16                  (27/0/39)
+jp3:                     23/0/10                  0/0/0                    19/0/14                  (42/0/24)
+jp2:                     16/0/17                  14/0/19                  0/0/0                    (30/0/36)
+
+some more of the same^ but redirecting std::err to /dev/null (suspect foul play by jp2)
+
+(wins/draws/losses):     reference-bot            jp3                      jp2                      
+reference-bot:           0/0/0                    16/0/16                  16/0/16                  (32/0/32)
+jp3:                     16/0/16                  0/0/0                    20/0/12                  (36/0/28)
+jp2:                     16/0/16                  12/0/20                  0/0/0                    (28/0/36)

@@ -39,12 +39,12 @@ std::shared_ptr<Command> MonteCarlo::GetBestMove()
 
 void MonteCarlo::PrintState()
 {
+    std::cerr << "N: " << _N << std::endl; //print this first so it comes up in PlayerCommand.txt
     std::cerr << "MC results: " << std::endl;
     for(auto const & move : _nodes) {
         std::cerr << *move << std::endl;
     }
     std::cerr << " best move is " << GetBestMove()->GetCommandString() << std::endl;
-    std::cerr << "N: " << _N << std::endl;
 }
 
 std::ostream & operator << (std::ostream &out, const MonteCarlo::MCNode &move)
