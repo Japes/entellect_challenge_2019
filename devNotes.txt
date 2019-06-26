@@ -112,6 +112,11 @@ insights from replays-----------------------------------------------------------
 latest profiling of performance unit test:--------------------------------------------
 
 
+bot description --------------------------------------------------------------------
+jp2 - what i submitted for Early Bird.  basic monte carlo, buggy
+jp3 - jp2 with various bug fixes
+jp4 - jp3 with optimizations to GetRandomMoveForWorm and added multithreading.  Plies/s up from ~600k to 1.2M
+
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
    reducing to 15 - seems to actually be a bit worse
@@ -128,13 +133,13 @@ upped the time limit to 3s, improvement not great.  beats reference bot and 1s j
    jp2:                     5/0/15                   0/0/0                    6/0/14                   (11/0/29)
    jp3:                     15/0/5                   14/0/6                   0/0/0                    (29/0/11)
 
-after fixing some edge case bugs in the engine and putting playthrough depth back to 24:
+after fixing some edge case bugs in the engine and putting playthrough depth back to 24 (engine version 2019.2.1):
    (wins/draws/losses):     reference-bot            jp2                      jp3                      
    reference-bot:           0/0/0                    84/0/53                  70/0/67                  (154/0/120)
    jp2:                     53/0/84                  0/0/0                    17/0/120                 (70/0/204)
    jp3:                     67/0/70                  120/0/17                 0/0/0                    (187/0/87)
 
-after optimising engine and adding multithreading (depth still 24):
+after optimising engine and adding multithreading (depth still 24) (engine version 2019.2.2)
 (wins/draws/losses):     reference-bot            jp3                      jp2                      
 reference-bot:           0/0/0                    10/0/23                  17/0/16                  (27/0/39)
 jp3:                     23/0/10                  0/0/0                    19/0/14                  (42/0/24)
@@ -146,3 +151,5 @@ some more of the same^ but redirecting std::err to /dev/null (suspect foul play 
 reference-bot:           0/0/0                    16/0/16                  16/0/16                  (32/0/32)
 jp3:                     16/0/16                  0/0/0                    20/0/12                  (36/0/28)
 jp2:                     16/0/16                  12/0/20                  0/0/0                    (28/0/36)
+
+bringing back the old one as jp3 and making current one jp4:

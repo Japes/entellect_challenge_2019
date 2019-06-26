@@ -6,6 +6,7 @@ import sys
 import shutil
 import time
 import datetime
+import glob
 
 #script for running matches/tournaments using the official runner/scripts.
 #goal is to mimic actual tournament running conditions as closely as possible
@@ -21,6 +22,7 @@ _resultsFolder = "runMatchesResults"
 _verbosity = 2 #verbosity 0 = fast as possible; 1 = show only game map; 2 = show as much as possible
 _bots = []
 _numRounds = 2 #how many times to run tournament
+_engineVer = "" #version of the engine we are using for this playthrough
 
 #function defs################################
 def showUsage():
@@ -226,7 +228,7 @@ def WriteSummary(grid, bots, summaryFilePath):
     maxBotNameLength = 25
     file = open(summaryFilePath, "a+")
 
-    summary = ''
+    summary = 'Engine version: ' + _engineVer + '\n'
     header = '(wins/draws/losses):'
     header = PadToNext(maxBotNameLength, header)
     for bot in _bots:
@@ -260,7 +262,10 @@ def WriteSummary(grid, bots, summaryFilePath):
 
 #the script  ###############################################################################
 
+#get/set global vars
 _startingPath = os.getcwd()
+_engineVer = glob.glob(_staterPackPath +'/*game-engine-jvm-full*.jar')[0][-12:-4]
+print("_engineVer: " +  _engineVer)
 parseArgs()
 print("BOTS: " + str(_bots))
 
