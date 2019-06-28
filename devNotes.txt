@@ -153,3 +153,10 @@ jp3:                     16/0/16                  0/0/0                    20/0/
 jp2:                     16/0/16                  12/0/20                  0/0/0                    (28/0/36)
 
 bringing back the old one as jp3 and making current one jp4:
+
+Engine version: 2019.2.2
+(wins/draws/losses):     reference-bot            jp2                      jp3                      jp4                      
+reference-bot:           0/0/0                    26/0/19                  21/0/24                  18/0/27                  (65/0/70)
+jp2:                     19/0/26                  0/0/0                    4/2/39                   6/2/37                   (29/4/102)
+jp3:                     24/0/21                  39/2/4                   0/0/0                    9/0/36                   (72/2/61)
+jp4:                     27/0/18                  37/2/6                   36/0/9                   0/0/0                    (100/2/33)

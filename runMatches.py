@@ -101,7 +101,22 @@ def confirmDir(file):
         return False
     return True
 
-#gets match info from the most recent folder in the given folder
+def getNameScoreHealth(line):
+    splitLineDash = line.split('-')
+    #print(splitLineDash)
+    name = splitLineDash[1][1:]
+    #print(name)
+    splitSpace = line.split(' ')
+    #print(splitSpace)
+    #print(splitSpace[-2])
+    score = int(splitSpace[-2].split(':')[1])
+    #print(score)
+    healthStr = splitSpace[-1].split(':')[1]
+    health = int(healthStr[:-1]) #strip off newline
+    #print(health)
+
+    return name, score, health
+
 ''' file looks like this:
 Match seed: 15086
 
@@ -110,19 +125,10 @@ The winner is: B - James
 A - Reference Bot- score:2114 health:0
 B - James- score:2165 health:20
 '''
-def getLatestMatchResult(matchLogsPath):
-
-    starting_path = os.getcwd()
+def getMatchResult(matchFolder):
     ret = {}
 
-    #print("Getting most recent match results in " + os.getcwd() + matchLogsPath)
-    os.chdir(matchLogsPath)
-    allMatches = [d for d in os.listdir('.') if os.path.isdir(d)]
-    latest_match = max(allMatches, key=os.path.getmtime)
-    #print("latest match is in " + latest_match)
-    ret["MatchFolder"] = os.getcwd() + "/" + latest_match
-
-    os.chdir(latest_match)
+    os.chdir(matchFolder)
     allRounds = [d for d in os.listdir('.') if os.path.isdir(d)]
     latest_round = max(allRounds, key=os.path.getmtime)
     #print("latest round is in " + latest_round)
@@ -140,22 +146,32 @@ def getLatestMatchResult(matchLogsPath):
         if("The game ended in a tie" in line):
             ret["winner"] = "tie"
         if(line.startswith("A - ")):
-            splitLineName = line.split('-')
-            ret["playerAName"] = splitLineName[1][1:]
-            splitScoreHealth = splitLineName[2].split(' ')
-            ret["playerAScore"] = int(splitScoreHealth[1][6:])
-            ret["playerAHealth"] = int(splitScoreHealth[2][7:])
+            ret["playerAName"], ret["playerAScore"], ret["playerAHealth"] = getNameScoreHealth(line)
         if(line.startswith("B - ")):
-            splitLineName = line.split('-')
-            ret["playerBName"] = splitLineName[1][1:]
-            splitScoreHealth = splitLineName[2].split(' ')
-            ret["playerBScore"] = int(splitScoreHealth[1][6:])
-            ret["playerBHealth"] = int(splitScoreHealth[2][7:])
+            ret["playerBName"], ret["playerBScore"], ret["playerBHealth"] = getNameScoreHealth(line)
 
-    os.chdir(starting_path)
+    print(ret)
 
     return ret
 
+#gets match info from the most recent folder in the given folder
+def getLatestMatchResult(matchLogsPath):
+
+    starting_path = os.getcwd()
+
+    #print("Getting most recent match results in " + os.getcwd() + matchLogsPath)
+    os.chdir(matchLogsPath)
+    allMatches = [d for d in os.listdir('.') if os.path.isdir(d)]
+    latest_match = max(allMatches, key=os.path.getmtime)
+    #print("latest match is in " + latest_match)
+
+    matchFolder = os.getcwd() + "/" + latest_match
+    matchResult = getMatchResult(matchFolder)
+    matchResult["MatchFolder"] = matchFolder
+
+    os.chdir(starting_path)
+
+    return matchResult
 
 def runMatch(bot1, bot2):
     global _staterPackPath
