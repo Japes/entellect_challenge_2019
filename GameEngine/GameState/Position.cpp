@@ -24,6 +24,14 @@ int Position::MovementDistanceTo(Position other)
    return MaximumDimension(other);
 }
 
+//range to target as defined in rules
+int Position::ShootDistanceTo(Position other)
+{
+    auto xdist = other.x - x;
+    auto ydist = other.y - y;
+    return static_cast<int>(std::sqrt((xdist*xdist) + (ydist*ydist)));
+}
+
 bool Position::IsOnMap() const
 {
     return x >= 0 && y >= 0 && x < GameConfig::mapSize && y < GameConfig::mapSize;

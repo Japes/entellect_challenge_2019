@@ -13,6 +13,7 @@ struct Position
     Position(int x, int y);
     int MaximumDimension(Position other);
     int MovementDistanceTo(Position other);
+    int ShootDistanceTo(Position other);
     bool IsOnMap() const;
 
     //fun shootingDistance(other: Point): Double = floor(euclideanDistance(other))
@@ -29,6 +30,11 @@ struct Position
     {
         x += other.x;
         y += other.y;
+    }
+
+    Position operator-(const Position& other)
+    {
+        return Position(x - other.x, y - other.y);
     }
 
     bool operator==(const Position& other) const

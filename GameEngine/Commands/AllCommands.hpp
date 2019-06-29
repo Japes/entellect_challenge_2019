@@ -2,3 +2,4 @@
 #include "DoNothingCommand.hpp"
 #include "ShootCommand.hpp"
 #include "TeleportCommand.hpp"
+#include "BananaCommand.hpp"
