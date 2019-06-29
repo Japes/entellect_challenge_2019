@@ -380,14 +380,24 @@ TEST_CASE( "13 do nothings means disqualified", "[disqualified]" ) {
     }
 }
 
+int ExpectedInitialHealth()
+{
+    return GameConfig::commandoWorms.initialHp*2 + GameConfig::agentWorms.initialHp;
+}
+
+int ExpectedInitialHealthScore()
+{
+    return ExpectedInitialHealth()/3;
+}
+
 TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
     /*
     The total score value is determined by adding together the player's average worm health and the points for every single command the they played:
 
     Attack:
-        Shooting any worm unconscious gives 40 points
-        Shooting an enemy worm gives 20 points
+        Any damages dealt to enemies gives dmg*2 points
+        Shooting a worm unconscious gives 40 points
         Shooting one of your own worms will reduce your points by 20
         A missed attack gives 2 points
     Moving gives 5 point
@@ -398,6 +408,19 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
     GIVEN("A semi realistic game state and engine")
     {
+        /*
+            0   1   2   3   
+        0   11  .   .   .   
+        1   .   .   .   .   
+        2   .   .   12  .   
+        3   .   .   .   .   
+        4   .   .   .   .   
+        5   .   .   .   .   
+        6   13  .   .   .   
+        7   .   .   .   .   
+        8   21  .   .   .   
+        */
+
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 1, {0,0}, state);
@@ -418,8 +441,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
             THEN("points are as expected")
             {
-                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.doNothing);
-                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.doNothing);
+                CHECK(eng.GetResult().winningPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.doNothing);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.doNothing);
             }
         }
 
@@ -431,8 +454,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
             THEN("points are as expected")
             {
-                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.move);
-                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.move);
+                CHECK(eng.GetResult().winningPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.move);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.move);
             }
         }
 
@@ -444,8 +467,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
             THEN("points are as expected")
             {
-                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.missedAttack);
-                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.missedAttack);
+                CHECK(eng.GetResult().winningPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.missedAttack);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.missedAttack);
             }
         }
 
@@ -458,8 +481,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
             THEN("points are as expected")
             {
                 CHECK(eng.GetResult().winningPlayer != eng.GetResult().losingPlayer);
-                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.dig);
-                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.dig);
+                CHECK(eng.GetResult().winningPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.dig);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.dig);
             }
         }
 
@@ -471,8 +494,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
 
             THEN("points are as expected")
             {
-                CHECK(eng.GetResult().winningPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.invalidCommand);
-                CHECK(eng.GetResult().losingPlayer->GetScore() == GameConfig::commandoWorms.initialHp + GameConfig::scores.invalidCommand);
+                CHECK(eng.GetResult().winningPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.invalidCommand);
+                CHECK(eng.GetResult().losingPlayer->GetScore() == ExpectedInitialHealthScore() + GameConfig::scores.invalidCommand);
             }
         }
 
@@ -486,9 +509,9 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
             {
                 auto player1Score = state->player1.GetScore();
                 auto player2Score = state->player2.GetScore();
-                int expectedAverageWormHealth = (GameConfig::commandoWorms.initialHp*3 - GameConfig::commandoWorms.weapon.damage*2) / 3; //he gets hit by himself and player 2
+                int expectedAverageWormHealth = (ExpectedInitialHealth() - GameConfig::commandoWorms.weapon.damage*2) / 3; //he gets hit by himself and player 2
                 CHECK( player1Score == expectedAverageWormHealth - GameConfig::commandoWorms.weapon.damage*2);
-                CHECK( player2Score == GameConfig::commandoWorms.initialHp + GameConfig::commandoWorms.weapon.damage*2);
+                CHECK( player2Score == ExpectedInitialHealthScore() + GameConfig::commandoWorms.weapon.damage*2);
             }
         }
 
@@ -506,7 +529,7 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
                 auto player2Score = state->player2.GetScore();
                 int expectedAverageWormHealth = (GameConfig::commandoWorms.initialHp) / 3; //loses a guy to himself and to player 2
                 CHECK( player1Score == expectedAverageWormHealth - (GameConfig::scores.killShot + GameConfig::commandoWorms.weapon.damage*2)  );
-                CHECK( player2Score == GameConfig::commandoWorms.initialHp + (GameConfig::scores.killShot + GameConfig::commandoWorms.weapon.damage*2));
+                CHECK( player2Score == ExpectedInitialHealthScore() + (GameConfig::scores.killShot + GameConfig::commandoWorms.weapon.damage*2));
             }
         }
 

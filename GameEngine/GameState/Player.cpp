@@ -11,7 +11,7 @@ Player::Player(GameState* _state) :
     //not sure why the usual vector constructors aren't working here...
     worms.push_back(Worm(state));
     worms.push_back(Worm(state));
-    worms.push_back(Worm(state));
+    worms.push_back(Worm(state, true)); //TODO big assumption here: agent worm is always number 3.  should actually read from state
     RecalculateHealth();
 }
 

@@ -1,11 +1,21 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state) : state{_state}, id{0}, movedThisRound{0}
+Worm::Worm(GameState* _state, bool agent) : state{_state}, id{0}, movedThisRound{0}
 {
-    health = GameConfig::commandoWorms.initialHp;
-    diggingRange = GameConfig::commandoWorms.diggingRange;
-    movementRange = GameConfig::commandoWorms.movementRange;
+    if(agent) {
+        proffession = Proffession::AGENT;
+        health = GameConfig::agentWorms.initialHp;
+        diggingRange = GameConfig::agentWorms.diggingRange;
+        movementRange = GameConfig::agentWorms.movementRange;
+        banana_bomb_count = GameConfig::agentWorms.banana.count;
+    } else {
+        proffession = Proffession::COMMANDO;
+        health = GameConfig::commandoWorms.initialHp;
+        diggingRange = GameConfig::commandoWorms.diggingRange;
+        movementRange = GameConfig::commandoWorms.movementRange;
+        banana_bomb_count = 0;
+    }
 }
 
 bool Worm::IsDead()
@@ -36,10 +46,13 @@ bool Worm::operator==(const Worm &other) const
     //std::endl;
 
     return (id == other.id &&
+            proffession == other.proffession &&
             health == other.health &&
             position == other.position &&
             //previous_position == other.previous_position && //not loaded from state (this operator only used for unit testing)
             weapon == other.weapon &&
+            banana_bomb == other.banana_bomb &&
+            banana_bomb_count == other.banana_bomb_count &&
             diggingRange == other.diggingRange &&
             movementRange == other.movementRange);
 }

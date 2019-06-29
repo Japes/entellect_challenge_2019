@@ -3,6 +3,7 @@
 const int GameConfig::maxRounds;
 const int GameConfig::maxDoNothings;
 const CommandoWorms GameConfig::commandoWorms;
+const AgentWorms GameConfig::agentWorms;
 const int GameConfig::pushbackDamage;
 const int GameConfig::mapSize;
 const int GameConfig::healthPackHp;
