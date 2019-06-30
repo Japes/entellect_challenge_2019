@@ -21,7 +21,7 @@ struct Position
     //fun euclideanDistance(other: Point) = sqrt((x - other.x).pow(2) + (y - other.y).pow(2))
     //fun euclideanDistance(other: Pair<Double, Double>) = sqrt((x - other.first).pow(2) + (y - other.second).pow(2))
 
-    Position operator+(const Position& other)
+    Position operator+(const Position& other) const
     {
         return Position(x + other.x, y + other.y);
     }

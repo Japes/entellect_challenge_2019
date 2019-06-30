@@ -14,23 +14,50 @@ TEST_CASE( "I can make a game engine instance", "[sanity]" ) {
 
 TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
     //according to the rules:
+    //select
     //move
     //dig
+    //banana
     //shoot
 
     GIVEN("A semi realistic game state and engine")
     {
+
+       /*
+            0   1   2   3   4   5   6   7   8   9   10
+        0   .   .   .   .   .   .   .   .   .   .   .
+        1   .   .   .   .   .   .   .   .   .   .   .
+        2   12  .   .   .   .   .   .   .   .   .   .
+        3   11  .   .   .   .   .   .   .   .   .   .
+        4   .   .   .   .   .   .   .   .   .   .   .
+        5   22  .   .   .   .   .   .   .   .   .   .
+        6   21  .   .   .   .   .   .   .   .   .   .
+        7   .   .   .   .   .   .   .   .   .   .   .
+        8   .   .   .   .   .   .   .   .   .   .   .
+        9   .   .   .   .   .   .   .   .   .   .   13
+        10  .   .   .   .   .   .   .   .   B   .   D
+        11  .   .   .   .   .   .   .   .   .   .   23
+        */
+
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 2, {0,2}, state);
-        place_worm(true, 3, {0,3}, state);
+        place_worm(true, 1, {0,3}, state);
         place_worm(false, 2, {0,5}, state);
-        place_worm(false, 3, {0,6}, state);
+        place_worm(false, 1, {0,6}, state);
 
-        place_worm(true, 1, {10,9}, state);
-        place_worm(false, 1, {10,11}, state);
+        place_worm(true, 3, {10,9}, state);
+        place_worm(false, 3, {10,11}, state);
         state->Cell_at({10, 10})->type = CellType::DIRT;
 
+        //make it the 3rd players turn
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        state->player1.consecutiveDoNothingCount = 0;
+        state->player2.consecutiveDoNothingCount = 0;
+
+        REQUIRE(state->player1.GetCurrentWorm() == &state->player1.worms[2]);
+        REQUIRE(state->player2.GetCurrentWorm() == &state->player2.worms[2]);
         REQUIRE(state->player1.consecutiveDoNothingCount == 0);
         REQUIRE(state->player2.consecutiveDoNothingCount == 0);
 
@@ -39,6 +66,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         {
             TeleportCommand player1move({10,8});
             DigCommand player2move({10,10});
+            REQUIRE(state->player1.GetCurrentWorm() == &state->player1.worms[2]);
             eng.AdvanceState(player1move, player2move);
             THEN("Its fine")
             {
@@ -51,6 +79,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         {
             TeleportCommand player1move({10,10});
             DigCommand player2move({10,10});
+            REQUIRE(state->player1.GetCurrentWorm() == &state->player1.worms[2]);
             eng.AdvanceState(player1move, player2move);
             THEN("The move is evaluated before the dig")
             {
@@ -59,18 +88,55 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
             }
         }
 
+        //Dig happens before banana----------------
+        WHEN("A player digs and a player bananas")
+        {
+            DigCommand player1move({10,10});
+            BananaCommand player2move({8,10});
+
+            auto p1ScoreBefore = state->player1.GetScore();
+            auto p2ScoreBefore = state->player2.GetScore();
+
+            REQUIRE(state->player1.GetCurrentWorm() == &state->player1.worms[2]);
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("The dig happens first")
+            {
+                REQUIRE(state->Cell_at({10, 10})->type == CellType::AIR);
+                REQUIRE(state->player1.GetScore() == p1ScoreBefore + GameConfig::scores.dig);
+                REQUIRE(state->player2.GetScore() == p2ScoreBefore);
+            }
+        }
+
+        //banana happens before shoot----------------
+        WHEN("A player shoots and a player bananas")
+        {
+            state->player1.GetCurrentWorm()->health = 1;
+            state->player2.GetCurrentWorm()->health = 1;
+
+            BananaCommand player1move({8,11});
+            ShootCommand player2move(ShootCommand::ShootDirection::N);
+
+            eng.AdvanceState(player1move, player2move);
+
+            THEN("The banana happens first")
+            {
+                REQUIRE(state->player2.worms[2].IsDead());
+                REQUIRE(!state->player1.worms[2].IsDead());
+            }
+        }
+
         //Dig happens before shoot----------------
         Worm* targetWorm = state->player1.GetCurrentWorm();
-
-        REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::commandoWorms.initialHp);
         WHEN("A player digs and a player shoots")
         {
+            REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::agentWorms.initialHp);
             DigCommand player1move({10,10});
             ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
             THEN("Its fine")
             {
-                REQUIRE(targetWorm->health < GameConfig::commandoWorms.initialHp);
+                REQUIRE(targetWorm->health < GameConfig::agentWorms.initialHp);
             }
         }
 
@@ -81,21 +147,22 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
             eng.AdvanceState(player1move, player2move);
             THEN("It fails")
             {
-                REQUIRE(targetWorm->health == GameConfig::commandoWorms.initialHp);
+                REQUIRE(targetWorm->health == GameConfig::agentWorms.initialHp);
             }
         }
 
         //Move happens before shoot----------------
-        REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::commandoWorms.initialHp);
         WHEN("A player moves away from a shot")
         {
+            REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::agentWorms.initialHp);
+
             state->Cell_at({10, 10})->type = CellType::AIR;
             TeleportCommand player1move({9,9});
             ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
             THEN("He doesn't get hit")
             {
-                REQUIRE(targetWorm->health == GameConfig::commandoWorms.initialHp);
+                REQUIRE(targetWorm->health == GameConfig::agentWorms.initialHp);
             }
         }
 
@@ -117,7 +184,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
             eng.AdvanceState(player1move, player2shoot);
             THEN("He gets hit")
             {
-                REQUIRE(targetWorm->health < GameConfig::commandoWorms.initialHp);
+                REQUIRE(targetWorm->health < GameConfig::agentWorms.initialHp);
             }
         }
     }

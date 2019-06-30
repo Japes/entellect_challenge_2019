@@ -20,7 +20,7 @@ void SetupAgent(std::shared_ptr<GameState> state, GameEngine& eng)
     REQUIRE(state->player1.consecutiveDoNothingCount == 0);
 }
 
-TEST_CASE( "Banana validation", "" ) {
+TEST_CASE( "Banana validation", "[banana]" ) {
 
     GIVEN("A game state and it's NOT agent worm's turn")
     {
@@ -74,7 +74,7 @@ TEST_CASE( "Banana validation", "" ) {
     }
 }
 
-TEST_CASE( "Banana range", "" ) {
+TEST_CASE( "Banana range", "[banana]" ) {
 
     /*banana radius:
     0   1   2   3   4   5   6   7   8   9   10
@@ -132,7 +132,7 @@ TEST_CASE( "Banana range", "" ) {
     }
 }
 
-TEST_CASE( "Banana can be lobbed over dirt", "" ) {
+TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
     GIVEN("A setup with dirt")
     {
         /*
@@ -197,7 +197,7 @@ TEST_CASE( "Banana can be lobbed over dirt", "" ) {
     }
 }
 
-TEST_CASE( "Banana bomb lobbed into deep space", "" ) {
+TEST_CASE( "Banana bomb lobbed into deep space", "[banana]" ) {
     //not invalid, but lose the bomb and does nothing
     GIVEN("A contrived situation")
     {
@@ -228,7 +228,7 @@ TEST_CASE( "Banana bomb lobbed into deep space", "" ) {
 
         WHEN("We chuck a banana into deep space")
         {
-            eng.AdvanceState(BananaCommand({2,6}), DoNothingCommand());
+            eng.AdvanceState(BananaCommand({2,4}), DoNothingCommand());
 
             THEN("It's fine")
             {
@@ -246,7 +246,7 @@ TEST_CASE( "Banana bomb lobbed into deep space", "" ) {
     }
 }
 
-TEST_CASE( "Banana command: damage", "[Shoot_command]" ) {
+TEST_CASE( "Banana command: damage", "[banana]" ) {
     //to enemies
     //include some it should miss
     //confirm points
@@ -254,22 +254,22 @@ TEST_CASE( "Banana command: damage", "[Shoot_command]" ) {
     //check different points in the damage radius
 }
 
-TEST_CASE( "Banana command: friendly fire", "[Shoot_command][Shot_missed]" ) {
+TEST_CASE( "Banana command: friendly fire", "[banana]" ) {
     //to my dudes
     //confirm points
 }
 
-TEST_CASE( "Banana removes dirt correctly", "[Banana_command][banana_mining]" ) {
+TEST_CASE( "Banana removes dirt correctly", "[banana]" ) {
 
 //check points here as well
 }
 
-TEST_CASE( "Banana command: mixed bag", "[Shoot_command][Shot_missed]" ) {
+TEST_CASE( "Banana command: mixed bag", "[banana]" ) {
 
     //test a combo of friendly/enemy worms, and dirt
 }
 
-TEST_CASE( "Dead worms are removed correctly for banana", "[dead_worms]" ) {
+TEST_CASE( "Dead worms are removed correctly for banana", "[banana]" ) {
     /*
     GIVEN("A target worm lined up for a kill")
     {
@@ -302,7 +302,7 @@ TEST_CASE( "Dead worms are removed correctly for banana", "[dead_worms]" ) {
     }*/
 }
 
-TEST_CASE( "Get command string", "[Banana_string]" ) {
+TEST_CASE( "Get command string", "[banana]" ) {
     auto state = std::make_shared<GameState>();
     ShootCommand move(ShootCommand::ShootDirection::S);
     //REQUIRE(move.GetCommandString() == "shoot S");

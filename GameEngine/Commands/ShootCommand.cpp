@@ -5,7 +5,7 @@
 
 ShootCommand::ShootCommand(ShootCommand::ShootDirection dir)
 {
-    _order = 3;
+    _order = 4;
     switch (dir)
     {
         case ShootDirection::N:     _shootVector = Position(0,-1); break;

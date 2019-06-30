@@ -14,6 +14,9 @@ class BananaCommand : public Command
     std::string GetCommandString() const override;
     
     bool operator==(const BananaCommand& other);
+
+    private:
+    static std::vector<std::vector<int>> _splashDamageLookup;
 };
 
 #endif
