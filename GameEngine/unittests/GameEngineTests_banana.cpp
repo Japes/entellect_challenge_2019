@@ -4,6 +4,22 @@
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
 
+void SetupAgent(std::shared_ptr<GameState> state, GameEngine& eng)
+{
+    place_worm(true, 1, {10,10}, state);
+    place_worm(true, 2, {11,11}, state);
+
+    //make it agent's turn
+    state->player1.worms[0].health = -1;
+    state->player1.worms[1].health = -1;
+    eng.AdvanceState(TeleportCommand({10,11}), DoNothingCommand());
+
+    Worm* currentWorm = state->player1.GetCurrentWorm();
+    REQUIRE(currentWorm->proffession == Worm::Proffession::AGENT);
+    REQUIRE(currentWorm->banana_bomb_count == GameConfig::agentWorms.banana.count);
+    REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+}
+
 TEST_CASE( "Banana validation", "" ) {
 
     GIVEN("A game state and it's NOT agent worm's turn")
@@ -77,23 +93,11 @@ TEST_CASE( "Banana range", "" ) {
     {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        place_worm(true, 1, {10,10}, state);
-        place_worm(true, 2, {11,11}, state);
         place_worm(true, 3, {15,15}, state); //3 is always the agent
 
-        place_worm(false, 1, {10,1}, state);
-        place_worm(false, 2, {11,1}, state);
-        place_worm(false, 3, {15,1}, state); //3 is always the agent
-
-        //make it agent's turn
-        state->player1.worms[0].health = -1;
-        state->player1.worms[1].health = -1;
+        SetupAgent(state,eng);
         state->player1.worms[2].health = 1000; //so he doesn't kill himself during this test
         state->player1.worms[2].banana_bomb_count = 1000; //its just a test
-        eng.AdvanceState(TeleportCommand({10,11}), DoNothingCommand());
-
-        REQUIRE(state->player1.GetCurrentWorm()->proffession == Worm::Proffession::AGENT);
-        REQUIRE(state->player1.consecutiveDoNothingCount == 0);
 
         auto wormpos = state->player1.GetCurrentWorm()->position;
 
@@ -129,69 +133,124 @@ TEST_CASE( "Banana range", "" ) {
 }
 
 TEST_CASE( "Banana can be lobbed over dirt", "" ) {
-        GIVEN("A semi realistic game state and engine")
+    GIVEN("A setup with dirt")
     {
         /*
             0   1   2   3   4   5   6   7
-        0   .   .   .   .   .   .   .   .
-        1   .   .   .   .   22  .   .   .
-        2   .   .   .   .   .   .   .   .
-        3   .   .   .   13  .   23  .   .
-        4   .   .   .   .   .   D   .   .
-        5   .   .   .   .   D   11  12  S
-        6   .   .   .   .   D   21  .   .
-        7   .   .   .   .   .   .   .   .            
+        0   D   D   D   D   D   D   D   .
+        1   D   D   D   D   D   D   D   .
+        2   D   D   D   D   D   D   D   .
+        3   D   D   D   D   D   D   D   .
+        4   D   D   D   D   D   D   D   .
+        5   .   .   .   .   .   W   D   .
+        6   .   .   .   .   .   .   D   .
+        7   .   .   .   .   .   .   D   .            
+        */
 
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        place_worm(true, 1, {5,5}, state);
-        place_worm(true, 2, {6,5}, state);
-        place_worm(true, 3, {3,3}, state);
-        place_worm(false, 1, {5,6}, state);
-        place_worm(false, 2, {4,1}, state);
-        place_worm(false, 3, {5,3}, state);
-        state->Cell_at({5, 4})->type = CellType::DIRT;
-        state->Cell_at({4, 5})->type = CellType::DIRT;
-        state->Cell_at({4, 6})->type = CellType::DIRT;
-        state->Cell_at({7, 5})->type = CellType::DEEP_SPACE;
-
-        THEN("Valid moves for player 1 are as expected")
-        {
-            auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-            INFO("moves: " << moves);
-            REQUIRE(moves == 0b10101111);
-        }
-
-        THEN("Valid moves for player 2 are as expected")
-        {
-            auto moves = NextTurn::GetValidTeleportDigs(false, state, false);
-            INFO("moves: " << moves);
-            REQUIRE(moves == 0b11111001);
-        }
-
-        AND_THEN("Progressing the game forward 1 turn")
-        {
-            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-
-            THEN("Valid moves for player 1 are as expected")
-            {
-                auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-                INFO("moves: " << moves);
-                REQUIRE(moves == 0b11000111);
+        place_worm(true, 1, {25,25}, state);
+        place_worm(true, 2, {26,26}, state);
+        place_worm(true, 3, {5,5}, state);
+        SetupAgent(state, eng);
+        for(int x = 0; x < 7; ++x) {
+            for(int y = 0; y < 5; ++y) {
+                state->Cell_at({x, y})->type = CellType::DIRT;
             }
         }
-        */
+        state->Cell_at({6, 5})->type = CellType::DIRT;
+        state->Cell_at({6, 6})->type = CellType::DIRT;
+        state->Cell_at({6, 7})->type = CellType::DIRT;
+
+        WHEN("We chuck a banana into empty space")
+        {
+            eng.AdvanceState(BananaCommand({2,6}), DoNothingCommand());
+
+            THEN("It's fine")
+            {
+                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+            }
+        }
+
+        WHEN("We chuck a banana into dirt")
+        {
+            eng.AdvanceState(BananaCommand({2,2}), DoNothingCommand());
+
+            THEN("It's fine")
+            {
+                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+            }
+        }
+
+        WHEN("We chuck a banana over dirt into empty space")
+        {
+            eng.AdvanceState(BananaCommand({9,5}), DoNothingCommand());
+
+            THEN("It's fine")
+            {
+                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+            }
+        }
     }
 }
 
 TEST_CASE( "Banana bomb lobbed into deep space", "" ) {
     //not invalid, but lose the bomb and does nothing
+    GIVEN("A contrived situation")
+    {
+        /*
+            0   1   2   3   4   5   6   7
+        0   S   S   S   S   S   S   .   .
+        1   S   S   S   S   S   S   .   .
+        2   S   S   S   S   S   S   .   .
+        3   S   S   S   S   S   S   .   .
+        4   S   S   S   S   S   S   .   .
+        5   .   D   W2  D   .   W   .   .
+        6   .   .   .   .   .   .   .   .
+        7   .   .   .   .   .   .   .   .            
+        */
+
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 3, {5,5}, state);
+        SetupAgent(state, eng);
+        for(int x = 0; x < 7; ++x) {
+            for(int y = 0; y < 5; ++y) {
+                state->Cell_at({x, y})->type = CellType::DEEP_SPACE;
+            }
+        }
+        state->Cell_at({1, 5})->type = CellType::DIRT;
+        place_worm(false, 1, {2,5}, state);
+        state->Cell_at({3, 5})->type = CellType::DIRT;
+
+        WHEN("We chuck a banana into deep space")
+        {
+            eng.AdvanceState(BananaCommand({2,6}), DoNothingCommand());
+
+            THEN("It's fine")
+            {
+                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+            }
+
+            THEN("It doesn't actually go off")
+            {
+                REQUIRE(state->Cell_at({1, 5})->type == CellType::DIRT);
+                REQUIRE(state->Cell_at({3, 5})->type == CellType::DIRT);
+                REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
+            }
+        }
+    }
 }
 
 TEST_CASE( "Banana command: damage", "[Shoot_command]" ) {
     //to enemies
     //include some it should miss
     //confirm points
+    //confirm points - do you get points just for lobbing a banana and missing completely?
     //check different points in the damage radius
 }
 
