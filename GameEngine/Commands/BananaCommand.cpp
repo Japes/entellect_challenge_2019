@@ -91,30 +91,7 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
         }
     }
 
-/*
-    Worm* hitworm = WormOnTarget(player1, state, _shootVector);
-
-    if(hitworm == nullptr) {
-        player->command_score += GameConfig::scores.missedAttack;
-        return;
-    }
-
-    hitworm->TakeDamage(worm->weapon.damage);
-*/
-    //int points = worm->weapon.damage*2;
-
-  /*  
-    if(hitworm->IsDead()) {
-        points += GameConfig::scores.killShot;
-    }
-
-    if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
-        points *= -1;
-    }
-    */
-
-
-    //player->command_score += points;
+    player->command_score += points;
 }
 
 

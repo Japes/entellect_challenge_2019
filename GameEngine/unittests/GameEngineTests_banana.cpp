@@ -246,60 +246,108 @@ TEST_CASE( "Banana bomb lobbed into deep space", "[banana]" ) {
     }
 }
 
-TEST_CASE( "Banana command: damage", "[banana]" ) {
+TEST_CASE( "Banana command: behavior", "[banana]" ) {
     //to enemies
     //include some it should miss
-    //confirm points
     //confirm points - do you get points just for lobbing a banana and missing completely?
+        //going to assume no
     //check different points in the damage radius
-}
-
-TEST_CASE( "Banana command: friendly fire", "[banana]" ) {
-    //to my dudes
-    //confirm points
-}
-
-TEST_CASE( "Banana removes dirt correctly", "[banana]" ) {
-
-//check points here as well
-}
-
-TEST_CASE( "Banana command: mixed bag", "[banana]" ) {
-
-    //test a combo of friendly/enemy worms, and dirt
-}
-
-TEST_CASE( "Dead worms are removed correctly for banana", "[banana]" ) {
-    /*
-    GIVEN("A target worm lined up for a kill")
+    //Dead worms are removed correctly
+    GIVEN("A contrived situation")
     {
+        /*
+            0   1   2   3   4   5   6   7
+        0   .   .   .   .   .   .   .   .
+        1   .   .   .   D   .   .   .   .
+        2   .   .   .   D   12  .   .   .
+        3   .   .   .   D  B21  22  D   .
+        4   .   .   .   11  .   .   D   .
+        5   .   .   .   .   23  D   D   .
+        6   .   13  .   .   D   D   .   .
+        7   .   .   .   .   .   .   .   .            
+        */
+
         auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 1, {3,4}, state);
+        place_worm(true, 2, {4,2}, state);
+        place_worm(true, 3, {1,6}, state); //3 is always the agent
+        place_worm(false, 1, {4,3}, state);
+        place_worm(false, 2, {5,3}, state);
+        place_worm(false, 3, {4,5}, state);
 
-        Position shooting_worm_pos{10,10};
-        Worm* shooting_worm = place_worm(true, 1, shooting_worm_pos, state);
-        Position target_worm_pos{10,11};
-        Worm* target_worm = place_worm(false, 1, target_worm_pos, state);
-        target_worm->health = shooting_worm->weapon.damage;
+        state->Cell_at({3, 1})->type = CellType::DIRT;
+        state->Cell_at({3, 2})->type = CellType::DIRT;
+        state->Cell_at({3, 3})->type = CellType::DIRT;
+        state->Cell_at({6, 3})->type = CellType::DIRT;
+        state->Cell_at({6, 4})->type = CellType::DIRT;
+        state->Cell_at({6, 5})->type = CellType::DIRT;
+        state->Cell_at({5, 5})->type = CellType::DIRT;
+        state->Cell_at({5, 6})->type = CellType::DIRT;
+        state->Cell_at({4, 6})->type = CellType::DIRT;
 
-        CHECK(!shooting_worm->IsDead());
-        CHECK(!target_worm->IsDead());
-        CHECK(state->Cell_at(shooting_worm_pos)->worm != nullptr);
-        CHECK(state->Cell_at(target_worm_pos)->worm != nullptr);
+        //set up 2 kills
+        state->player1.worms[1].health = 1;
+        state->player2.worms[2].health = 1;
 
-        THEN("Shooting him kills him")
+
+        //make it agent's turn
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+        Worm* currentWorm = state->player1.GetCurrentWorm();
+        REQUIRE(currentWorm->proffession == Worm::Proffession::AGENT);
+
+        auto pointsBefore = state->player1.command_score;
+
+        WHEN("We chuck the banana")
         {
-            ShootCommand player1move(ShootCommand::ShootDirection::S);
-            DoNothingCommand player2move;
+            eng.AdvanceState(BananaCommand({4,3}), DoNothingCommand());
 
-            GameEngine eng(state);
-            eng.AdvanceState(player1move,player2move);
+            THEN("Everything is as expected")
+            {
+                //damage:
+                //P2
+                CHECK(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp - GameConfig::agentWorms.banana.damage);
+                CHECK(!state->player2.worms[0].IsDead());
+                
+                CHECK(state->player2.worms[1].health == GameConfig::commandoWorms.initialHp - 13);
+                CHECK(!state->player2.worms[1].IsDead());
 
-            CHECK(!shooting_worm->IsDead());
-            CHECK(target_worm->IsDead());
-            CHECK(state->Cell_at(shooting_worm_pos)->worm != nullptr);
-            CHECK(state->Cell_at(target_worm_pos)->worm == nullptr);
+                CHECK(state->player2.worms[2].health == 1 - 7);
+                CHECK(state->player2.worms[2].IsDead());
+                CHECK(state->Cell_at(state->player2.worms[2].position)->worm == nullptr);
+
+                //P1
+                CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp - 11);
+                CHECK(!state->player1.worms[0].IsDead());
+
+                CHECK(state->player1.worms[1].health == 1 - 13);
+                CHECK(state->player1.worms[1].IsDead());
+                CHECK(state->Cell_at(state->player1.worms[1].position)->worm == nullptr);
+                
+                CHECK(state->player1.worms[2].health == GameConfig::agentWorms.initialHp);
+                CHECK(!state->player1.worms[2].IsDead());
+
+                //dirt
+                CHECK(state->Cell_at({3, 1})->type == CellType::DIRT);
+                CHECK(state->Cell_at({3, 2})->type == CellType::AIR);
+                CHECK(state->Cell_at({3, 3})->type == CellType::AIR);
+                CHECK(state->Cell_at({6, 3})->type == CellType::AIR);
+                CHECK(state->Cell_at({6, 4})->type == CellType::DIRT);
+                CHECK(state->Cell_at({6, 5})->type == CellType::DIRT);
+                CHECK(state->Cell_at({5, 5})->type == CellType::DIRT);
+                CHECK(state->Cell_at({5, 6})->type == CellType::DIRT);
+                CHECK(state->Cell_at({4, 6})->type == CellType::DIRT);
+
+                //points
+                auto expectedEnemyDmgPoints = (GameConfig::agentWorms.banana.damage + 13 + 7 + GameConfig::scores.killShot)*2;
+                auto expectedFriendlyDmgPoints = (11 + 13 + GameConfig::scores.killShot)*-2;
+                auto expectedDigPoints = GameConfig::scores.dig*3;
+                CHECK(state->player1.command_score == pointsBefore + expectedEnemyDmgPoints + expectedFriendlyDmgPoints + expectedDigPoints);
+            }
         }
-    }*/
+    }
 }
 
 TEST_CASE( "Get command string", "[banana]" ) {
