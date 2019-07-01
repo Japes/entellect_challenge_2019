@@ -13,19 +13,19 @@ Position::Position(int x, int y)
     this->y = y;
 }
 
-int Position::MaximumDimension(Position other) 
+int Position::MaximumDimension(const Position &other) const
 {
     return std::max(std::abs(x - other.x), std::abs(y - other.y));
 }
 
 //number of steps it would take to get to other
-int Position::MovementDistanceTo(Position other)
+int Position::MovementDistanceTo(const Position &other) const
 {
    return MaximumDimension(other);
 }
 
 //range to target as defined in rules
-int Position::ShootDistanceTo(Position other)
+int Position::ShootDistanceTo(const Position &other) const
 {
     auto xdist = other.x - x;
     auto ydist = other.y - y;
@@ -35,6 +35,11 @@ int Position::ShootDistanceTo(Position other)
 bool Position::IsOnMap() const
 {
     return x >= 0 && y >= 0 && x < GameConfig::mapSize && y < GameConfig::mapSize;
+}
+
+bool Position::BananaCanReach(const Position &other) const
+{
+    return (ShootDistanceTo(other) <= GameConfig::agentWorms.banana.range);
 }
 
 //to help with debugging...

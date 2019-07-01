@@ -226,6 +226,51 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
     }
 }
 
+TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
+{
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        
+        place_worm(true, 3, {31,15}, state); //agent
+        place_worm(true, 1, {30,15}, state); //friendly right next to us
+        place_worm(true, 2, {0,0}, state); //friendly far away
+
+        place_worm(false, 1, {31,11}, state); //enemy in range to the north
+        place_worm(false, 2, {29,13}, state); //enemy in range NW
+        place_worm(false, 3, {15,31}, state); //enemy out of range
+
+        WHEN("It's not the agent's turn")
+        {
+            THEN("GetValidBananas is always 0")
+            {
+                auto ret = NextTurn::GetValidBananas(true, state, true);
+                INFO("shoots: " << ret)
+                REQUIRE(ret.count() == 0);
+            }
+        }
+
+        WHEN("It is the agents turn")
+        {
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+            THEN("GetValidBananas returns correct")
+            {
+                auto ret = NextTurn::GetValidBananas(true, state, true);
+                INFO("shoots: " << ret)
+                REQUIRE(ret.count() == 2);
+                REQUIRE(ret.test(16));
+                REQUIRE(ret.test(36));
+                REQUIRE(!ret.test(56)); //returned this when i confused x with y
+                REQUIRE(NextTurn::GetBanana(true, state, 16)->GetCommandString() == "banana 31 11");
+                REQUIRE(NextTurn::GetBanana(true, state, 36)->GetCommandString() == "banana 29 13");            
+            }
+        }
+    }
+}
+
 //just made this to confirm that random moves are actually random
 TEST_CASE( "Get random move", "[get_random_move][.statistics]" )
 {

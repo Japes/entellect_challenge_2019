@@ -115,9 +115,8 @@ bool BananaCommand::IsValid(bool player1, std::shared_ptr<GameState> state) cons
         return false;
     }
 
-    auto shootDist = worm->position.ShootDistanceTo(_pos);
-    if(shootDist > GameConfig::agentWorms.banana.range) {
-        std::cerr << "(" << __FUNCTION__ << ") " << shootDist << " is too far to throw a banana!" << std::endl;
+    if(!worm->position.BananaCanReach(_pos)) {
+        std::cerr << "(" << __FUNCTION__ << ") " << _pos << " is too far to throw a banana from " << worm->position << "!" << std::endl;
         return false;
     }
 

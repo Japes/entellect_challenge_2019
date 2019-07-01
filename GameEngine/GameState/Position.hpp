@@ -11,10 +11,11 @@ struct Position
 
     Position();
     Position(int x, int y);
-    int MaximumDimension(Position other);
-    int MovementDistanceTo(Position other);
-    int ShootDistanceTo(Position other);
+    int MaximumDimension(const Position &other) const;
+    int MovementDistanceTo(const Position &other) const;
+    int ShootDistanceTo(const Position &other) const;
     bool IsOnMap() const;
+    bool BananaCanReach(const Position &other) const;
 
     //fun shootingDistance(other: Point): Double = floor(euclideanDistance(other))
     //fun manhattanDistance(other: Point) = abs(x - other.x) + abs(y - other.y)
