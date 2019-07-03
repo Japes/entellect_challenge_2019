@@ -1,6 +1,7 @@
 TODO
 
-   add worm name to logs to distinguish
+   my playthroughs are getting slashed
+
    run grep on match logs
    run compare over LOTS of matches
    make monte carlo choose random if tie

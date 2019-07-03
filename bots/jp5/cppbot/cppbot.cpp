@@ -204,6 +204,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     //choose the best move and do it
     auto best_move = mc->GetBestMove();
+    std::cerr << "JP5:" << std::endl;
     mc->PrintState();
 
     return best_move->GetCommandString();

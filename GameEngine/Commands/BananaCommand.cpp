@@ -101,22 +101,22 @@ bool BananaCommand::IsValid(bool player1, std::shared_ptr<GameState> state) cons
     Worm* worm = player->GetCurrentWorm();
 
     if(!_pos.IsOnMap()) {
-        std::cerr << "(" << __FUNCTION__ << ") banana target not on map: " << _pos << std::endl;
+        std::cerr << latestBot << " (" << __FUNCTION__ << ") banana target not on map: " << _pos << std::endl;
         return false;
     }
 
     if(worm->proffession != Worm::Proffession::AGENT) {
-        std::cerr << "(" << __FUNCTION__ << ") only agents can throw bananas!" << std::endl;
+        std::cerr << latestBot << " (" << __FUNCTION__ << ") only agents can throw bananas!" << std::endl;
         return false;
     }
 
     if(worm->banana_bomb_count <= 0) {
-        std::cerr << "(" << __FUNCTION__ << ") This guy doesn't have any bananas left!" << std::endl;
+        std::cerr << latestBot << " (" << __FUNCTION__ << ") This guy doesn't have any bananas left!" << std::endl;
         return false;
     }
 
     if(!worm->position.BananaCanReach(_pos)) {
-        std::cerr << "(" << __FUNCTION__ << ") " << _pos << " is too far to throw a banana from " << worm->position << "!" << std::endl;
+        std::cerr << latestBot << " (" << __FUNCTION__ << ") " << _pos << " is too far to throw a banana from " << worm->position << "!" << std::endl;
         return false;
     }
 

@@ -3,6 +3,7 @@
 
 #include "GameState.hpp"
 #include <memory>
+#include <string>
 
 class Command
 {
@@ -20,7 +21,7 @@ class Command
 
     protected:
     int _order; //the order in which this command should be processed.  Some commands must happen before others
-
+    static const std::string latestBot;
 };
 
 #endif

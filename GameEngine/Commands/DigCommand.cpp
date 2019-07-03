@@ -25,17 +25,17 @@ bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {
-        std::cerr << "Cant dig off the map..." << _pos << std::endl;
+        std::cerr << latestBot << " Cant dig off the map..." << _pos << std::endl;
         return false;
     }
 
     if(state->map[_pos.x][_pos.y].type != CellType::DIRT) {
-        std::cerr << "Cant dig air..." << _pos << " (round " << state->roundNumber << " worm " << player->id << worm->id <<  ")" << std::endl;
+        std::cerr << latestBot << " Cant dig air..." << _pos << " (round " << state->roundNumber << " worm " << player->id << worm->id <<  ")" << std::endl;
         return false;
     }
 
     if (worm->position.MovementDistanceTo(_pos) > worm->diggingRange) {
-        std::cerr << _pos << "is too far to dig: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->diggingRange << std::endl;
+        std::cerr << latestBot << " " << _pos << "is too far to dig: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->diggingRange << std::endl;
         return false;
     }
 
