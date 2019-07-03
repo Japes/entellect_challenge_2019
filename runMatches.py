@@ -23,17 +23,20 @@ _verbosity = 2 #verbosity 0 = fast as possible; 1 = show only game map; 2 = show
 _bots = []
 _numRounds = 2 #how many times to run tournament
 _engineVer = "" #version of the engine we are using for this playthrough
+_playall = False
 
 #function defs################################
 def showUsage():
-    print("Usage: runMatches [-v0|-v1|-v2] bot1 bot2 ...")
-    print("       runs matches between bots")
+    print("Usage: runMatches [-v0|-v1|-v2] [-a] bot1 bot2 ...")
+    print("       runs matches, bot1 vs the rest")
     print("       bot1, bot2 etc are folder names of bots in " + _botsPath)
     print("       -v specifies verbosity (with 0 being least verbose)")
+    print("       -a : run all bots against each other")
 
 def parseArgs():
     global _verbosity
     global _bots
+    global _playall
 
     if(len(sys.argv) < 2):
         showUsage()
@@ -41,19 +44,20 @@ def parseArgs():
 
     #defaults
     _verbosity = 2
-    firstBotArgIndex = 1
 
-    if("-v" in sys.argv[1]):
-        firstBotArgIndex = 2
-        if(sys.argv[1] == "-v0"):
-            _verbosity = 0
-        elif(sys.argv[1] == "-v1"):
-            _verbosity = 1
+    for arg in sys.argv[1:]:
+        if("-v" in arg):
+            if(arg == "-v0"):
+                print("setting verbosity to level 0")
+                _verbosity = 0
+            elif(arg == "-v1"):
+                print("setting verbosity to level 1")
+                _verbosity = 1
+        elif(arg == "-a"):
+            print("playall true")
+            _playall = True
         else:
-            _verbosity = 2
-
-    for i in range (firstBotArgIndex, len(sys.argv)):
-        _bots.append(sys.argv[i])
+            _bots.append(arg)
 
 def copy(src, dest):
     try:
@@ -290,12 +294,16 @@ allMatchesFilePath, summaryFilePath = GetOutputPaths()
 #run matches
 grid_summary = GetSummaryGrid()
 
-#for rounds in range(0, _numRounds):
+endIndex = 1
+if _playall is True:
+    endIndex = len(_bots)-1
+    
 while True:
-    for i in range(0, len(_bots)-1):
+    for i in range(0, endIndex):
         for j in range(i + 1, len(_bots)):
     
             print(_bots[i] + " " + _bots[j])
+
             matchResult = runMatch(_bots[i], _bots[j])
             file = open(allMatchesFilePath, "a+")
             file.writelines(str(matchResult) + "\n")
