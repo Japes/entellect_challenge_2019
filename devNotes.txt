@@ -8,6 +8,8 @@ TODO
    add per-worm playthroughs
       not just for performance - other worms actually generate noise
 
+   ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
+      currently always assuming he has 3 - it's not in the state file
    consecutivedonothing count for opponent isnt in file!
    previousposition is wrong when loading file!
 
@@ -109,13 +111,18 @@ insights from replays-----------------------------------------------------------
             happened against nico beukes
         reference bot strategy is quite popular
         
-latest profiling of performance unit test:--------------------------------------------
+to run bot on state file:--------------------------------------------
+ - copy file to bin/rounds/roundnumber/state.json
+ - cd into bin folder
+ - run bot
+ - input round number
 
 
 bot description --------------------------------------------------------------------
 jp2 - what i submitted for Early Bird.  basic monte carlo, buggy
 jp3 - jp2 with various bug fixes
 jp4 - jp3 with optimizations to GetRandomMoveForWorm and added multithreading.  Plies/s up from ~600k to 1.2M
+jp5 - jp4 with simple bananas - consider chucking at any enemies in range
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -160,3 +167,16 @@ reference-bot:           0/0/0                    26/0/19                  21/0/
 jp2:                     19/0/26                  0/0/0                    4/2/39                   6/2/37                   (29/4/102)
 jp3:                     24/0/21                  39/2/4                   0/0/0                    9/0/36                   (72/2/61)
 jp4:                     27/0/18                  37/2/6                   36/0/9                   0/0/0                    (100/2/33)
+
+Added banana bombs! still has bugs tho
+Engine version: 2019.2.2
+(wins/draws/losses):     jp5                      jp4                      
+jp5:                     0/0/0                    29/0/12                  (29/0/12)
+jp4:                     12/0/29                  0/0/0                    (12/0/29)
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp5                      jp3                      jp2                      reference-bot            
+jp5:                     0/0/0                    12/0/6                   18/0/0                   18/0/0                   (48/0/6)
+jp3:                     6/0/12                   0/0/0                    11/0/7                   13/0/5                   (30/0/24)
+jp2:                     0/0/18                   7/0/11                   0/0/0                    8/0/10                   (15/0/39)
+reference-bot:           0/0/18                   5/0/13                   10/0/8                   0/0/0                    (15/0/39)

@@ -25,20 +25,7 @@ GameState::GameState(const GameState& other) :
     roundNumber = other.roundNumber;
     healthPack = other.healthPack;
 
-    //update internal references
-    player1.state = this;
-    for(Worm &w : player1.worms) {
-        w.state = this;
-        if(w.health > 0) {
-            Cell_at(w.position)->worm = &w;
-        }
-    }
-
-    player2.state = this;
-    for(Worm &w : player2.worms) {
-        w.state = this;
-        Cell_at(w.position)->worm = &w;
-    }
+    UpdateRefs();
 }
 
 void GameState::UpdateRefs()
@@ -120,6 +107,12 @@ void GameState::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)
     if(wormJson.HasMember("weapon")) {
         PopulateWeapon(worm.weapon, wormJson["weapon"]);
     } //else it will just use the default, i guess
+
+    if(wormJson.HasMember("bananaBombs")) {
+        PopulateBanana(worm.banana_bomb, wormJson["bananaBombs"]);
+        worm.banana_bomb_count = wormJson["bananaBombs"]["count"].GetInt();
+    } //else it will just use the default, i guess WHICH IS AN ISSUE I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
+
 }
 
 void GameState::PopulateWeapon(Weapon& weapon, const rapidjson::Value& wJson)
@@ -129,6 +122,22 @@ void GameState::PopulateWeapon(Weapon& weapon, const rapidjson::Value& wJson)
     weapon.range = wJson["range"].GetInt();
     //weapon.diagRange = std::ceil(std::sqrt((weapon.range*weapon.range)/2)); //inverse of euclidian SEEMS TO BE A PROBLEM WITH THIS WHEN i SUBMIT...
     weapon.diagRange = 3;
+}
+
+void GameState::PopulateBanana(BananaBomb& banana, const rapidjson::Value& wJson)
+{
+    /*
+    "bananaBombs": {
+                    "damage": 20,
+                    "range": 5,
+                    "count": 3,
+                    "damageRadius": 2
+                }
+                */
+    auto weaponJson = wJson.GetObject();
+    banana.damage = wJson["damage"].GetInt();
+    banana.range = wJson["range"].GetInt();
+    banana.damageRadius = wJson["damageRadius"].GetInt();
 }
 
 void GameState::PopulatePosition(Position& pos, const rapidjson::Value& posJson)

@@ -36,6 +36,7 @@ class GameState
     void PopulatePlayer(Player& player, const rapidjson::Value& playerJson);
     void PopulateWorm(Worm& worm, const rapidjson::Value& wormJson);
     void PopulateWeapon(Weapon& weapon, const rapidjson::Value& weaponJson);
+    void PopulateBanana(BananaBomb& banana, const rapidjson::Value& wJson);
 
     void PopulateMap(rapidjson::Document& roundJSON);
 

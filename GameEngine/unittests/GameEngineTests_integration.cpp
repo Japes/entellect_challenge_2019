@@ -370,8 +370,9 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
     {
         for(unsigned i = 0; i < 30000; i++)
         {
-            auto roundJSON = Utilities::ReadJsonFile("./Test_files/state_move_occupied1.json");
-            auto state = std::make_shared<GameState>(roundJSON);
+            auto roundJSON = Utilities::ReadJsonFile("./Test_files/invalids.json");
+            auto state1 = std::make_shared<GameState>(roundJSON);
+            auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
             GameEngine eng(state);
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);

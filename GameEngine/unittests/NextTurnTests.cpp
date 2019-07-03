@@ -256,16 +256,29 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
-            THEN("GetValidBananas returns correct")
+            AND_WHEN("He has bananas")
             {
-                auto ret = NextTurn::GetValidBananas(true, state, true);
-                INFO("shoots: " << ret)
-                REQUIRE(ret.count() == 2);
-                REQUIRE(ret.test(16));
-                REQUIRE(ret.test(36));
-                REQUIRE(!ret.test(56)); //returned this when i confused x with y
-                REQUIRE(NextTurn::GetBanana(true, state, 16)->GetCommandString() == "banana 31 11");
-                REQUIRE(NextTurn::GetBanana(true, state, 36)->GetCommandString() == "banana 29 13");            
+                THEN("GetValidBananas returns correct")
+                {
+                    auto ret = NextTurn::GetValidBananas(true, state, true);
+                    INFO("shoots: " << ret)
+                    REQUIRE(ret.count() == 2);
+                    REQUIRE(ret.test(16));
+                    REQUIRE(ret.test(36));
+                    REQUIRE(!ret.test(56)); //returned this when i confused x with y
+                    REQUIRE(NextTurn::GetBanana(true, state, 16)->GetCommandString() == "banana 31 11");
+                    REQUIRE(NextTurn::GetBanana(true, state, 36)->GetCommandString() == "banana 29 13");            
+                }
+            }
+            AND_WHEN("He has no bananas")
+            {
+                state->player1.worms[2].banana_bomb_count = 0;
+                THEN("GetValidBananas returns zero")
+                {
+                    auto ret = NextTurn::GetValidBananas(true, state, true);
+                    INFO("shoots: " << ret)
+                    REQUIRE(ret.count() == 0);
+                }
             }
         }
     }

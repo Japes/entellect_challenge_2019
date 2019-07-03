@@ -33,6 +33,25 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
             }
         }
     }
+    GIVEN("A game state file with a dead worm in it (for player 2)")
+    {
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/invalids.json");
+        GameState state(roundJSON);
+
+        THEN("That worm isn't on the map")
+        {
+            REQUIRE(state.Cell_at({18,6})->worm == nullptr);
+        }
+
+        AND_THEN("When we make a copy")
+        {
+            GameState state2 = state;
+            THEN("That worm doesn't appear on the map.")
+            {
+                REQUIRE(state2.Cell_at({18,6})->worm == nullptr);
+            }
+        }
+    }
 }
 
 TEST_CASE( "Copy constructor", "[copy_constructor]" ) {

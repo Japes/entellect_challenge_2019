@@ -69,7 +69,7 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
 
     Worm* worm_there = state->map[_pos.x][_pos.y].worm;
     if(worm_there != nullptr && !worm_there->movedThisRound) {
-        std::cerr << "------Cant move into space " << _pos << ", occupied by worm " << worm_there->id << std::endl;
+        std::cerr << "------Cant move into space " << _pos << ", occupied by worm " << worm_there->id << " (" << worm_there << ").  I am worm " << worm->id << "(" << worm << ")" << std::endl;
         return false;
     }
 

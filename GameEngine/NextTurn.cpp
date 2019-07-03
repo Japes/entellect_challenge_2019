@@ -116,7 +116,7 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
     Player* player = player1 ? &state->player1 : &state->player2;
     Worm* worm = player->GetCurrentWorm();
 
-    if(worm->proffession != Worm::Proffession::AGENT) {
+    if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0) {
         return std::bitset<121>(0);
     }
 
@@ -214,21 +214,26 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
 {
     std::vector<std::shared_ptr<Command>> ret;
 
-    auto moves = NextTurn::GetValidTeleportDigs (player1, state, false);
+    auto moves = NextTurn::GetValidTeleportDigs (player1, state, trimStupidMoves);
     for(unsigned i = 0; i < 8; ++i ) {
         if(moves[i]) {
             ret.push_back(NextTurn::GetTeleportDig(player1, state, i));
         }
     }
 
-    auto possible_shoots = NextTurn::GetValidShoots (player1, state, false);
-    for(unsigned i = 0; i < 8; ++i ) {
+    auto possible_shoots = NextTurn::GetValidShoots (player1, state, trimStupidMoves);
+    for(unsigned i = 0; i < possible_shoots.size(); ++i ) {
         if(possible_shoots[i]) {
             ret.push_back(NextTurn::_playerShoots[i]);
         }
     }
 
-    //todo add bananas
+    std::bitset<121> bananas = std::bitset<121>(GetValidBananas(player1, state, trimStupidMoves));
+    for(unsigned i = 0; i < bananas.size(); ++i ) {
+        if(bananas[i]) {
+            ret.push_back(NextTurn::GetBanana(player1, state, i));
+        }
+    }
 
     return ret;
 }
