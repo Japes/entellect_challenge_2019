@@ -113,6 +113,9 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
     std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
 
+    //figure out which worms will be included in this playthrough
+
+    //run the playthrough
     auto evaluationBefore = evaluationFn(player1, _state);
 
     numPlies = 0;

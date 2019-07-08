@@ -64,6 +64,7 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
         GameEngine eng(state);
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+        //auto nextMoveFn = [] (bool player1, std::shared_ptr<GameState> gs) -> std::shared_ptr<Command> {return std::make_shared<DoNothingCommand>();};
         int numplies{0};
         int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
@@ -111,6 +112,8 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     INFO("Moves per second: " << turnCount/num_seconds << ", Moves per game: " << turnCount/gameCount << " (" << turnCount << " moves in " << gameCount << " games in " << num_seconds << " seconds)");
     CHECK(false);
+
+    //700000 moves per second, with just donothings, 2.5M per second
 }
 
 std::shared_ptr<Command> GetCommandFromString(std::string cmd)

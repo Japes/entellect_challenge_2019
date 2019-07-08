@@ -1,62 +1,47 @@
 TODO
 
-   my playthroughs are getting slashed
-
-   run grep on match logs
-   run compare over LOTS of matches
-   make monte carlo choose random if tie
-
    add per-worm playthroughs
       not just for performance - other worms actually generate noise
 
-   ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
-      currently always assuming he has 3 - it's not in the state file
-   consecutivedonothing count for opponent isnt in file!
-   previousposition is wrong when loading file!
+   my playthroughs got slashed by banana - optimise a bit
 
-   explicit exclude of potential game ending move
-      explicit exclude of all chances for opponent to shoot?
+   add weighting to monte carlo results - read up
 
-   make proper unit test for deep copy
+   add select!
 
-   why does dodging not always work
-      i think it's just the monte carlo that is dof
-      Need to take KOs into account when evaluating!  not just score
-         can i try to reproduce this and confirm it works 
-            (maybe reference bot with specific seed)
-            or just reference bot with my health real low
+   Need to avoid getting lost
+      try using seed/jippo'd game state to reproduce this
+      one solution - bias towards moving in a direction
+      another solution - low confidence, go for heuristic 
+         aim for big clump of dirt if health looking bad
+         go for enemies if health looking good
+         run away if at a points advantage
 
-   low hanging fruit improvements (update and then compare against previous bot and ref bot)
-      Need to avoid getting lost
-         try using seed/jippo'd game state to reproduce this
-         one solution - bias towards moving in a direction
-         another solution - low confidence, go for heuristic 
-            aim for big clump of dirt if health looking bad
-            go for enemies if health looking good
-            run away if at a points advantage
-      upload after doing this if better
-      
-    Tuning
+   Tuning
        make bot tunable via config file
        update tournament script
        upload after doing this if better
 
-    add new rules to engine 
-       compare with previous bots after doing this
-       upload after doing this if better
+   add some carry-over state
+      ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
+         currently always assuming he has 3 - it's not in the state file
+      consecutivedonothing count for opponent isnt in file!
+      previousposition is wrong when loading file!
+
+   run compare over LOTS of matches
+   make monte carlo choose random if tie
+
+   explicit exclude of potential game ending move
+      explicit exclude of all chances for opponent to shoot?
+         add unit tests for this
        
-    spreadsheet profile of opponents
+   upload bot!
+
+   spreadsheet profile of opponents
+      run grep on match logs
        scrape logs to find their output
    
-    optimise engine
-        next steps:
-            return just directions, create move/dig just before advancestate
-            possibly bulk allocate list of all move/dig moves at startup
-
-    runmatch script update
-       look at using same seed for all matches?
-
-    sort out deployment
+sort out deployment---------------
         known issue: with cell.cpp (global method)
         known issue: with std::ceil line
            c++ std?
