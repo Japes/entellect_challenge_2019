@@ -9,9 +9,15 @@ Player::Player(GameState* _state) :
     consecutiveDoNothingCount{0}
 {
     //not sure why the usual vector constructors aren't working here...
-    worms.push_back(Worm(state));
-    worms.push_back(Worm(state));
-    worms.push_back(Worm(state, true)); //TODO big assumption here: agent worm is always number 3.  should actually read from state
+    Worm worm1(state);
+    Worm worm2(state);
+    Worm worm3(state, true); //TODO big assumption here: agent worm is always number 3.  should actually read from state;
+    worm1.id = 1;
+    worm2.id = 2;
+    worm3.id = 3;
+    worms.push_back(worm1);
+    worms.push_back(worm2);
+    worms.push_back(worm3);
     RecalculateHealth();
 }
 

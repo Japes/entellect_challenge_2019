@@ -10,7 +10,7 @@ DigCommand::DigCommand(Position pos) : _pos{pos}
 //NOTE this assumes move is valid
 void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
+    Player* player = state->GetPlayer(player1);
 
     player->consecutiveDoNothingCount = 0;
 
@@ -20,8 +20,8 @@ void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
 bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {

@@ -25,7 +25,7 @@ int Position::MovementDistanceTo(const Position &other) const
 }
 
 //range to target as defined in rules
-int Position::ShootDistanceTo(const Position &other) const
+int Position::EuclideanDistanceTo(const Position &other) const
 {
     auto xdist = other.x - x;
     auto ydist = other.y - y;
@@ -39,7 +39,7 @@ bool Position::IsOnMap() const
 
 bool Position::BananaCanReach(const Position &other) const
 {
-    return (ShootDistanceTo(other) <= GameConfig::agentWorms.banana.range);
+    return (EuclideanDistanceTo(other) <= GameConfig::agentWorms.banana.range);
 }
 
 //to help with debugging...

@@ -14,8 +14,8 @@ TeleportCommand::TeleportCommand(Position pos, bool* forceRandom) :
 //note: assumes move is valid.
 void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
     player->consecutiveDoNothingCount = 0;
     
@@ -48,8 +48,8 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
 
 bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {

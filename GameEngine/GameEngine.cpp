@@ -55,7 +55,7 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
 //returns false if move is invalid
 bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
 {
-    Player* player = player1 ? &_state->player1 : &_state->player2;
+    Player* player = _state->GetPlayer(player1);
 
     if(!valid) {
         player->command_score += GameConfig::scores.invalidCommand;
@@ -75,26 +75,30 @@ void GameEngine::UpdateWinCondition()
 
 void GameEngine::ApplyPowerups()
 {
-    for(auto& worm : _state->player1.worms) {
-        auto powerupHere = _state->Cell_at(worm.position)->powerup;
+    auto worms = _state->AllWorms();
+    for(auto& worm : worms) {
+        auto powerupHere = _state->Cell_at(worm->position)->powerup;
         if(powerupHere != nullptr) {
-            powerupHere->ApplyTo(&worm);
-            _state->Cell_at(worm.position)->powerup = nullptr;
+            powerupHere->ApplyTo(worm);
+            _state->Cell_at(worm->position)->powerup = nullptr;
             _state->player1.RecalculateHealth();
             _state->player2.RecalculateHealth();
         }
     }
+}
 
-    //lame that this is duplicated
-    for(auto& worm : _state->player2.worms) {
-        auto powerupHere = _state->Cell_at(worm.position)->powerup;
-        if(powerupHere != nullptr) {
-            powerupHere->ApplyTo(&worm);
-            _state->Cell_at(worm.position)->powerup = nullptr;
-            _state->player1.RecalculateHealth();
-            _state->player2.RecalculateHealth();
+//return all worms if dist is -1
+std::vector<Worm*> GameEngine::WormsWithinDistance(Position pos, int dist)
+{
+    std::vector<Worm*> ret;
+
+    auto worms = _state->AllWorms();
+    for(auto& worm : worms) {
+        if(dist < 0 || pos.EuclideanDistanceTo(worm->position) <= dist) {
+            ret.push_back(worm);
         }
     }
+    return ret;
 }
 
 //do a random playthrough to the end and return:
@@ -110,25 +114,45 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
                             int depth,
                             int& numPlies)
 {
-    std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
-    std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
+    //filter out worms too far away:
+    Player* player = _state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
+    std::vector<Worm*> considered_worms = WormsWithinDistance(worm->position, radiusToConsider);
 
-    //figure out which worms will be included in this playthrough
+    auto filteredNextMoveFn = [&] (bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> {
+        Player* player = state->GetPlayer(player1);
+        Worm* worm = player->GetCurrentWorm();
+        if(std::end(considered_worms) == std::find(std::begin(considered_worms), std::end(considered_worms), worm)) {
+            return std::make_shared<DoNothingCommand>();
+        }
+        return nextMoveFn(player1, state);
+    };
+
+    std::shared_ptr<Command> p1Command = player1? command : filteredNextMoveFn(true, _state);
+    std::shared_ptr<Command> p2Command = !player1? command : filteredNextMoveFn(false, _state);
 
     //run the playthrough
     auto evaluationBefore = evaluationFn(player1, _state);
 
     numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
+        
+        if(radiusToConsider >= 0) {
+            //don't allow disqualification if we're filtering out worms
+            _state->player1.consecutiveDoNothingCount = 0;
+            _state->player2.consecutiveDoNothingCount = 0;
+        }
+
         AdvanceState(*p1Command.get(), *p2Command.get());
-        p1Command = nextMoveFn(true, _state);
-        p2Command = nextMoveFn(false, _state);
+        p1Command = filteredNextMoveFn(true, _state);
+        p2Command = filteredNextMoveFn(false, _state);
         --depth;
         ++numPlies;
     }
 
     auto evaluationAfter = evaluationFn(player1, _state);
 
+    //evaluate the playthrough
     bool won = (evaluationAfter > evaluationBefore);
 
     if(won) {

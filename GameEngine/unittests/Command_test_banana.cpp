@@ -110,7 +110,7 @@ TEST_CASE( "Banana range", "[banana]" ) {
 
                 Position targetPos = {x,y};
                 INFO("wormPos: " << wormpos << " targetPos: " << targetPos << " diff: " << targetPos - wormpos <<
-                " shootDistance: " << wormpos.ShootDistanceTo(targetPos));
+                " shootDistance: " << wormpos.EuclideanDistanceTo(targetPos));
 
                 BananaCommand player1move(targetPos);
 
@@ -122,7 +122,7 @@ TEST_CASE( "Banana range", "[banana]" ) {
                 state->player1.consecutiveDoNothingCount = 0;
 
                 eng.AdvanceState(player1move, player2move);
-                if(wormpos.ShootDistanceTo(targetPos) <= GameConfig::agentWorms.banana.range) {
+                if(wormpos.EuclideanDistanceTo(targetPos) <= GameConfig::agentWorms.banana.range) {
                     REQUIRE(state->player1.consecutiveDoNothingCount == 0);
                 } else {
                     REQUIRE(state->player1.consecutiveDoNothingCount == 1);

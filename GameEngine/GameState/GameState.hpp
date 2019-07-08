@@ -24,6 +24,9 @@ class GameState
 
     void Move_worm(Worm* worm, Position pos);
 
+    Player* GetPlayer(bool player1);
+    std::vector<Worm*> AllWorms();
+
     bool operator==(const GameState &other) const;
 
     private:

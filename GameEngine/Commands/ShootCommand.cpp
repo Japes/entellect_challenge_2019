@@ -41,8 +41,8 @@ ShootCommand::ShootCommand(Position dir)
 
 void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
     player->consecutiveDoNothingCount = 0;
 
@@ -70,8 +70,8 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
 Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> state, const Position& shootvector)
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
     Position pos = worm->position + shootvector;
 

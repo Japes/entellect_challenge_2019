@@ -35,8 +35,8 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
         .   .   .   .   .   .   .
     */
 
-    Player* player = player1 ? &state->player1 : &state->player2;
-    Worm* worm = &player->worms[player->currentWormId-1];
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
     player->consecutiveDoNothingCount = 0;
     --worm->banana_bomb_count;
@@ -97,7 +97,7 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
 
 bool BananaCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
+    Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
     if(!_pos.IsOnMap()) {

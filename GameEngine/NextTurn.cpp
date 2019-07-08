@@ -81,7 +81,7 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
 
     std::bitset<8> ret(0);
 
-    Player* player = player1 ? &state->player1 : &state->player2;
+    Player* player = state->GetPlayer(player1);
 
     //TODO can rearrange this so we don't check every direction - rather check where the enemy worms are first
     for(auto const & space : _surroundingWormSpaces) {
@@ -113,7 +113,7 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
 //there are 3 bits in each corner that are out of range - they will always be 0
 std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
-    Player* player = player1 ? &state->player1 : &state->player2;
+    Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
     if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0) {
