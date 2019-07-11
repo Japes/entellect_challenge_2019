@@ -15,7 +15,8 @@ GameEngine::GameEngine(std::shared_ptr<GameState> state) :
 
 void GameEngine::AdvanceState(const Command& player1_command, const Command& player2_command)
 {
-    //std::cerr << "Advancing state with moves P1: " << player1_command.GetCommandString() << " and P2: " << player2_command.GetCommandString() << std::endl;
+    //std::cerr << "Advancing state with moves 1" << _state->player1.GetCurrentWorm()->id << ": " << player1_command.GetCommandString() << 
+    //            " and 2" << _state->player2.GetCurrentWorm()->id << ": " << player2_command.GetCommandString() << std::endl;
     if(_currentResult.result != ResultType::IN_PROGRESS) {
         return; //nothing more to do here
     }
@@ -90,11 +91,16 @@ void GameEngine::ApplyPowerups()
 //return all worms if dist is -1
 std::vector<Worm*> GameEngine::WormsWithinDistance(Position pos, int dist)
 {
+    auto worms = _state->AllWorms();
+
+    if(dist < 0) {
+        return worms;
+    }
+
     std::vector<Worm*> ret;
 
-    auto worms = _state->AllWorms();
     for(auto& worm : worms) {
-        if(dist < 0 || pos.EuclideanDistanceTo(worm->position) <= dist) {
+        if(!worm->IsDead() && pos.EuclideanDistanceTo(worm->position) <= dist) {
             ret.push_back(worm);
         }
     }

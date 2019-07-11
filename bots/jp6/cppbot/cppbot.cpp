@@ -145,6 +145,26 @@ std::mutex mtx;
 
 void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
 {
+    //get distance to closest enemy
+    //pos of my worm:
+    Player * me = state1->GetPlayer(ImPlayer1);
+    Worm * worm = me->GetCurrentWorm();
+    Position myWormPos = worm->position;
+
+    //now calc
+    Player * enemy = state1->GetPlayer(!ImPlayer1);
+    int closestDist = 9999;
+    for(auto const & worm : enemy->worms) {
+        if(worm.IsDead()) {
+            continue;
+        }
+        auto dist = myWormPos.EuclideanDistanceTo(worm.position);
+        if(dist < closestDist){
+            closestDist = dist;
+        }
+    }
+    int distToConsider = std::max(closestDist, 7);
+
     while(Get_ns_since_epoch() < stopTime) {
 
         mtx.lock();
@@ -158,7 +178,7 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
         int numplies{0};
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, 7, playthroughDepth, numplies);
+        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
         mtx.lock();
 

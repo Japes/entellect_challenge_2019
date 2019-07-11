@@ -32,7 +32,7 @@ struct Worm
 
     Worm(GameState* _state, bool agent = false);
 
-    bool IsDead();
+    bool IsDead() const;
     void TakeDamage(int dmgAmount);
 
     bool operator==(const Worm &other) const;

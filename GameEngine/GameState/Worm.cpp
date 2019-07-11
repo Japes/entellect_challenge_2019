@@ -18,7 +18,7 @@ Worm::Worm(GameState* _state, bool agent) : state{_state}, id{0}, movedThisRound
     }
 }
 
-bool Worm::IsDead()
+bool Worm::IsDead() const
 {
     return (health <= 0);
 }

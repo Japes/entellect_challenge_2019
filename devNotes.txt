@@ -109,6 +109,7 @@ jp2 - what i submitted for Early Bird.  basic monte carlo, buggy
 jp3 - jp2 with various bug fixes
 jp4 - jp3 with optimizations to GetRandomMoveForWorm and added multithreading.  Plies/s up from ~600k to 1.2M
 jp5 - jp4 with simple bananas - consider chucking at any enemies in range
+jp6 - added radius of worms to consider
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -166,3 +167,18 @@ jp5:                     0/0/0                    12/0/6                   18/0/
 jp3:                     6/0/12                   0/0/0                    11/0/7                   13/0/5                   (30/0/24)
 jp2:                     0/0/18                   7/0/11                   0/0/0                    8/0/10                   (15/0/39)
 reference-bot:           0/0/18                   5/0/13                   10/0/8                   0/0/0                    (15/0/39)
+
+added radius, seems to make things worse :/ same code with infinite radius:------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      reference-bot            
+jp6:                     0/0/0                    19/0/12                  27/0/4                   (46/0/16)
+
+made radius (distance to nearest enemy)*2---------------------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      jp4                      reference-bot            
+jp6:                     0/0/0                    0/0/32                   16/0/16                  26/0/6                   (42/0/54)
+
+infinite radius - seems to be no different to jp5 :/ -------------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      jp4                      reference-bot            
+jp6:                     0/0/0                    21/0/24                  42/0/3                   43/0/2                   (106/0/29)
