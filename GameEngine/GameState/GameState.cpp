@@ -199,16 +199,14 @@ Player* GameState::GetPlayer(bool player1)
     return player1 ? &this->player1 : &player2;
 }
 
-std::vector<Worm*> GameState::AllWorms()
+void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
 {
-    std::vector<Worm*> ret;
     for(auto & worm : player1.worms) {
-        ret.push_back(&worm);
+        wormFn(worm);
     }
     for(auto & worm : player2.worms) {
-        ret.push_back(&worm);
+        wormFn(worm);
     }
-    return ret;
 }
 
 bool GameState::operator==(const GameState &other) const

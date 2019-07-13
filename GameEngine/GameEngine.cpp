@@ -76,34 +76,28 @@ void GameEngine::UpdateWinCondition()
 
 void GameEngine::ApplyPowerups()
 {
-    auto worms = _state->AllWorms();
-    for(auto& worm : worms) {
-        auto powerupHere = _state->Cell_at(worm->position)->powerup;
+    _state->ForAllWorms([&](Worm& worm) {
+        auto powerupHere = _state->Cell_at(worm.position)->powerup;
         if(powerupHere != nullptr) {
-            powerupHere->ApplyTo(worm);
-            _state->Cell_at(worm->position)->powerup = nullptr;
+            powerupHere->ApplyTo(&worm);
+            _state->Cell_at(worm.position)->powerup = nullptr;
             _state->player1.RecalculateHealth();
             _state->player2.RecalculateHealth();
         }
-    }
+    });
 }
 
 //return all worms if dist is -1
 std::vector<Worm*> GameEngine::WormsWithinDistance(Position pos, int dist)
 {
-    auto worms = _state->AllWorms();
-
-    if(dist < 0) {
-        return worms;
-    }
-
     std::vector<Worm*> ret;
 
-    for(auto& worm : worms) {
-        if(!worm->IsDead() && pos.EuclideanDistanceTo(worm->position) <= dist) {
-            ret.push_back(worm);
+    _state->ForAllWorms([&](Worm& worm) {
+        if(dist < 0 || (!worm.IsDead() && pos.EuclideanDistanceTo(worm.position) <= dist)) {
+            ret.push_back(&worm);
         }
-    }
+    });
+
     return ret;
 }
 
@@ -169,14 +163,14 @@ float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
         }
     }
 
-    ////else clamp scorediff to 0.25 - 0.75
+    //else clamp scorediff to 0.25 - 0.75
     //auto diff = evaluationAfter - evaluationBefore;
     //float bestPossible = static_cast<float>(numPlies) * 16; //should be safe
     //float frac = diff/bestPossible; //number between +- 1
-    ////std::cerr << "(" << __FUNCTION__ << ") frac: " << frac << std::endl;
+    //std::cerr << "(" << __FUNCTION__ << ") frac: " << frac << std::endl;
     //float scaledFrac = frac/4; //number between +- 0.25
     //auto ret = scaledFrac + 0.5f; //number between 0.25 - 0.75
-    ////std::cerr << "(" << __FUNCTION__ << ") ret: " << ret << std::endl;
+    //std::cerr << "(" << __FUNCTION__ << ") ret: " << ret << std::endl;
     //return ret;
 
     return (((evaluationAfter - evaluationBefore) / (static_cast<float>(numPlies) * 16)) / 4) + 0.5f;

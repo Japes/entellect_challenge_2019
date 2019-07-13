@@ -4,6 +4,8 @@ TODO
       end of game showdown, i have more health - why not shoot him??
       my (not last) worm about to die - why not evade?
 
+   they are too scared of agents - keep track of count
+   
    optimise
 
    add select!
@@ -182,11 +184,77 @@ Engine version: 2019.2.2
 (wins/draws/losses):     jp6                      jp5                      jp4                      reference-bot            
 jp6:                     0/0/0                    21/0/24                  42/0/3                   43/0/2                   (106/0/29)
 
-add weighted playthroughs... (combined more than 1 run's results here)
+add weighted playthroughs... (combined more than 1 run's results here)----------------------------------------------------------------------------------
 Engine version: 2019.2.2
 (wins/draws/losses):     jp6                      jp5                      reference-bot            
 jp6:                     0/0/0                    48/0/24                  31/0/0           
 
-Engine version: 2019.2.2
-(wins/draws/losses):     jp6                      jp5                      
-jp6:                     0/0/0                    29/0/12                  (29/0/12)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#0  0x000000000040fbb6 in std::sqrt<int> (__x=4) at /usr/include/c++/5/cmath:495
+#1  Position::EuclideanDistanceTo (this=this@entry=0x7ffff80071e0, other=...) at ../../GameEngine/GameState/Position.cpp:32
+#2  0x000000000040fc09 in Position::BananaCanReach (this=this@entry=0x7ffff80071e0, other=...) at ../../GameEngine/GameState/Position.cpp:42
+#3  0x000000000040c883 in NextTurn::GetValidBananas (player1=player1@entry=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=trimStupidMoves@entry=true)
+    at ../../GameEngine/NextTurn.cpp:138
+#4  0x000000000040d1f1 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=true) at ../../GameEngine/NextTurn.cpp:186
+
+#0  Position::EuclideanDistanceTo (this=this@entry=0x7ffff0007230, other=...) at ../../GameEngine/GameState/Position.cpp:30
+#1  0x000000000040fc09 in Position::BananaCanReach (this=this@entry=0x7ffff0007230, other=...) at ../../GameEngine/GameState/Position.cpp:42
+#2  0x000000000040c883 in NextTurn::GetValidBananas (player1=player1@entry=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff00008d0, trimStupidMoves=trimStupidMoves@entry=true)
+    at ../../GameEngine/NextTurn.cpp:138
+#3  0x000000000040d1f1 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff00008d0, trimStupidMoves=true) at ../../GameEngine/NextTurn.cpp:186
+
+
+#0  0x000000000040c874 in NextTurn::GetValidBananas (player1=player1@entry=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff00008d0, trimStupidMoves=trimStupidMoves@entry=true)
+    at ../../GameEngine/NextTurn.cpp:136
+#1  0x000000000040d1f1 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff00008d0, trimStupidMoves=true) at ../../GameEngine/NextTurn.cpp:186
+
+
+#0  0x00000000004142bd in GameState::Cell_at (this=0x7ffff80008d0, pos=...) at ../../GameEngine/GameState/GameState.cpp:185
+#1  0x000000000040c871 in NextTurn::GetValidBananas (player1=player1@entry=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=trimStupidMoves@entry=true)
+    at ../../GameEngine/NextTurn.cpp:137
+#2  0x000000000040d1f1 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=true) at ../../GameEngine/NextTurn.cpp:186
+
+
+
+#7  0x000000000041485f in std::vector<Worm*, std::allocator<Worm*> >::push_back(Worm*&&) (__x=<unknown type in /mnt/c/Users/jpdac/dev/entellect_challenge_2019/bots/jp6/bin/cppbot.exe, CU 0xab928, DIE 0xbce29>,
+    this=0x7ffffdd2fb80) at /usr/include/c++/5/bits/stl_vector.h:932
+#8  GameState::AllWorms (this=0x7ffff00008d0) at ../../GameEngine/GameState/GameState.cpp:206
+#9  0x000000000040a0a7 in GameEngine::ApplyPowerups (this=this@entry=0x7ffffdd2fe00) at ../../GameEngine/GameEngine.cpp:79
+#10 0x000000000040a7af in GameEngine::AdvanceState (this=this@entry=0x7ffffdd2fe00, player1_command=..., player2_command=...) at ../../GameEngine/GameEngine.cpp:47
+
+#6  0x000000000041488f in std::vector<Worm*, std::allocator<Worm*> >::push_back(Worm*&&) (__x=<unknown type in /mnt/c/Users/jpdac/dev/entellect_challenge_2019/bots/jp6/bin/cppbot.exe, CU 0xab928, DIE 0xbce29>,
+    this=0x7ffffe53fb80) at /usr/include/c++/5/bits/stl_vector.h:932
+#7  GameState::AllWorms (this=0x7ffff80008d0) at ../../GameEngine/GameState/GameState.cpp:209
+#8  0x000000000040a0a7 in GameEngine::ApplyPowerups (this=this@entry=0x7ffffe53fe00) at ../../GameEngine/GameEngine.cpp:79
+#9  0x000000000040a7af in GameEngine::AdvanceState (this=this@entry=0x7ffffe53fe00, player1_command=..., player2_command=...) at ../../GameEngine/GameEngine.cpp:47
+
+
+
+
+#0  0x000000000040cea6 in std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release (this=0x7ffff00008c0) at /usr/include/c++/5/bits/shared_ptr_base.h:147
+#1  std::__shared_count<(__gnu_cxx::_Lock_policy)2>::~__shared_count (this=0x7ffffdd2fb28, __in_chrg=<optimized out>) at /usr/include/c++/5/bits/shared_ptr_base.h:659
+#2  std::__shared_ptr<GameState, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr (this=0x7ffffdd2fb20, __in_chrg=<optimized out>) at /usr/include/c++/5/bits/shared_ptr_base.h:925
+#3  std::shared_ptr<GameState>::~shared_ptr (this=0x7ffffdd2fb20, __in_chrg=<optimized out>) at /usr/include/c++/5/bits/shared_ptr.h:93
+#4  NextTurn::GetValidShoots (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x7ffff00008d0, trimStupidMoves=trimStupidMoves@entry=true) at ../../GameEngine/NextTurn.cpp:89
+#5  0x000000000040d193 in NextTurn::GetRandomValidMoveForPlayer (player1=true, state=std::shared_ptr (count 5, weak 0) 0x7ffff00008d0, trimStupidMoves=true) at ../../GameEngine/NextTurn.cpp:185
+
+#8  std::__shared_ptr<GameState, (__gnu_cxx::_Lock_policy)2>::__shared_ptr<std::allocator<GameState>, GameState&> (__a=..., __tag=..., this=<synthetic pointer>) at /usr/include/c++/5/bits/shared_ptr_base.h:1097
+#9  std::shared_ptr<GameState>::shared_ptr<std::allocator<GameState>, GameState&> (__a=..., __tag=..., this=<synthetic pointer>) at /usr/include/c++/5/bits/shared_ptr.h:319
+#10 std::allocate_shared<GameState, std::allocator<GameState>, GameState&> (__a=...) at /usr/include/c++/5/bits/shared_ptr.h:620
+#11 std::make_shared<GameState, GameState&> () at /usr/include/c++/5/bits/shared_ptr.h:636
+#12 runMC (stopTime=1562999242421381000, mc=std::shared_ptr (count 3, weak 0) 0x645980, state1=std::shared_ptr (count 3, weak 0) 0x63e960, ImPlayer1=<optimized out>, playthroughDepth=24)
+    at cppbot/cppbot.cpp:176
+
+
+
+
+
+#0  std::bitset<8ul>::_Unchecked_set (__val=<optimized out>, __pos=<optimized out>, this=<optimized out>) at /usr/include/c++/5/bitset:1036
+#1  std::bitset<8ul>::set (__val=<optimized out>, __position=<optimized out>, this=<optimized out>) at /usr/include/c++/5/bitset:1084
+#2  NextTurn::GetValidTeleportDigs (player1=player1@entry=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=trimStupidMoves@entry=true) at ../../GameEngine/NextTurn.cpp:64
+#3  0x000000000040d137 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=true) at ../../GameEngine/NextTurn.cpp:184
+
+#0  runMC (stopTime=1562999322862701300, mc=std::shared_ptr (count 3, weak 0) 0x645200, state1=std::shared_ptr (count 3, weak 0) 0x63e960, ImPlayer1=<optimized out>, playthroughDepth=24)
+at cppbot/cppbot.cpp:181
+

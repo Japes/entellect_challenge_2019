@@ -39,7 +39,22 @@ bool Position::IsOnMap() const
 
 bool Position::BananaCanReach(const Position &other) const
 {
-    return (EuclideanDistanceTo(other) <= GameConfig::agentWorms.banana.range);
+       /*xdist + ydist in bananas radius:
+    0   1   2   3   4   5   6   7   8   9   10
+    0   .   .   .   .   .   .   .   .   .   .
+    1   .   5   6   7   8   .   .   .   .   .
+    2   .   4   5   6   7   8   .   .   .   .
+    3   .   3   4   5   6   x   8   .   .   .
+    4   .   2   3   4   5   6   7   .   .   .
+    5   .   1   2   3   4   5   6   .   .   .
+    6   .   W   1   2   3   4   5   .   .   .
+    7   .   .   .   .   .   .   .   .   .   .    
+    */
+
+    auto distX = std::abs(x - other.x);
+    auto distY = std::abs(y - other.y);
+    bool isInTheCorner = (distX + distY) > 8;
+    return !isInTheCorner && (MaximumDimension(other) <= GameConfig::agentWorms.banana.range);
 }
 
 //to help with debugging...

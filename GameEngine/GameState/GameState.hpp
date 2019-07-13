@@ -5,6 +5,7 @@
 #include "Player.hpp"
 #include "Cell.hpp"
 #include "./rapidjson/document.h"
+#include <functional>
 
 //current state of the game
 class GameState
@@ -25,7 +26,7 @@ class GameState
     void Move_worm(Worm* worm, Position pos);
 
     Player* GetPlayer(bool player1);
-    std::vector<Worm*> AllWorms();
+    void ForAllWorms(std::function<void(Worm&)> wormFn);
 
     bool operator==(const GameState &other) const;
 
