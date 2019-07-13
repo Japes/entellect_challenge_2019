@@ -113,7 +113,7 @@ std::vector<Worm*> GameEngine::WormsWithinDistance(Position pos, int dist)
 //depth is how far to go before applying heuristic, -1 means play to end
 //TODO pass in strategies for each player
 //TODO pass in whether or not it should return binary or weights
-int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, 
+float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, 
                             std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn,
                             std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
                             int radiusToConsider,
@@ -159,12 +159,27 @@ int GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     auto evaluationAfter = evaluationFn(player1, _state);
 
     //evaluate the playthrough
-    bool won = (evaluationAfter > evaluationBefore);
 
-    if(won) {
-        return 1;
+    //first, best/worst possible outcome
+    if(_currentResult.result != ResultType::IN_PROGRESS) {
+        if(_currentResult.winningPlayer == player) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
-    return -1;
+
+    ////else clamp scorediff to 0.25 - 0.75
+    //auto diff = evaluationAfter - evaluationBefore;
+    //float bestPossible = static_cast<float>(numPlies) * 16; //should be safe
+    //float frac = diff/bestPossible; //number between +- 1
+    ////std::cerr << "(" << __FUNCTION__ << ") frac: " << frac << std::endl;
+    //float scaledFrac = frac/4; //number between +- 0.25
+    //auto ret = scaledFrac + 0.5f; //number between 0.25 - 0.75
+    ////std::cerr << "(" << __FUNCTION__ << ") ret: " << ret << std::endl;
+    //return ret;
+
+    return (((evaluationAfter - evaluationBefore) / (static_cast<float>(numPlies) * 16)) / 4) + 0.5f;
 }
 
 GameEngine::GameResult GameEngine::GetResult()

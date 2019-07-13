@@ -1,11 +1,10 @@
 TODO
 
-   add per-worm playthroughs
-      not just for performance - other worms actually generate noise
+   2 weird cases:
+      end of game showdown, i have more health - why not shoot him??
+      my (not last) worm about to die - why not evade?
 
-   my playthroughs got slashed by banana - optimise a bit
-
-   add weighting to monte carlo results - read up
+   optimise
 
    add select!
 
@@ -182,3 +181,12 @@ infinite radius - seems to be no different to jp5 :/ ---------------------------
 Engine version: 2019.2.2
 (wins/draws/losses):     jp6                      jp5                      jp4                      reference-bot            
 jp6:                     0/0/0                    21/0/24                  42/0/3                   43/0/2                   (106/0/29)
+
+add weighted playthroughs... (combined more than 1 run's results here)
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      reference-bot            
+jp6:                     0/0/0                    48/0/24                  31/0/0           
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      
+jp6:                     0/0/0                    29/0/12                  (29/0/12)

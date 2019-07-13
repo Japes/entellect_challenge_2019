@@ -178,12 +178,12 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
         int numplies{0};
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+        auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
         mtx.lock();
 
         next_node->score += thisScore;
-        next_node->w += thisScore > 0? 1 : 0;
+        next_node->w += thisScore;
         ++next_node->n;
 
         mc->UpdateNumSamples();

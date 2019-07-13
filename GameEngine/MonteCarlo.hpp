@@ -21,7 +21,7 @@ class MonteCarlo
         std::shared_ptr<Command> command;
         float w;
         float n;
-        int score;
+        float score;
         float UCT;
     };
 

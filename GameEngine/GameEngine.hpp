@@ -30,7 +30,7 @@ class GameEngine
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
-    int Playthrough(bool player1, std::shared_ptr<Command> command, 
+    float Playthrough(bool player1, std::shared_ptr<Command> command, 
         std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, 
         std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
         int radiusToConsider,
