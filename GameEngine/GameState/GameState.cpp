@@ -48,7 +48,7 @@ void GameState::UpdateRefs(Player& player)
     for(Worm &w : player.worms) {
         w.state = this;
         if(w.health > 0) {
-            Cell_at(w.position)->worm = &w;
+            PlaceWormAt(w.position, &w); //so that cell's worm is updated
         }
     }
 }
@@ -166,28 +166,31 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
         for (rapidjson::Value::ConstValueIterator colItr = (*rowItr).Begin(); colItr != (*rowItr).End(); ++colItr) {
             int x = (*colItr)["x"].GetInt();
             int y = (*colItr)["y"].GetInt();
+            Position pos(x,y);
             CellType type =  Cell::strToCellType((*colItr)["type"].GetString());
 
-            Cell* thisCell = Cell_at({x,y});
+            Cell* thisCell = Cell_at(pos);
             thisCell->type = type;
-            thisCell->worm = nullptr;
-            ClearPowerupAt({x,y});
+            SetCellTypeAt(pos, type);
+            ClearWormAt(pos);
+            ClearPowerupAt(pos);
 
             if((*colItr).HasMember("occupier")) {
                 int wormId = (*colItr)["occupier"].GetObject()["id"].GetInt();
                 int playerId = (*colItr)["occupier"].GetObject()["playerId"].GetInt();
                 Player& wormOwner = playerId == 1? player1 : player2;
-                thisCell->worm = &wormOwner.worms[wormId - 1];
+                PlaceWormAt(pos, &wormOwner.worms[wormId - 1]);
             }
             if((*colItr).HasMember("powerup")) {
                 //TODO this is where we'd distinguish between different types
-                PlacePowerupAt({x,y}, powerupIndex);
+                PlacePowerupAt(pos, powerupIndex);
                 ++powerupIndex;
             }
         }
     }
 }
 
+//const Cell* GameState::Cell_at(Position pos) const
 Cell* GameState::Cell_at(Position pos)
 {
     return &map[pos.x][pos.y];
@@ -208,13 +211,23 @@ void GameState::ClearPowerupAt(Position pos)
     map[pos.x][pos.y].powerup = nullptr;
 }
 
+void GameState::PlaceWormAt(Position pos, Worm* worm)
+{
+    map[pos.x][pos.y].worm = worm;
+    worm->position = pos;
+}
+
+void GameState::ClearWormAt(Position pos)
+{
+    map[pos.x][pos.y].worm = nullptr;
+}
+
 void GameState::Move_worm(Worm* worm, Position pos)
 {
     worm->previous_position = worm->position;
 
-    Cell_at(worm->position)->worm = nullptr;
-    worm->position = pos;
-    Cell_at(worm->position)->worm = worm;
+    ClearWormAt(worm->position);
+    PlaceWormAt(pos, worm);
 }
 
 Player* GameState::GetPlayer(bool player1)

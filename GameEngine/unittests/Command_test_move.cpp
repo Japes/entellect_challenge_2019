@@ -19,17 +19,17 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
         Position worm_under_test_pos{10,10};
         Worm* worm_under_test = &state->player1.worms[0];
         worm_under_test->position = worm_under_test->previous_position = worm_under_test_pos;
-        state->Cell_at(worm_under_test_pos)->worm = worm_under_test;
+        state->PlaceWormAt(worm_under_test_pos, worm_under_test);
 
         Position friendly_worm_pos{10,9};
         Worm* friendly_worm = &state->player1.worms[1];
         friendly_worm->position = friendly_worm->previous_position = friendly_worm_pos;
-        state->Cell_at(friendly_worm_pos)->worm = friendly_worm;
+        state->PlaceWormAt(friendly_worm_pos, friendly_worm);
 
         Position enemy_worm_pos{9,9};
         Worm* enemy_worm = &state->player2.worms[1];
         enemy_worm->position =  enemy_worm->previous_position = enemy_worm_pos;
-        state->Cell_at(enemy_worm_pos)->worm = enemy_worm;
+        state->PlaceWormAt(enemy_worm_pos, enemy_worm);
 
         Position dirt_pos_straight{11,10};
         state->SetCellTypeAt(dirt_pos_straight, CellType::DIRT);
@@ -148,11 +148,11 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 
         Worm* worm_under_test = &state->player1.worms[0];
         worm_under_test->position = worm_under_test->previous_position = worm_under_test_pos;
-        state->Cell_at(worm_under_test_pos)->worm = worm_under_test;
+        state->PlaceWormAt(worm_under_test_pos, worm_under_test);
 
         Worm* enemy_worm = &state->player2.worms[0];
         enemy_worm->position =  enemy_worm->previous_position = enemy_worm_pos;
-        state->Cell_at(enemy_worm_pos)->worm = enemy_worm;
+        state->PlaceWormAt(enemy_worm_pos, enemy_worm);
 
         GameEngine eng(state);
 

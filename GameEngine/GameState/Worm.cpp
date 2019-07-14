@@ -27,7 +27,7 @@ void Worm::TakeDamage(int dmgAmount)
 {
     health -= dmgAmount;
     if(IsDead()) {
-        state->Cell_at(position)->worm = nullptr;
+        state->ClearWormAt(position);
     }
     state->player1.RecalculateHealth();
     state->player2.RecalculateHealth();
