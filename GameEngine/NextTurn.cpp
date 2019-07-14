@@ -60,7 +60,7 @@ std::bitset<8> NextTurn::GetValidTeleportDigs(bool player1, std::shared_ptr<Game
     for(auto const & space : _surroundingWormSpaces) {
         ret >>= 1;
         Position wormSpace{worm->position + space};
-        if(wormSpace.IsOnMap() && state->Cell_at(wormSpace)->worm == nullptr && state->Cell_at(wormSpace)->type != CellType::DEEP_SPACE) {
+        if(wormSpace.IsOnMap() && state->Cell_at(wormSpace).worm == nullptr && state->Cell_at(wormSpace).type != CellType::DEEP_SPACE) {
             ret.set(7);
         }
     }
@@ -156,10 +156,10 @@ std::shared_ptr<Command> NextTurn::GetTeleportDig(bool player1, std::shared_ptr<
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
     Position targetPos{worm->position + _surroundingWormSpaces[index]};
 
-    if(state->Cell_at(targetPos)->worm == nullptr) {
-        if(state->Cell_at(targetPos)->type == CellType::AIR) {
+    if(state->Cell_at(targetPos).worm == nullptr) {
+        if(state->Cell_at(targetPos).type == CellType::AIR) {
             return std::make_shared<TeleportCommand>(targetPos);
-        } else if(state->Cell_at(targetPos)->type == CellType::DIRT) {
+        } else if(state->Cell_at(targetPos).type == CellType::DIRT) {
             return std::make_shared<DigCommand>(targetPos);
         }
     }

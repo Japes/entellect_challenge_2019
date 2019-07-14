@@ -77,7 +77,7 @@ void GameEngine::UpdateWinCondition()
 void GameEngine::ApplyPowerups()
 {
     _state->ForAllWorms([&](Worm& worm) {
-        auto powerupHere = _state->Cell_at(worm.position)->powerup;
+        auto powerupHere = _state->Cell_at(worm.position).powerup;
         if(powerupHere != nullptr) {
             powerupHere->ApplyTo(&worm);
             _state->ClearPowerupAt(worm.position);

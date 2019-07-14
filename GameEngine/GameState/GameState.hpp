@@ -16,16 +16,11 @@ class GameState
     int roundNumber;
     PowerUp healthPack; //just here so that cells can reference something static
 
-
-    //TODO can use 32bits here if I treat some of the deep space blocks as blocks in the rows that have more than 32 spaces
-    uint64_t mapDirts[MAP_SIZE];
-    Position healPackPos[2];
-
     GameState();
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
-    const Cell* Cell_at(Position pos) const;
+    Cell Cell_at(Position pos) const;
     void SetCellTypeAt(Position pos, CellType type);
     void PlacePowerupAt(Position pos, int powerupIndex);
     void ClearPowerupAt(Position pos);
@@ -42,6 +37,10 @@ class GameState
     private:
     
     Cell map[MAP_SIZE][MAP_SIZE];
+    
+    //TODO can use 32bits here if I treat some of the deep space blocks as blocks in the rows that have more than 32 spaces
+    uint64_t mapDirts[MAP_SIZE];
+    Position healthPackPos[2];
 
     void UpdateRefs();
     void UpdateRefs(Player& player);

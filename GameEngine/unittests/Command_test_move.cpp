@@ -112,8 +112,8 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
 
 void Check_valid_move(GameEngine& eng, std::shared_ptr<GameState> state, Position startPos, Position destPos)
 {
-    REQUIRE(state->Cell_at(startPos)->worm == state->player1.GetWormById(1));
-    REQUIRE(state->Cell_at(destPos)->worm == nullptr);
+    REQUIRE(state->Cell_at(startPos).worm == state->player1.GetWormById(1));
+    REQUIRE(state->Cell_at(destPos).worm == nullptr);
 
     TeleportCommand player2move({0,0});
     TeleportCommand player1move(destPos);    
@@ -123,8 +123,8 @@ void Check_valid_move(GameEngine& eng, std::shared_ptr<GameState> state, Positio
     bool happy = state->player1.GetWormById(1)->position == destPos;
     REQUIRE(happy);
 
-    REQUIRE(state->Cell_at(startPos)->worm == nullptr);
-    REQUIRE(state->Cell_at(destPos)->worm == state->player1.GetWormById(1));
+    REQUIRE(state->Cell_at(startPos).worm == nullptr);
+    REQUIRE(state->Cell_at(destPos).worm == state->player1.GetWormById(1));
 }
 
 TEST_CASE( "Move command execution", "[Move_command_execution]" ) {

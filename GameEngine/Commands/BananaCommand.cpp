@@ -41,7 +41,7 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
     player->consecutiveDoNothingCount = 0;
     --worm->banana_bomb_count;
 
-    if(state->Cell_at(_pos)->type == CellType::DEEP_SPACE) {
+    if(state->Cell_at(_pos).type == CellType::DEEP_SPACE) {
         return; //wasted your bomb...
     }
 
@@ -62,18 +62,18 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
             auto cell = state->Cell_at(mapPos);
 
             //clear dirt
-            if(cell->type == CellType::DIRT) {
+            if(cell.type == CellType::DIRT) {
                 state->SetCellTypeAt(mapPos, CellType::AIR);
                 points += GameConfig::scores.dig;
             } 
 
             //destroy powerup
-            if(cell->powerup != nullptr) {
+            if(cell.powerup != nullptr) {
                 state->ClearPowerupAt(mapPos);
             }
             
             //hurt worms
-            auto hitWorm = cell->worm;
+            auto hitWorm = cell.worm;
             if(hitWorm != nullptr) {
                 int dmgPoints = 0;
                 hitWorm->TakeDamage(dmg);

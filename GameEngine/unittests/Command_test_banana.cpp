@@ -238,8 +238,8 @@ TEST_CASE( "Banana bomb lobbed into deep space", "[banana]" ) {
 
             THEN("It doesn't actually go off")
             {
-                REQUIRE(state->Cell_at({1, 5})->type == CellType::DIRT);
-                REQUIRE(state->Cell_at({3, 5})->type == CellType::DIRT);
+                REQUIRE(state->Cell_at({1, 5}).type == CellType::DIRT);
+                REQUIRE(state->Cell_at({3, 5}).type == CellType::DIRT);
                 REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
             }
         }
@@ -316,7 +316,7 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
 
                 CHECK(state->player2.worms[2].health == 1 - 7);
                 CHECK(state->player2.worms[2].IsDead());
-                CHECK(state->Cell_at(state->player2.worms[2].position)->worm == nullptr);
+                CHECK(state->Cell_at(state->player2.worms[2].position).worm == nullptr);
 
                 //P1
                 CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp - 11);
@@ -324,21 +324,21 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
 
                 CHECK(state->player1.worms[1].health == 1 - 13);
                 CHECK(state->player1.worms[1].IsDead());
-                CHECK(state->Cell_at(state->player1.worms[1].position)->worm == nullptr);
+                CHECK(state->Cell_at(state->player1.worms[1].position).worm == nullptr);
                 
                 CHECK(state->player1.worms[2].health == GameConfig::agentWorms.initialHp);
                 CHECK(!state->player1.worms[2].IsDead());
 
                 //dirt
-                CHECK(state->Cell_at({3, 1})->type == CellType::DIRT);
-                CHECK(state->Cell_at({3, 2})->type == CellType::AIR);
-                CHECK(state->Cell_at({3, 3})->type == CellType::AIR);
-                CHECK(state->Cell_at({6, 3})->type == CellType::AIR);
-                CHECK(state->Cell_at({6, 4})->type == CellType::DIRT);
-                CHECK(state->Cell_at({6, 5})->type == CellType::DIRT);
-                CHECK(state->Cell_at({5, 5})->type == CellType::DIRT);
-                CHECK(state->Cell_at({5, 6})->type == CellType::DIRT);
-                CHECK(state->Cell_at({4, 6})->type == CellType::DIRT);
+                CHECK(state->Cell_at({3, 1}).type == CellType::DIRT);
+                CHECK(state->Cell_at({3, 2}).type == CellType::AIR);
+                CHECK(state->Cell_at({3, 3}).type == CellType::AIR);
+                CHECK(state->Cell_at({6, 3}).type == CellType::AIR);
+                CHECK(state->Cell_at({6, 4}).type == CellType::DIRT);
+                CHECK(state->Cell_at({6, 5}).type == CellType::DIRT);
+                CHECK(state->Cell_at({5, 5}).type == CellType::DIRT);
+                CHECK(state->Cell_at({5, 6}).type == CellType::DIRT);
+                CHECK(state->Cell_at({4, 6}).type == CellType::DIRT);
 
                 //points
                 auto expectedEnemyDmgPoints = (GameConfig::agentWorms.banana.damage + 13 + 7 + GameConfig::scores.killShot)*2;
