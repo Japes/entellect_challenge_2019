@@ -57,6 +57,24 @@ bool Position::BananaCanReach(const Position &other) const
     return !isInTheCorner && (MaximumDimension(other) <= GameConfig::agentWorms.banana.range);
 }
 
+Position Position::Normalized() const
+{
+    Position ret(0,0);
+    if(x > 0) {
+        ret.x = 1;
+    } else if (x < 0) {
+        ret.x = -1;
+    }
+
+    if(y > 0) {
+        ret.y = 1;
+    } else if (y < 0) {
+        ret.y = -1;
+    }
+
+    return ret;
+}
+
 //to help with debugging...
 std::ostream & operator << (std::ostream &out, const Position &pos)
 {

@@ -531,7 +531,67 @@ TEST_CASE( "Get shoot string", "[Move_string]" ) {
     REQUIRE(move1.GetCommandString() == "shoot NE");
 }
 
+TEST_CASE( "Shoot command: WormOnTarget", "[shoot][WormOnTarget]" ) {
+    GIVEN("A contrived situation")
+    {
+        /*
+            0   1   2   3   4   5   6   7
+        0   .   .   .   .   .   .   .   .
+        1   .   .   .   .   .   .   .   .
+        2   .   .   .   .   12  .   .   .
+        3   .   .   11  D   21  .   .   .
+        4   .   .   .   .   .   .   .   .
+        5   .   .   22  .   .   .   .   .
+        6   .   13  .   .   .   .   .   .
+        7   .   .   .   .   .   .   .   .            
+        8   .   .   .   .   23  .   .   .            
+        9   .   .   .   .   .   .   .   .            
+        */
+
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        place_worm(true, 1, {2,3}, state);
+        place_worm(true, 2, {4,2}, state);
+        place_worm(true, 3, {1,6}, state);
+        place_worm(false, 1, {4,3}, state);
+        place_worm(false, 2, {2,5}, state);
+        place_worm(false, 3, {4,8}, state);
+
+        state->Cell_at({3, 3})->type = CellType::DIRT;
+
+        THEN("WormOnTarget behaves correctly...")
+        {
+            Worm* worm21 = &state->player2.worms[0];
+            Worm* worm22 = &state->player2.worms[1];
+            Worm* worm23 = &state->player2.worms[2];
+
+            Worm* worm11 = &state->player1.worms[0];
+            Worm* worm12 = &state->player1.worms[1];
+            Worm* worm13 = &state->player1.worms[2];
+
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,-1}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {0,-1}) == worm12);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {1,-1}) == nullptr);
+
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,0}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {1,0}) == nullptr);
+
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,1}) == worm22);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {0,1}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {1,1}) == nullptr);
+        }
+    }
+}
+
+
+//TODO ADD UNIT TESTS FOR 
+//Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, std::shared_ptr<GameState> state)
+
+
+
 //TODO check correct behaviour when 2 worms shoot the same guy in the same turn
+
+
 
 /*
 @Test

@@ -82,13 +82,20 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
     std::bitset<8> ret(0);
 
     Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
-    //TODO can rearrange this so we don't check every direction - rather check where the enemy worms are first
-    for(auto const & space : _surroundingWormSpaces) {
-        ret >>= 1;
-        Worm* hitworm = ShootCommand::WormOnTarget(player1, state, space);
-        if(hitworm != nullptr && std::none_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
-            ret.set(ret.size() - 1);
+    auto enemyWorms = player1? &(state->player2.worms) : &(state->player1.worms);
+
+    Position noShot{0,0};
+    for(auto const & enemyWorm : (*enemyWorms)) {
+        Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state);
+        if(shootVec != noShot) {
+            auto it = std::find(_surroundingWormSpaces.begin(), _surroundingWormSpaces.end(), shootVec);
+            if (it != _surroundingWormSpaces.end()) {
+                int index = std::distance(_surroundingWormSpaces.begin(), it);
+                ret.set(index);
+            }
+
         }
     }
 

@@ -53,7 +53,6 @@ std::mutex mtx;
 void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
 {
     while(Get_ns_since_epoch() < stopTime) {
-
         mtx.lock();
         //choose next node
         auto next_node = mc->NextNode();
@@ -86,7 +85,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     gameCount = 0;
     turnCount = 0;
-    unsigned num_seconds = 3;
+    uint64_t num_seconds = 3;
     auto start_time = Get_ns_since_epoch();
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json"); //todo need to make sure there are bots in range
@@ -98,12 +97,15 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
 //from the bot---------------------------------------------------------
 
-    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), std::sqrt(2));
+    float c = std::sqrt(2);
+    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), c);
 
-    unsigned playthroughDepth = -1;
+    unsigned playthroughDepth = 24;
 
-    std::thread t1(runMC, start_time + (num_seconds * 1000000000), mc, state1, ImPlayer1, playthroughDepth);
-    std::thread t2(runMC, start_time + (num_seconds * 1000000000), mc, state1, ImPlayer1, playthroughDepth);
+    uint64_t stopTime = start_time + (num_seconds * 1000000000LL);
+
+    std::thread t1(runMC, stopTime, mc, state1, ImPlayer1, playthroughDepth);
+    std::thread t2(runMC, stopTime, mc, state1, ImPlayer1, playthroughDepth);
     t1.join();
     t2.join();
 

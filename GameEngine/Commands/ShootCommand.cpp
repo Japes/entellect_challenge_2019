@@ -46,7 +46,7 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     player->consecutiveDoNothingCount = 0;
 
-    Worm* hitworm = WormOnTarget(player1, state, _shootVector);
+    Worm* hitworm = WormOnTarget(worm, state, _shootVector);
 
     if(hitworm == nullptr) {
         player->command_score += GameConfig::scores.missedAttack;
@@ -68,11 +68,9 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
     player->command_score += points;
 }
 
-Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> state, const Position& shootvector)
+//returns worm that would be hit if currentWorm shot in direction of shootvector
+Worm* ShootCommand::WormOnTarget(const Worm* worm, const std::shared_ptr<GameState> state, const Position& shootvector)
 {
-    Player* player = state->GetPlayer(player1);
-    Worm* worm = player->GetCurrentWorm();
-
     Position pos = worm->position + shootvector;
 
     bool diag = shootvector.x != 0 && shootvector.y != 0;
@@ -107,6 +105,39 @@ Worm* ShootCommand::WormOnTarget(bool player1, const std::shared_ptr<GameState> 
 bool ShootCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
     return true; //always valid!
+}
+
+//returns a vector pointing in the direction of a clear shot to targetWorm
+//returns {0,0} if no shot available
+Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, std::shared_ptr<GameState> state)
+{
+    if(targetWorm.IsDead()) {
+        return {0,0};
+    }
+
+    if(shootingWorm.position.MovementDistanceTo(targetWorm.position) > shootingWorm.weapon.range) {
+        return {0,0};
+    }
+
+    Position posDiff = targetWorm.position - shootingWorm.position;
+
+    bool isStraight = posDiff.x == 0 || posDiff.y == 0;
+    bool isInLine = ( isStraight || posDiff.x == posDiff.y || posDiff.x == -posDiff.y);
+    if( !isInLine) {
+        return {0,0};
+    }
+
+    if(!isStraight && shootingWorm.position.MovementDistanceTo(shootingWorm.position) > shootingWorm.weapon.diagRange) {
+        return {0,0};
+    }
+
+    //finally, check for obstacles
+    Position shootVec = posDiff.Normalized();
+    if (WormOnTarget(&shootingWorm, state, shootVec) != &targetWorm) {
+        return {0,0};
+    }
+
+    return shootVec;
 }
 
 bool ShootCommand::operator==(const ShootCommand& other)

@@ -16,6 +16,7 @@ struct Position
     int EuclideanDistanceTo(const Position &other) const;
     bool IsOnMap() const;
     bool BananaCanReach(const Position &other) const;
+    Position Normalized() const;
 
     //fun shootingDistance(other: Point): Double = floor(euclideanDistance(other))
     //fun manhattanDistance(other: Point) = abs(x - other.x) + abs(y - other.y)
@@ -33,7 +34,7 @@ struct Position
         y += other.y;
     }
 
-    Position operator-(const Position& other)
+    Position operator-(const Position& other) const
     {
         return Position(x - other.x, y - other.y);
     }
