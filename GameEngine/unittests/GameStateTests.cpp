@@ -7,8 +7,8 @@ TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
     GameState state;
     for(unsigned x = 0; x < GameConfig::mapSize; ++x) {
         for(unsigned y = 0; y < GameConfig::mapSize; ++y) {
-            REQUIRE( state.map[x][x].worm == nullptr );
-            REQUIRE( state.map[x][x].powerup == nullptr );
+            REQUIRE( state.Cell_at({x,y})->worm == nullptr );
+            REQUIRE( state.Cell_at({x,y})->powerup == nullptr );
         }
     }
 }

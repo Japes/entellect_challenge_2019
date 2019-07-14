@@ -12,9 +12,9 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
 
         place_worm(true, 1, {10,10}, state);
         place_worm(false, 1, {12,12}, state);
-        state->map[11][10].type = CellType::DIRT;
-        state->map[11][11].type = CellType::DIRT;
-        state->map[10][11].type = CellType::DEEP_SPACE;
+        state->Cell_at({11, 10})->type = CellType::DIRT;
+        state->Cell_at({11, 11})->type = CellType::DIRT;
+        state->Cell_at({10, 11})->type = CellType::DEEP_SPACE;
         GameEngine eng(state);
 
         int expectedDoNothings = 0;
@@ -63,14 +63,14 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
         {
             player1move = DigCommand({11,10});    eng.AdvanceState(player1move,player2move);    //++expectedDoNothings;
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->map[11][10].type == CellType::AIR);
+            REQUIRE(state->Cell_at({11, 10})->type == CellType::AIR);
         }
 
         THEN("digging dirt diagonally is valid")
         {
             player1move = DigCommand({11,11});    eng.AdvanceState(player1move,player2move);    //++expectedDoNothings;
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->map[11][11].type == CellType::AIR);
+            REQUIRE(state->Cell_at({11, 11})->type == CellType::AIR);
         }
 
         THEN("Both worms digging same hole is valid")
@@ -81,7 +81,7 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
             //++expectedDoNothings;
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
             REQUIRE(state->player2.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->map[11][11].type == CellType::AIR);
+            REQUIRE(state->Cell_at({11, 11})->type == CellType::AIR);
         }
     }
 }

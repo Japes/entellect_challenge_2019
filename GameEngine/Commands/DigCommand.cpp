@@ -29,7 +29,7 @@ bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
         return false;
     }
 
-    if(state->map[_pos.x][_pos.y].type != CellType::DIRT) {
+    if(state->Cell_at(_pos)->type != CellType::DIRT) {
         std::cerr << latestBot << " Cant dig air..." << _pos << " (round " << state->roundNumber << " worm " << player->id << worm->id <<  ")" << std::endl;
         return false;
     }

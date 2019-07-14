@@ -345,16 +345,16 @@ TEST_CASE( "Shoot command obstacles : dirt", "[Shoot_command][Shot_missed]" ) {
         place_worm(true, 1, worm_under_test_pos, state);
 
         //surround the dude in dirt
-        state->map[worm_under_test_pos.x - 1][worm_under_test_pos.y - 1].type = CellType::DIRT;
-        state->map[worm_under_test_pos.x]    [worm_under_test_pos.y - 1].type = CellType::DIRT;
-        state->map[worm_under_test_pos.x + 1][worm_under_test_pos.y - 1].type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(-1,-1))->type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(0,-1))->type = CellType::DIRT; 
+        state->Cell_at(worm_under_test_pos + Position(1,-1))->type = CellType::DIRT; 
 
-        state->map[worm_under_test_pos.x - 1][worm_under_test_pos.y + 1].type = CellType::DIRT;
-        state->map[worm_under_test_pos.x]    [worm_under_test_pos.y + 1].type = CellType::DIRT;
-        state->map[worm_under_test_pos.x + 1][worm_under_test_pos.y + 1].type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(-1,1))->type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(0,1))->type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(1,1))->type = CellType::DIRT;
 
-        state->map[worm_under_test_pos.x - 1][worm_under_test_pos.y].type = CellType::DIRT;
-        state->map[worm_under_test_pos.x + 1][worm_under_test_pos.y].type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(-1,0))->type = CellType::DIRT;
+        state->Cell_at(worm_under_test_pos + Position(1,0))->type = CellType::DIRT;
 
         auto range = GameConfig::commandoWorms.weapon.range;
         auto diagRange = GameConfig::commandoWorms.weapon.diagRange;

@@ -16,6 +16,12 @@ GameState::GameState(const GameState& other) :
     player1{other.player1},
     player2{other.player2}
 {
+
+
+    //TODO do this by assigning arrays directly
+
+
+
     for(unsigned i = 0; i < MAP_SIZE; i++){
         for(unsigned j = 0; j < MAP_SIZE; j++){
             map[i][j] = other.map[i][j];
@@ -161,20 +167,20 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             int y = (*colItr)["y"].GetInt();
             CellType type =  Cell::strToCellType((*colItr)["type"].GetString());
 
-            Cell& thisCell = map[x][y];
-            thisCell.type = type;
-            thisCell.worm = nullptr;
-            thisCell.powerup = nullptr;
+            Cell* thisCell = Cell_at({x,y});
+            thisCell->type = type;
+            thisCell->worm = nullptr;
+            thisCell->powerup = nullptr;
 
             if((*colItr).HasMember("occupier")) {
                 int wormId = (*colItr)["occupier"].GetObject()["id"].GetInt();
                 int playerId = (*colItr)["occupier"].GetObject()["playerId"].GetInt();
                 Player& wormOwner = playerId == 1? player1 : player2;
-                thisCell.worm = &wormOwner.worms[wormId - 1];
+                thisCell->worm = &wormOwner.worms[wormId - 1];
             }
             if((*colItr).HasMember("powerup")) {
                 //TODO this is where we'd distinguish between different types
-                thisCell.powerup = &healthPack;
+                thisCell->powerup = &healthPack;
             }
         }
     }
@@ -212,11 +218,18 @@ void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
 bool GameState::operator==(const GameState &other) const
 {
     bool cellsGood = true;
+
+
+
+
+    //TODO do this by comparing arrays directly
+
     for(unsigned x = 0; x < MAP_SIZE; ++x) {
         for(unsigned y = 0; y < MAP_SIZE; ++y) {
             cellsGood &= map[x][y] == other.map[x][y];
         }
     } 
+
     return cellsGood && 
             player1 == other.player1 && 
             player2 == other.player2 &&

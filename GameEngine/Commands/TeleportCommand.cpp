@@ -19,7 +19,7 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
 
     player->consecutiveDoNothingCount = 0;
     
-    Worm* worm_there = state->map[_pos.x][_pos.y].worm;
+    Worm* worm_there = state->Cell_at(_pos)->worm;
     if(worm_there == nullptr) {
         state->Move_worm(worm, _pos);
     } else if ( worm_there->movedThisRound ) {
@@ -57,7 +57,7 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
         return false;
     }
 
-    if(state->map[_pos.x][_pos.y].type != CellType::AIR) {
+    if(state->Cell_at(_pos)->type != CellType::AIR) {
         std::cerr << latestBot << "------Cant move through non-air..." << _pos << std::endl;
         return false;
     }
@@ -67,7 +67,7 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
         return false;
     }
 
-    Worm* worm_there = state->map[_pos.x][_pos.y].worm;
+    Worm* worm_there = state->Cell_at(_pos)->worm;
     if(worm_there != nullptr && !worm_there->movedThisRound) {
         std::cerr << latestBot << "------Cant move into space " << _pos << ", occupied by worm " << worm_there->id << " (" << worm_there << ").  I am worm " << worm->id << "(" << worm << ")" << std::endl;
         return false;
