@@ -77,7 +77,6 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
 
         mc->UpdateNumSamples();
         mtx.unlock();
-
     }
 }
 
