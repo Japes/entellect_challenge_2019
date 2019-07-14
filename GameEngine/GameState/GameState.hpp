@@ -26,8 +26,7 @@ class GameState
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
-//    const Cell* Cell_at(Position pos) const;
-    Cell* Cell_at(Position pos);
+    const Cell* Cell_at(Position pos) const;
     void SetCellTypeAt(Position pos, CellType type);
     void PlacePowerupAt(Position pos, int powerupIndex);
     void ClearPowerupAt(Position pos);

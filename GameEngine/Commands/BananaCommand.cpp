@@ -59,12 +59,11 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
                 continue;
             }
 
-            Cell* cell = state->Cell_at(mapPos);
+            auto cell = state->Cell_at(mapPos);
 
             //clear dirt
-            CellType& type = cell->type;
-            if(type == CellType::DIRT) {
-                type = CellType::AIR;
+            if(cell->type == CellType::DIRT) {
+                state->SetCellTypeAt(mapPos, CellType::AIR);
                 points += GameConfig::scores.dig;
             } 
 

@@ -169,8 +169,6 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             Position pos(x,y);
             CellType type =  Cell::strToCellType((*colItr)["type"].GetString());
 
-            Cell* thisCell = Cell_at(pos);
-            thisCell->type = type;
             SetCellTypeAt(pos, type);
             ClearWormAt(pos);
             ClearPowerupAt(pos);
@@ -190,8 +188,7 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
     }
 }
 
-//const Cell* GameState::Cell_at(Position pos) const
-Cell* GameState::Cell_at(Position pos)
+const Cell* GameState::Cell_at(Position pos) const
 {
     return &map[pos.x][pos.y];
 }
