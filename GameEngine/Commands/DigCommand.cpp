@@ -14,7 +14,7 @@ void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     player->consecutiveDoNothingCount = 0;
 
-    state->map[_pos.x][_pos.y].type = CellType::AIR;
+    state->SetCellTypeAt(_pos, CellType::AIR);
     player->command_score += GameConfig::scores.dig;
 }
 

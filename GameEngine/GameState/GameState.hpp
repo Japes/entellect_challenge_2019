@@ -14,11 +14,10 @@ class GameState
     Player player1;
     Player player2;
     int roundNumber;
-    Cell map[MAP_SIZE][MAP_SIZE];
     PowerUp healthPack; //just here so that cells can reference something static
 
 
-    //TODO can use 32bits here if I tread some of the deep space blocks as blocks in the rows that have more than 32 spaces
+    //TODO can use 32bits here if I treat some of the deep space blocks as blocks in the rows that have more than 32 spaces
     uint64_t mapDirts[MAP_SIZE];
     Position healPackPos[2];
 
@@ -41,6 +40,9 @@ class GameState
     bool operator==(const GameState &other) const;
 
     private:
+    
+    Cell map[MAP_SIZE][MAP_SIZE];
+
     void UpdateRefs();
     void UpdateRefs(Player& player);
 
