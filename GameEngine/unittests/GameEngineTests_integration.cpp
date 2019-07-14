@@ -84,7 +84,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     gameCount = 0;
     turnCount = 0;
-    uint64_t num_seconds = 3;
+    uint64_t num_milliseconds = 880;
     auto start_time = Get_ns_since_epoch();
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json"); //todo need to make sure there are bots in range
@@ -101,7 +101,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     unsigned playthroughDepth = 24;
 
-    uint64_t stopTime = start_time + (num_seconds * 1000000000LL);
+    uint64_t stopTime = start_time + (num_milliseconds * 1000000LL);
 
     std::thread t1(runMC, stopTime, mc, state1, ImPlayer1, playthroughDepth);
     std::thread t2(runMC, stopTime, mc, state1, ImPlayer1, playthroughDepth);
@@ -111,7 +111,8 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 //from the bot---------------------------------------------------------
 
 
-    INFO("Moves per second: " << turnCount/num_seconds << ", Moves per game: " << turnCount/gameCount << " (" << turnCount << " moves in " << gameCount << " games in " << num_seconds << " seconds)");
+    INFO("Moves per second: " << (turnCount*1000)/num_milliseconds << ", Moves per game: " << turnCount/gameCount << 
+                " (" << turnCount << " moves in " << gameCount << " games in " << num_milliseconds/1000.0f << " seconds)");
     CHECK(false);
 
     //700000 moves per second, with just donothings, 2.5M per second
