@@ -161,6 +161,7 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
         return;
     }
 
+    int powerupIndex = 0;
     for (rapidjson::Value::ConstValueIterator rowItr = roundJSON["map"].Begin(); rowItr != roundJSON["map"].End(); ++rowItr) {
         for (rapidjson::Value::ConstValueIterator colItr = (*rowItr).Begin(); colItr != (*rowItr).End(); ++colItr) {
             int x = (*colItr)["x"].GetInt();
@@ -170,7 +171,7 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             Cell* thisCell = Cell_at({x,y});
             thisCell->type = type;
             thisCell->worm = nullptr;
-            thisCell->powerup = nullptr;
+            ClearPowerupAt({x,y});
 
             if((*colItr).HasMember("occupier")) {
                 int wormId = (*colItr)["occupier"].GetObject()["id"].GetInt();
@@ -180,7 +181,8 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             }
             if((*colItr).HasMember("powerup")) {
                 //TODO this is where we'd distinguish between different types
-                thisCell->powerup = &healthPack;
+                PlacePowerupAt({x,y}, powerupIndex);
+                ++powerupIndex;
             }
         }
     }
@@ -199,6 +201,11 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
 void GameState::PlacePowerupAt(Position pos, int powerupIndex)
 {
     map[pos.x][pos.y].powerup = &healthPack;
+}
+
+void GameState::ClearPowerupAt(Position pos)
+{
+    map[pos.x][pos.y].powerup = nullptr;
 }
 
 void GameState::Move_worm(Worm* worm, Position pos)

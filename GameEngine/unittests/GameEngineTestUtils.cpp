@@ -18,5 +18,7 @@ Worm* place_worm(bool player1, int wormNumber, Position pos, std::shared_ptr<Gam
 
 void place_powerup(Position pos, std::shared_ptr<GameState> state)
 {
-    state->Cell_at(pos)->powerup = &state->healthPack;
+    static int powerupIndex = 0;
+    state->PlacePowerupAt(pos, powerupIndex);
+    ++powerupIndex;
 };

@@ -70,7 +70,7 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
 
             //destroy powerup
             if(cell->powerup != nullptr) {
-                cell->powerup = nullptr;
+                state->ClearPowerupAt(mapPos);
             }
             
             //hurt worms
