@@ -191,6 +191,16 @@ Cell* GameState::Cell_at(Position pos)
     return &map[pos.x][pos.y];
 }
 
+void GameState::SetCellTypeAt(Position pos, CellType type)
+{
+    map[pos.x][pos.y].type = type;
+}
+
+void GameState::PlacePowerupAt(Position pos, int powerupIndex)
+{
+    map[pos.x][pos.y].powerup = &healthPack;
+}
+
 void GameState::Move_worm(Worm* worm, Position pos)
 {
     worm->previous_position = worm->position;

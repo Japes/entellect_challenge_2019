@@ -345,16 +345,16 @@ TEST_CASE( "Shoot command obstacles : dirt", "[Shoot_command][Shot_missed]" ) {
         place_worm(true, 1, worm_under_test_pos, state);
 
         //surround the dude in dirt
-        state->Cell_at(worm_under_test_pos + Position(-1,-1))->type = CellType::DIRT;
-        state->Cell_at(worm_under_test_pos + Position(0,-1))->type = CellType::DIRT; 
-        state->Cell_at(worm_under_test_pos + Position(1,-1))->type = CellType::DIRT; 
+        state->SetCellTypeAt(worm_under_test_pos + Position(-1,-1), CellType::DIRT);
+        state->SetCellTypeAt(worm_under_test_pos + Position(0,-1), CellType::DIRT); 
+        state->SetCellTypeAt(worm_under_test_pos + Position(1,-1), CellType::DIRT); 
 
-        state->Cell_at(worm_under_test_pos + Position(-1,1))->type = CellType::DIRT;
-        state->Cell_at(worm_under_test_pos + Position(0,1))->type = CellType::DIRT;
-        state->Cell_at(worm_under_test_pos + Position(1,1))->type = CellType::DIRT;
+        state->SetCellTypeAt(worm_under_test_pos + Position(-1,1), CellType::DIRT);
+        state->SetCellTypeAt(worm_under_test_pos + Position(0,1), CellType::DIRT);
+        state->SetCellTypeAt(worm_under_test_pos + Position(1,1), CellType::DIRT);
 
-        state->Cell_at(worm_under_test_pos + Position(-1,0))->type = CellType::DIRT;
-        state->Cell_at(worm_under_test_pos + Position(1,0))->type = CellType::DIRT;
+        state->SetCellTypeAt(worm_under_test_pos + Position(-1,0), CellType::DIRT);
+        state->SetCellTypeAt(worm_under_test_pos + Position(1,0), CellType::DIRT);
 
         auto range = GameConfig::commandoWorms.weapon.range;
         auto diagRange = GameConfig::commandoWorms.weapon.diagRange;
@@ -557,17 +557,14 @@ TEST_CASE( "Shoot command: WormOnTarget", "[shoot][WormOnTarget]" ) {
         place_worm(false, 2, {2,5}, state);
         place_worm(false, 3, {4,8}, state);
 
-        state->Cell_at({3, 3})->type = CellType::DIRT;
+        state->SetCellTypeAt({3, 3}, CellType::DIRT);
 
         THEN("WormOnTarget behaves correctly...")
         {
             Worm* worm21 = &state->player2.worms[0];
             Worm* worm22 = &state->player2.worms[1];
-            Worm* worm23 = &state->player2.worms[2];
 
-            Worm* worm11 = &state->player1.worms[0];
             Worm* worm12 = &state->player1.worms[1];
-            Worm* worm13 = &state->player1.worms[2];
 
             REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,-1}) == nullptr);
             REQUIRE(ShootCommand::WormOnTarget(worm21, state, {0,-1}) == worm12);

@@ -48,7 +48,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 
         place_worm(true, 3, {10,9}, state);
         place_worm(false, 3, {10,11}, state);
-        state->Cell_at({10, 10})->type = CellType::DIRT;
+        state->SetCellTypeAt({10, 10}, CellType::DIRT);
 
         //make it the 3rd players turn
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
@@ -156,7 +156,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         {
             REQUIRE(state->player1.GetCurrentWorm()->health == GameConfig::agentWorms.initialHp);
 
-            state->Cell_at({10, 10})->type = CellType::AIR;
+            state->SetCellTypeAt({10, 10}, CellType::AIR);
             TeleportCommand player1move({9,9});
             ShootCommand player2move(ShootCommand::ShootDirection::N);
             eng.AdvanceState(player1move, player2move);
@@ -168,7 +168,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 
         WHEN("A player moves into a shot")
         {
-            state->Cell_at({10, 10})->type = CellType::AIR;
+            state->SetCellTypeAt({10, 10}, CellType::AIR);
             //move player1 out of firing range
             TeleportCommand player1move({9,9});
             DoNothingCommand player2doNothing;
@@ -497,8 +497,8 @@ TEST_CASE( "Points are allocated correctly", "[scores]" ) {
         place_worm(false, 2, {0,12}, state);
         place_worm(false, 3, {0,15}, state);
 
-        state->Cell_at({0, 1})->type = CellType::DIRT;
-        state->Cell_at({0, 9})->type = CellType::DIRT;
+        state->SetCellTypeAt({0, 1}, CellType::DIRT);
+        state->SetCellTypeAt({0, 9}, CellType::DIRT);
 
         WHEN("both players do nothing")
         {

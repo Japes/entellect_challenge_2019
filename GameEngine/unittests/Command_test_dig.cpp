@@ -12,9 +12,9 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
 
         place_worm(true, 1, {10,10}, state);
         place_worm(false, 1, {12,12}, state);
-        state->Cell_at({11, 10})->type = CellType::DIRT;
-        state->Cell_at({11, 11})->type = CellType::DIRT;
-        state->Cell_at({10, 11})->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt({11, 10}, CellType::DIRT);
+        state->SetCellTypeAt({11, 11}, CellType::DIRT);
+        state->SetCellTypeAt({10, 11}, CellType::DEEP_SPACE);
         GameEngine eng(state);
 
         int expectedDoNothings = 0;

@@ -13,15 +13,22 @@ class GameState
 	public:
     Player player1;
     Player player2;
-    Cell map[MAP_SIZE][MAP_SIZE];
     int roundNumber;
+    Cell map[MAP_SIZE][MAP_SIZE];
     PowerUp healthPack; //just here so that cells can reference something static
+
+
+    //TODO can use 32bits here if I tread some of the deep space blocks as blocks in the rows that have more than 32 spaces
+    uint64_t mapDirts[MAP_SIZE];
+    Position healPackPos[2];
 
     GameState();
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
     Cell* Cell_at(Position pos);
+    void SetCellTypeAt(Position pos, CellType type);
+    void PlacePowerupAt(Position pos, int powerupIndex);
 
     void Move_worm(Worm* worm, Position pos);
 

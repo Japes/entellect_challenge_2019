@@ -12,14 +12,14 @@ TEST_CASE( "Handle no available moves", "[no_available_moves]" )
         auto state = std::make_shared<GameState>();
         
         place_worm(true, 1, {10,10}, state);
-        state->Cell_at({9, 9})->type = CellType::DEEP_SPACE;
-        state->Cell_at({9, 10})->type = CellType::DEEP_SPACE;
-        state->Cell_at({9, 11})->type = CellType::DEEP_SPACE;
-        state->Cell_at({10, 9})->type = CellType::DEEP_SPACE;
-        state->Cell_at({11, 9})->type = CellType::DEEP_SPACE;
-        state->Cell_at({11, 10})->type = CellType::DEEP_SPACE;
-        state->Cell_at({11, 11})->type = CellType::DEEP_SPACE;
-        state->Cell_at({10, 11})->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt({9, 9}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({9, 10}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({9, 11}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({10, 9}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({11, 9}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({11, 10}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({11, 11}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({10, 11}, CellType::DEEP_SPACE);
 
 
         THEN("We return the donothing command (if we trim stupid shoots)")
@@ -89,10 +89,10 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
         place_worm(false, 1, {5,6}, state);
         place_worm(false, 2, {4,1}, state);
         place_worm(false, 3, {5,3}, state);
-        state->Cell_at({5, 4})->type = CellType::DIRT;
-        state->Cell_at({4, 5})->type = CellType::DIRT;
-        state->Cell_at({4, 6})->type = CellType::DIRT;
-        state->Cell_at({7, 5})->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt({5, 4}, CellType::DIRT);
+        state->SetCellTypeAt({4, 5}, CellType::DIRT);
+        state->SetCellTypeAt({4, 6}, CellType::DIRT);
+        state->SetCellTypeAt({7, 5}, CellType::DEEP_SPACE);
 
         THEN("Valid moves for player 1 are as expected")
         {
@@ -151,9 +151,9 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {2,1}, state);
         place_worm(false, 2, {2,2}, state);
-        state->Cell_at({0, 0})->type = CellType::DIRT;
-        state->Cell_at({2, 0})->type = CellType::DIRT;
-        state->Cell_at({0, 1})->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt({0, 0}, CellType::DIRT);
+        state->SetCellTypeAt({2, 0}, CellType::DIRT);
+        state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
         auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
         REQUIRE(moves == 0b01100111);
@@ -189,10 +189,10 @@ TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
         place_worm(false, 1, {1,4}, state);
         place_worm(false, 2, {4,4}, state);
         place_worm(false, 3, {30,30}, state);
-        state->Cell_at({0, 0})->type = CellType::DIRT;
-        state->Cell_at({2, 0})->type = CellType::DIRT;
-        state->Cell_at({1, 3})->type = CellType::DIRT;
-        state->Cell_at({0, 1})->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt({0, 0}, CellType::DIRT);
+        state->SetCellTypeAt({2, 0}, CellType::DIRT);
+        state->SetCellTypeAt({1, 3}, CellType::DIRT);
+        state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
         auto shoots = NextTurn::GetValidShoots(true, state, true);
         INFO("shoots: " << shoots)
@@ -306,10 +306,10 @@ TEST_CASE( "Get random move", "[get_random_move][.statistics]" )
         place_worm(false, 1, {1,4}, state);
         place_worm(false, 2, {4,4}, state);
         place_worm(false, 3, {30,30}, state);
-        state->Cell_at({0, 0})->type = CellType::DIRT;
-        state->Cell_at({2, 0})->type = CellType::DIRT;
-        state->Cell_at({1, 3})->type = CellType::DIRT;
-        state->Cell_at({0, 1})->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt({0, 0}, CellType::DIRT);
+        state->SetCellTypeAt({2, 0}, CellType::DIRT);
+        state->SetCellTypeAt({1, 3}, CellType::DIRT);
+        state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
         auto cmds = NextTurn::AllValidMovesForPlayer(true, state, true);
 

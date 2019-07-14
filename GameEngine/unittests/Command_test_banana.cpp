@@ -155,12 +155,12 @@ TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
         SetupAgent(state, eng);
         for(int x = 0; x < 7; ++x) {
             for(int y = 0; y < 5; ++y) {
-                state->Cell_at({x, y})->type = CellType::DIRT;
+                state->SetCellTypeAt({x, y}, CellType::DIRT);
             }
         }
-        state->Cell_at({6, 5})->type = CellType::DIRT;
-        state->Cell_at({6, 6})->type = CellType::DIRT;
-        state->Cell_at({6, 7})->type = CellType::DIRT;
+        state->SetCellTypeAt({6, 5}, CellType::DIRT);
+        state->SetCellTypeAt({6, 6}, CellType::DIRT);
+        state->SetCellTypeAt({6, 7}, CellType::DIRT);
 
         WHEN("We chuck a banana into empty space")
         {
@@ -219,12 +219,12 @@ TEST_CASE( "Banana bomb lobbed into deep space", "[banana]" ) {
         SetupAgent(state, eng);
         for(int x = 0; x < 7; ++x) {
             for(int y = 0; y < 5; ++y) {
-                state->Cell_at({x, y})->type = CellType::DEEP_SPACE;
+                state->SetCellTypeAt({x, y}, CellType::DEEP_SPACE);
             }
         }
-        state->Cell_at({1, 5})->type = CellType::DIRT;
+        state->SetCellTypeAt({1, 5}, CellType::DIRT);
         place_worm(false, 1, {2,5}, state);
-        state->Cell_at({3, 5})->type = CellType::DIRT;
+        state->SetCellTypeAt({3, 5}, CellType::DIRT);
 
         WHEN("We chuck a banana into deep space")
         {
@@ -276,15 +276,15 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
         place_worm(false, 2, {5,3}, state);
         place_worm(false, 3, {4,5}, state);
 
-        state->Cell_at({3, 1})->type = CellType::DIRT;
-        state->Cell_at({3, 2})->type = CellType::DIRT;
-        state->Cell_at({3, 3})->type = CellType::DIRT;
-        state->Cell_at({6, 3})->type = CellType::DIRT;
-        state->Cell_at({6, 4})->type = CellType::DIRT;
-        state->Cell_at({6, 5})->type = CellType::DIRT;
-        state->Cell_at({5, 5})->type = CellType::DIRT;
-        state->Cell_at({5, 6})->type = CellType::DIRT;
-        state->Cell_at({4, 6})->type = CellType::DIRT;
+        state->SetCellTypeAt({3, 1}, CellType::DIRT);
+        state->SetCellTypeAt({3, 2}, CellType::DIRT);
+        state->SetCellTypeAt({3, 3}, CellType::DIRT);
+        state->SetCellTypeAt({6, 3}, CellType::DIRT);
+        state->SetCellTypeAt({6, 4}, CellType::DIRT);
+        state->SetCellTypeAt({6, 5}, CellType::DIRT);
+        state->SetCellTypeAt({5, 5}, CellType::DIRT);
+        state->SetCellTypeAt({5, 6}, CellType::DIRT);
+        state->SetCellTypeAt({4, 6}, CellType::DIRT);
 
         //set up 2 kills
         state->player1.worms[1].health = 1;

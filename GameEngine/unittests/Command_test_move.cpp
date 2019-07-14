@@ -32,13 +32,13 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
         state->Cell_at(enemy_worm_pos)->worm = enemy_worm;
 
         Position dirt_pos_straight{11,10};
-        state->Cell_at(dirt_pos_straight)->type = CellType::DIRT;
+        state->SetCellTypeAt(dirt_pos_straight, CellType::DIRT);
 
         Position dirt_pos_diag{11,11};
-        state->Cell_at(dirt_pos_diag)->type = CellType::DIRT;
+        state->SetCellTypeAt(dirt_pos_diag, CellType::DIRT);
 
         Position deep_space_pos{10,11};
-        state->Cell_at(deep_space_pos)->type = CellType::DEEP_SPACE;
+        state->SetCellTypeAt(deep_space_pos, CellType::DEEP_SPACE);
 
         GameEngine eng(state);
 
