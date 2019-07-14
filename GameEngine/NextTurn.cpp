@@ -128,34 +128,25 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
     }
 
     if (!trimStupidMoves) {
-        std::bitset<121> ret;
+        std::bitset<121> ret; //TODO not strictly correct - includes corners
         ret.set();
         return ret;
     }
 
     std::bitset<121> ret(0);
 
-    for(auto const & space : _relativeBananaTargets) {
-        ret >>= 1;
+    auto enemyWorms = player1? &(state->player2.worms) : &(state->player1.worms);
 
-        Position targetPos = worm->position + space;
-
-        if(!targetPos.IsOnMap() || 
-            state->Cell_at(targetPos)->type == CellType::DEEP_SPACE ||
-            !worm->position.BananaCanReach(targetPos)) {
-            continue;
+    for(auto const & enemyWorm : (*enemyWorms)) {
+        if(worm->position.BananaCanReach(enemyWorm.position)) {
+            Position posDiff = enemyWorm.position - worm->position;
+            int index = 60 + posDiff.x + (posDiff.y*11); //see ascii art at top of this function
+            ret.set(index);
         }
-
-        Worm* hitworm = state->Cell_at(targetPos)->worm;
-        if(hitworm != nullptr && std::none_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
-            ret.set(ret.size() - 1);
-        }
+    }
 
         //TODO get dirt score and consider if above a threshold
-        //if we were only considering worms it would be much quicker to just check if any of the opponents are in range
         //dirts could be improved by rather maintaining a bitmap of dirts and XORing
-
-    }
 
     return ret;
 }
