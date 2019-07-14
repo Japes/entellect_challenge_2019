@@ -2,6 +2,7 @@
 #include "../GameEngine.hpp"
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
+#include "GameEngineTestUtils.hpp"
 
 TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
 
@@ -17,19 +18,13 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
         */
 
         Position worm_under_test_pos{10,10};
-        Worm* worm_under_test = &state->player1.worms[0];
-        worm_under_test->position = worm_under_test->previous_position = worm_under_test_pos;
-        state->PlaceWormAt(worm_under_test_pos, worm_under_test);
+        place_worm(true, 1, worm_under_test_pos, state);
 
         Position friendly_worm_pos{10,9};
-        Worm* friendly_worm = &state->player1.worms[1];
-        friendly_worm->position = friendly_worm->previous_position = friendly_worm_pos;
-        state->PlaceWormAt(friendly_worm_pos, friendly_worm);
+        place_worm(true, 2, friendly_worm_pos, state);
 
         Position enemy_worm_pos{9,9};
-        Worm* enemy_worm = &state->player2.worms[1];
-        enemy_worm->position =  enemy_worm->previous_position = enemy_worm_pos;
-        state->PlaceWormAt(enemy_worm_pos, enemy_worm);
+        place_worm(false, 2, enemy_worm_pos, state);
 
         Position dirt_pos_straight{11,10};
         state->SetCellTypeAt(dirt_pos_straight, CellType::DIRT);
