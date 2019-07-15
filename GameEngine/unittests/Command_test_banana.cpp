@@ -74,7 +74,7 @@ TEST_CASE( "Banana validation", "[banana]" ) {
     }
 }
 
-TEST_CASE( "Banana range", "[banana]" ) {
+TEST_CASE( "Banana range", "[banana][banana_range]" ) {
 
     /*banana radius:
     0   1   2   3   4   5   6   7   8   9   10
@@ -94,6 +94,7 @@ TEST_CASE( "Banana range", "[banana]" ) {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 3, {15,15}, state); //3 is always the agent
+        place_worm(false, 3, {29,29}, state); //put him somewhere sensible
 
         SetupAgent(state,eng);
         state->player1.worms[2].health = 1000; //so he doesn't kill himself during this test
@@ -107,7 +108,6 @@ TEST_CASE( "Banana range", "[banana]" ) {
         bool flipPlayer2Pos = 0;
         for(int x = startPos.x; x <= endPos.x; ++x) {
             for(int y = startPos.y; y <= endPos.y; ++y) {
-
                 Position targetPos = {x,y};
                 INFO("wormPos: " << wormpos << " targetPos: " << targetPos << " diff: " << targetPos - wormpos <<
                 " shootDistance: " << wormpos.EuclideanDistanceTo(targetPos));
@@ -121,11 +121,18 @@ TEST_CASE( "Banana range", "[banana]" ) {
 
                 state->player1.consecutiveDoNothingCount = 0;
 
-                eng.AdvanceState(player1move, player2move);
-                if(wormpos.EuclideanDistanceTo(targetPos) <= GameConfig::agentWorms.banana.range) {
-                    REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-                } else {
-                    REQUIRE(state->player1.consecutiveDoNothingCount == 1);
+                WHEN("We advance state")
+                {
+                    eng.AdvanceState(player1move, player2move);
+
+                    THEN("The right places are throwable")
+                    {
+                        if(wormpos.EuclideanDistanceTo(targetPos) <= GameConfig::agentWorms.banana.range) {
+                            REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                        } else {
+                            REQUIRE(state->player1.consecutiveDoNothingCount == 1);
+                        }
+                    }
                 }
             }
         }
@@ -197,7 +204,7 @@ TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
     }
 }
 
-TEST_CASE( "Banana bomb lobbed into deep space", "[banana]" ) {
+TEST_CASE( "Banana bomb lobbed into deep space", "[banana][deepspacebanana]" ) {
     //not invalid, but lose the bomb and does nothing
     GIVEN("A contrived situation")
     {
@@ -225,6 +232,8 @@ TEST_CASE( "Banana bomb lobbed into deep space", "[banana]" ) {
         state->SetCellTypeAt({1, 5}, CellType::DIRT);
         place_worm(false, 1, {2,5}, state);
         state->SetCellTypeAt({3, 5}, CellType::DIRT);
+
+        REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
 
         WHEN("We chuck a banana into deep space")
         {

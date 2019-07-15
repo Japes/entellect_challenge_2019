@@ -70,6 +70,7 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
             REQUIRE(copied_state->player1.GetCurrentWorm() != original_state->player1.GetCurrentWorm());
             for(int i = 0; i < GameConfig::mapSize; ++i) {
                 for(int j = 0; j < GameConfig::mapSize; ++j) {
+                    INFO("position " << i << ", " << j);
                     auto copied_cell = copied_state->Cell_at({i,j});
                     auto original_cell = original_state->Cell_at({i,j});
                     REQUIRE(copied_cell.type == original_cell.type);
@@ -101,5 +102,61 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
             REQUIRE(copied_state->player1.worms[1].health == original_state->player1.worms[1].health);
             REQUIRE(copied_state->player1.worms[2].health == original_state->player1.worms[2].health);
         }
+    }
+}
+
+TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
+    GIVEN("A game state ")
+    {
+        GameState state;
+
+        WHEN("We set the type of a cell")
+        {
+            state.SetCellTypeAt({1,2}, CellType::DIRT);
+            state.SetCellTypeAt({2,3}, CellType::AIR);
+            state.SetCellTypeAt({3,4}, CellType::DEEP_SPACE);
+
+            THEN("The cell is of that type")
+            {
+                REQUIRE(state.Cell_at({1,2}).type == CellType::DIRT);
+                REQUIRE(state.Cell_at({2,3}).type == CellType::AIR);
+                REQUIRE(state.Cell_at({4,5}).type == CellType::AIR);
+                REQUIRE(state.Cell_at({3,4}).type == CellType::DEEP_SPACE);
+            }
+        }
+
+        WHEN("We place a powerup on a cell")
+        {
+            state.PlacePowerupAt({1,2}, 0);
+
+            THEN("That cell has a powerup...")
+            {
+                REQUIRE(state.Cell_at({1,2}).powerup != nullptr);
+                REQUIRE(state.Cell_at({2,3}).powerup == nullptr);
+                REQUIRE(state.Cell_at({3,4}).powerup == nullptr);
+            }
+
+            AND_THEN("We clear it")
+            {
+                state.ClearPowerupAt({1,2});
+                THEN("its gone")
+                {
+                    REQUIRE(state.Cell_at({1,2}).powerup == nullptr);
+                }
+            }
+        }
+
+        WHEN("We place a worm on a cell")
+        {
+            state.PlaceWormAt({1,2}, &state.player1.worms[0]);
+
+            THEN("That cell has a worm...")
+            {
+                REQUIRE(state.Cell_at({1,2}).worm == &state.player1.worms[0]);
+                REQUIRE(state.Cell_at({2,3}).worm == nullptr);
+                REQUIRE(state.Cell_at({3,4}).worm == nullptr);
+            }
+        }
+
     }
 }

@@ -20,12 +20,11 @@ class GameState
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
-    Cell Cell_at(Position pos) const;
+    Cell Cell_at(Position pos);
     void SetCellTypeAt(Position pos, CellType type);
     void PlacePowerupAt(Position pos, int powerupIndex);
     void ClearPowerupAt(Position pos);
     void PlaceWormAt(Position pos, Worm* worm);
-    void ClearWormAt(Position pos);
 
     void Move_worm(Worm* worm, Position pos);
 
@@ -36,11 +35,10 @@ class GameState
 
     private:
     
-    Cell map[MAP_SIZE][MAP_SIZE];
-    
     //TODO can use 32bits here if I treat some of the deep space blocks as blocks in the rows that have more than 32 spaces
-    uint64_t mapDirts[MAP_SIZE];
-    Position healthPackPos[2];
+    uint64_t mapDeepSpaces[MAP_SIZE] = {0}; //TODO no need to store this actually, it is always the same
+    uint64_t mapDirts[MAP_SIZE] = {0};
+    Position healthPackPos[2]; //todo make this a vector...
 
     void UpdateRefs();
     void UpdateRefs(Player& player);

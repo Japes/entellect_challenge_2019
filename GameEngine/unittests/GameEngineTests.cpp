@@ -1,4 +1,3 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
 #include "../GameEngine.hpp"
 #include "../GameConfig.hpp"
@@ -202,7 +201,7 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
         place_worm(false, 2, {4,0}, state);
         place_worm(false, 3, {5,0}, state);
 
-        WHEN("We advancd state with a move to the right")
+        WHEN("We advance state with a move down")
         {
             TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
             TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
@@ -217,7 +216,7 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
                 REQUIRE(state->player2.worms[1].position.y == 0);
                 REQUIRE(state->player2.worms[2].position.y == 0);
 
-                WHEN("We advancd state with a move to the right")
+                WHEN("We advance state with a move down")
                 {
                     TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
                     TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
@@ -232,7 +231,7 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
                         REQUIRE(state->player2.worms[1].position.y == 1);
                         REQUIRE(state->player2.worms[2].position.y == 0);
 
-                        WHEN("We advancd state with a move to the right")
+                        WHEN("We advance state with a move down")
                         {
                             TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
                             TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
@@ -247,7 +246,7 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
                                 REQUIRE(state->player2.worms[1].position.y == 1);
                                 REQUIRE(state->player2.worms[2].position.y == 1);
 
-                                WHEN("We advancd state with a move to the right")
+                                WHEN("We advance state with a move down")
                                 {
                                     TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
                                     TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
@@ -267,7 +266,7 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
                                             state->player1.worms[2].TakeDamage(5000);
                                             state->player2.worms[2].TakeDamage(5000);
 
-                                            WHEN("We advancd state with a move to the right")
+                                            WHEN("We advance state with a move down")
                                             {
                                                 TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
                                                 TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
@@ -277,12 +276,10 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
                                                 {
                                                     REQUIRE(state->player1.worms[0].position.y == 2);
                                                     REQUIRE(state->player1.worms[1].position.y == 2);
-                                                    REQUIRE(state->player1.worms[2].position.y == 1);
                                                     REQUIRE(state->player2.worms[0].position.y == 2);
                                                     REQUIRE(state->player2.worms[1].position.y == 2);
-                                                    REQUIRE(state->player2.worms[2].position.y == 1);
 
-                                                    WHEN("We advancd state with a move to the right")
+                                                    WHEN("We advance state with a move down")
                                                     {
                                                         TeleportCommand player1move(state->player1.GetCurrentWorm()->position + Position{0,1});
                                                         TeleportCommand player2move(state->player2.GetCurrentWorm()->position + Position{0,1});
@@ -292,10 +289,8 @@ TEST_CASE( "Active worms are chosen correctly", "[active_worm]" ) {
                                                         {
                                                             REQUIRE(state->player1.worms[0].position.y == 3);
                                                             REQUIRE(state->player1.worms[1].position.y == 2);
-                                                            REQUIRE(state->player1.worms[2].position.y == 1);
                                                             REQUIRE(state->player2.worms[0].position.y == 3);
                                                             REQUIRE(state->player2.worms[1].position.y == 2);
-                                                            REQUIRE(state->player2.worms[2].position.y == 1);
                                                         }
                                                     }
                                                 }
@@ -676,7 +671,17 @@ TEST_CASE( "Game goes to score if both players die in the same round", "[double_
 
         WHEN("players knock each other out in the same round")
         {
+            INFO("1player2 worm 0 health, pos: " << state->player2.worms[0].health << " " << state->player2.worms[0].position);
             eng.AdvanceState(player1move, player2move);
+
+            REQUIRE(state->player1.worms[0].IsDead());
+            REQUIRE(state->player1.worms[1].IsDead());
+            REQUIRE(state->player1.worms[2].IsDead());
+
+            INFO("player2 worm 0 health, pos: " << state->player2.worms[0].health << " " << state->player2.worms[0].position);
+            REQUIRE(state->player2.worms[0].IsDead());
+            REQUIRE(state->player2.worms[1].IsDead());
+            REQUIRE(state->player2.worms[2].IsDead());
 
             THEN("Game is finished, and goes to score") {
                 REQUIRE(eng.GetResult().result == resType::FINISHED_POINTS);

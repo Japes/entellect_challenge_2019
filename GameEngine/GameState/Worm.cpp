@@ -1,7 +1,7 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state, bool agent) : state{_state}, id{0}, movedThisRound{0}
+Worm::Worm(GameState* _state, bool agent) : state{_state}, id{0}, position{-1,-1}, movedThisRound{0}
 {
     if(agent) {
         proffession = Proffession::AGENT;
@@ -26,9 +26,6 @@ bool Worm::IsDead() const
 void Worm::TakeDamage(int dmgAmount)
 {
     health -= dmgAmount;
-    if(IsDead()) {
-        state->ClearWormAt(position);
-    }
     state->player1.RecalculateHealth();
     state->player2.RecalculateHealth();
 }

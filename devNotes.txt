@@ -1,20 +1,23 @@
 TODO
 
    optimise
-      bottleneck is now the copy of GameState
-         make gamestate smaller - MAP
-         somehow make it so you don't do a copy
+      bottleneck is now Cell_at
 
    throw bananas more intelligently
       only consider if the points are great
 
    add select!
 
+   fix agent runaway
+   heavier playthroughs (biases)
+
+   make tourneys 50/50 p1/p2
+   scrape match logs for stats
+
    2 weird cases:
       end of game showdown, i have more health - why not shoot him??
+         cant see till the end of the game, points wise makes sense to rather dodge
       my (not last) worm about to die - why not evade?
-
-   they are too scared of agents - keep track of count
 
    Need to avoid getting lost
       try using seed/jippo'd game state to reproduce this
@@ -116,7 +119,8 @@ jp2 - what i submitted for Early Bird.  basic monte carlo, buggy
 jp3 - jp2 with various bug fixes
 jp4 - jp3 with optimizations to GetRandomMoveForWorm and added multithreading.  Plies/s up from ~600k to 1.2M
 jp5 - jp4 with simple bananas - consider chucking at any enemies in range
-jp6 - added radius of worms to consider
+jp6 - added radius of worms to consider (but it doesn't help, so set infinite.)  Added weighted playthroughs
+jp7 - optimised version of jp6
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -195,28 +199,10 @@ Engine version: 2019.2.2
 (wins/draws/losses):     jp6                      jp5                      reference-bot            
 jp6:                     0/0/0                    48/0/24                  31/0/0           
 
+OPTIMISE (supersnob)-----------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    46/0/20                  (32/0/12)
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-#7  std::allocate_shared<GameState, std::allocator<GameState>, GameState&> (__a=...) at /usr/include/c++/5/bits/shared_ptr.h:620                                                                                   #8  std::make_shared<GameState, GameState&> () at /usr/include/c++/5/bits/shared_ptr.h:636                                                                                                                         #9  runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                                       at GameEngineTests_integration.cpp:62 
-
-#8  std::allocate_shared<GameState, std::allocator<GameState>, GameState&> (__a=...) at /usr/include/c++/5/bits/shared_ptr.h:620                                                                                   #9  std::make_shared<GameState, GameState&> () at /usr/include/c++/5/bits/shared_ptr.h:636                                                                                                                         #10 runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                                       at GameEngineTests_integration.cpp:62
-
-#7  std::allocate_shared<GameState, std::allocator<GameState>, GameState&> (__a=...) at /usr/include/c++/5/bits/shared_ptr.h:620                                                                                   #8  std::make_shared<GameState, GameState&> () at /usr/include/c++/5/bits/shared_ptr.h:636                                                                                                                         #9  runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                                       at GameEngineTests_integration.cpp:62
-
-#8  std::allocate_shared<GameState, std::allocator<GameState>, GameState&> (__a=...) at /usr/include/c++/5/bits/shared_ptr.h:620                                                                                   #9  std::make_shared<GameState, GameState&> () at /usr/include/c++/5/bits/shared_ptr.h:636                                                                                                                         #10 runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                                       at GameEngineTests_integration.cpp:62 
-
-
-
-#0  NextTurn::GetValidShoots (player1=player1@entry=false, state=std::shared_ptr (count 6, weak 0) 0x7ffff00008d0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:91                               #1  0x00000000004c18f3 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 6, weak 0) 0x7ffff00008d0, trimStupidMoves=true) at ../NextTurn.cpp:183 
-
-#0  0x00000000004c2f9b in Player::GetCurrentWorm (this=0x7ffff80008d0) at ../GameState/Player.cpp:40                                                                                                               #1  0x00000000004c0729 in NextTurn::GetValidBananas (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:124        #2  0x00000000004c1951 in NextTurn::GetRandomValidMoveForPlayer (player1=true, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=true) at ../NextTurn.cpp:184 
-
-#0  0x00000000004c0646 in Position::operator+ (other=..., this=<optimized out>) at ../GameState/Position.hpp:28                                                                                                    #1  NextTurn::GetValidTeleportDigs (player1=player1@entry=true, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:62                          #2  0x00000000004c1897 in NextTurn::GetRandomValidMoveForPlayer (player1=true, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=true) at ../NextTurn.cpp:182 
-
-#0  0x00000000004c80dd in GameState::Cell_at (this=0x7ffff80008d0, pos=...) at ../GameState/GameState.cpp:185                                                                                                      #1  0x00000000004c066f in NextTurn::GetValidTeleportDigs (player1=player1@entry=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63   #2  0x00000000004c1897 in NextTurn::GetRandomValidMoveForPlayer (player1=false, state=std::shared_ptr (count 5, weak 0) 0x7ffff80008d0, trimStupidMoves=true) at ../NextTurn.cpp:182
-
-
-#3  0x000000000040b739 in Get_ns_since_epoch () at GameEngineTests_integration.cpp:19                                                                                                                              #4  0x000000000040d53d in runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                 at GameEngineTests_integration.cpp:55
-
-#3  0x000000000040b739 in Get_ns_since_epoch () at GameEngineTests_integration.cpp:19                                                                                                                              #4  0x000000000040d53d in runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                 at GameEngineTests_integration.cpp:55
+                                                                                                                            #4  0x000000000040d53d in runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                 at GameEngineTests_integration.cpp:55

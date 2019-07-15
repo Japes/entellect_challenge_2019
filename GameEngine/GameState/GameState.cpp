@@ -2,6 +2,8 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
+#define first_bit_set (0x8000000000000000)
+
 GameState::GameState() :
     player1(this),
     player2(this),
@@ -9,6 +11,9 @@ GameState::GameState() :
 {
     player1.id = 1;
     player2.id = 2;
+    healthPackPos[0] = Position(-2,-2); //different to default worm space, else confusion
+    healthPackPos[1] = Position(-2,-2);
+
 }
 
 //deep copy of state
@@ -16,17 +21,11 @@ GameState::GameState(const GameState& other) :
     player1{other.player1},
     player2{other.player2}
 {
+    std::memcpy(mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces));
+    std::memcpy(mapDirts, other.mapDirts, sizeof(mapDirts));
 
-
-    //TODO do this by assigning arrays directly
-
-
-
-    for(unsigned i = 0; i < MAP_SIZE; i++){
-        for(unsigned j = 0; j < MAP_SIZE; j++){
-            map[i][j] = other.map[i][j];
-        }
-    }
+    healthPackPos[0] = other.healthPackPos[0];
+    healthPackPos[1] = other.healthPackPos[1];
 
     roundNumber = other.roundNumber;
     healthPack = other.healthPack;
@@ -170,7 +169,6 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             CellType type =  Cell::strToCellType((*colItr)["type"].GetString());
 
             SetCellTypeAt(pos, type);
-            ClearWormAt(pos);
             ClearPowerupAt(pos);
 
             if((*colItr).HasMember("occupier")) {
@@ -188,42 +186,74 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
     }
 }
 
-Cell GameState::Cell_at(Position pos) const
+Cell GameState::Cell_at(Position pos)
 {
-    return map[pos.x][pos.y];
+    Cell ret;
+    if(mapDeepSpaces[pos.y] & (first_bit_set >> pos.x) ) {
+        ret.type = CellType::DEEP_SPACE;
+    } else if (mapDirts[pos.y] & (first_bit_set >> pos.x)) {
+        ret.type = CellType::DIRT;
+    } else {
+        ret.type = CellType::AIR;
+    }
+
+    ForAllWorms([&] (Worm& w) {
+        if(w.position == pos && !w.IsDead()) {
+            ret.worm = &w;
+        }
+    });
+
+
+    if(healthPackPos[0] == pos || healthPackPos[1] == pos) {
+        ret.powerup = &healthPack;
+    }
+
+    return ret;
 }
 
 void GameState::SetCellTypeAt(Position pos, CellType type)
 {
-    map[pos.x][pos.y].type = type;
+    auto posField = (first_bit_set >> pos.x);
+
+    switch(type) {
+        case CellType::AIR:
+            mapDeepSpaces[pos.y] &= ~posField;
+            mapDirts[pos.y] &= ~posField;
+        break;
+        case CellType::DEEP_SPACE:
+            mapDeepSpaces[pos.y] |= posField;
+            mapDirts[pos.y] &= ~posField;
+        break;
+        case CellType::DIRT:
+            mapDeepSpaces[pos.y] &= ~posField;
+            mapDirts[pos.y] |= posField;
+        break;
+    }
 }
 
 void GameState::PlacePowerupAt(Position pos, int powerupIndex)
 {
-    map[pos.x][pos.y].powerup = &healthPack;
+    healthPackPos[powerupIndex] = pos;
 }
 
 void GameState::ClearPowerupAt(Position pos)
 {
-    map[pos.x][pos.y].powerup = nullptr;
+    if(healthPackPos[0] == pos) {
+        healthPackPos[0] = Position(-1,-1);
+    } else if(healthPackPos[1] == pos) {
+        healthPackPos[1] = Position(-1,-1);
+    }
 }
 
 void GameState::PlaceWormAt(Position pos, Worm* worm)
 {
-    map[pos.x][pos.y].worm = worm;
     worm->position = pos;
-}
-
-void GameState::ClearWormAt(Position pos)
-{
-    map[pos.x][pos.y].worm = nullptr;
 }
 
 void GameState::Move_worm(Worm* worm, Position pos)
 {
     worm->previous_position = worm->position;
 
-    ClearWormAt(worm->position);
     PlaceWormAt(pos, worm);
 }
 
@@ -244,21 +274,13 @@ void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
 
 bool GameState::operator==(const GameState &other) const
 {
-    bool cellsGood = true;
-
-
-
-
-    //TODO do this by comparing arrays directly
-
-    for(unsigned x = 0; x < MAP_SIZE; ++x) {
-        for(unsigned y = 0; y < MAP_SIZE; ++y) {
-            cellsGood &= map[x][y] == other.map[x][y];
-        }
-    } 
+    bool cellsGood = (memcmp ( mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces) ) == 0);
+    cellsGood &= (memcmp ( mapDirts, other.mapDirts, sizeof(mapDirts) ) == 0);
 
     return cellsGood && 
             player1 == other.player1 && 
             player2 == other.player2 &&
+            healthPackPos[0] == other.healthPackPos[0] &&
+            healthPackPos[1] == other.healthPackPos[1] &&
             roundNumber == other.roundNumber;
 }

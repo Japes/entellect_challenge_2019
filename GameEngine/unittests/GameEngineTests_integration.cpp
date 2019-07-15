@@ -84,7 +84,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     gameCount = 0;
     turnCount = 0;
-    uint64_t num_milliseconds = 880;
+    uint64_t num_milliseconds = 88000;
     auto start_time = Get_ns_since_epoch();
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json"); //todo need to make sure there are bots in range
