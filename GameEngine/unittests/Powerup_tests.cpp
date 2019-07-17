@@ -23,8 +23,8 @@ TEST_CASE( "Healthpack", "[powerup]" ) {
             eng.AdvanceState(player1move, player2move);
 
             REQUIRE(worm->health == GameConfig::healthPackHp);
-            REQUIRE(worm == state->Cell_at(powerup_pos).worm);
-            REQUIRE(state->Cell_at(powerup_pos).powerup == nullptr);
+            REQUIRE(worm == state->Worm_at(powerup_pos));
+            REQUIRE(state->PowerUp_at(powerup_pos) == nullptr);
             REQUIRE(!worm->IsDead());
         }
     }

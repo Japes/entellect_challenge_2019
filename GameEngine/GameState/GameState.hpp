@@ -20,6 +20,9 @@ class GameState
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
+    CellType CellType_at(Position pos);
+    PowerUp* PowerUp_at(Position pos);
+    Worm* Worm_at(Position pos);
     Cell Cell_at(Position pos);
     void SetCellTypeAt(Position pos, CellType type);
     void PlacePowerupAt(Position pos, int powerupIndex);

@@ -101,7 +101,7 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
 
             THEN("The dig happens first")
             {
-                REQUIRE(state->Cell_at({10, 10}).type == CellType::AIR);
+                REQUIRE(state->CellType_at({10, 10}) == CellType::AIR);
                 REQUIRE(state->player1.GetScore() == p1ScoreBefore + GameConfig::scores.dig);
                 REQUIRE(state->player2.GetScore() == p2ScoreBefore);
             }

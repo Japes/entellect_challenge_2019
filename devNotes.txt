@@ -199,10 +199,33 @@ Engine version: 2019.2.2
 (wins/draws/losses):     jp6                      jp5                      reference-bot            
 jp6:                     0/0/0                    48/0/24                  31/0/0           
 
-OPTIMISE (supersnob)-----------------------------------------------------------------------------------------------------------------------------
+OPTIMISE (supersnob)-(1.5M plies/s)---------------------------------------------------------------------------------------------------------------------
 Engine version: 2019.2.2
 (wins/draws/losses):     jp7                      jp6                      
 jp7:                     0/0/0                    46/0/20                  (32/0/12)
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                                                                                                            #4  0x000000000040d53d in runMC (stopTime=1563123417290732500, mc=std::shared_ptr (count 3, weak 0) 0x748150, state1=std::shared_ptr (count 3, weak 0) 0x737600, ImPlayer1=false, playthroughDepth=24)                 at GameEngineTests_integration.cpp:55
+Engine version: 2019.2.2 tried optimising but actually made things slightly worse (1M plies/s)-------------------------------------------
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    26/0/20                  (26/0/20)
+
+////////////////
+
+making gamestate
+making gamestate
+making gamestate
+making gamestate
+
+nextTurn:199
+nextTurn:185
+rand
+
+celltype_at (getvalidteleportdigs)
+
+worm_at
+worm_at
+worm_at
+worm_at
+
+getResult
+
+getvalidteleportdigs

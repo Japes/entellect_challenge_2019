@@ -46,8 +46,8 @@ TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
     CHECK(false);
 }
 
-unsigned gameCount = 0;
-int turnCount = 0;
+uint64_t gameCount = 0;
+uint64_t turnCount = 0;
 std::mutex mtx;
 
 void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
@@ -84,7 +84,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     gameCount = 0;
     turnCount = 0;
-    uint64_t num_milliseconds = 88000;
+    uint64_t num_milliseconds = 3000;
     auto start_time = Get_ns_since_epoch();
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json"); //todo need to make sure there are bots in range

@@ -63,14 +63,14 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
         {
             player1move = DigCommand({11,10});    eng.AdvanceState(player1move,player2move);    //++expectedDoNothings;
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->Cell_at({11, 10}).type == CellType::AIR);
+            REQUIRE(state->CellType_at({11, 10}) == CellType::AIR);
         }
 
         THEN("digging dirt diagonally is valid")
         {
             player1move = DigCommand({11,11});    eng.AdvanceState(player1move,player2move);    //++expectedDoNothings;
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->Cell_at({11, 11}).type == CellType::AIR);
+            REQUIRE(state->CellType_at({11, 11}) == CellType::AIR);
         }
 
         THEN("Both worms digging same hole is valid")
@@ -81,7 +81,7 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
             //++expectedDoNothings;
             REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
             REQUIRE(state->player2.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->Cell_at({11, 11}).type == CellType::AIR);
+            REQUIRE(state->CellType_at({11, 11}) == CellType::AIR);
         }
     }
 }

@@ -7,8 +7,8 @@ TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
     GameState state;
     for(int x = 0; x < GameConfig::mapSize; ++x) {
         for(int y = 0; y < GameConfig::mapSize; ++y) {
-            REQUIRE( state.Cell_at({x,y}).worm == nullptr );
-            REQUIRE( state.Cell_at({x,y}).powerup == nullptr );
+            REQUIRE( state.Worm_at({x,y}) == nullptr );
+            REQUIRE( state.PowerUp_at({x,y}) == nullptr );
         }
     }
 }
@@ -21,7 +21,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
 
         THEN("That worm isn't on the map")
         {
-            REQUIRE(state.Cell_at({20,25}).worm == nullptr);
+            REQUIRE(state.Worm_at({20,25}) == nullptr);
         }
 
         AND_THEN("When we make a copy")
@@ -29,7 +29,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
             GameState state2 = state;
             THEN("That worm doesn't appear on the map.")
             {
-                REQUIRE(state2.Cell_at({20,25}).worm == nullptr);
+                REQUIRE(state2.Worm_at({20,25}) == nullptr);
             }
         }
     }
@@ -40,7 +40,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
 
         THEN("That worm isn't on the map")
         {
-            REQUIRE(state.Cell_at({18,6}).worm == nullptr);
+            REQUIRE(state.Worm_at({18,6}) == nullptr);
         }
 
         AND_THEN("When we make a copy")
@@ -48,7 +48,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
             GameState state2 = state;
             THEN("That worm doesn't appear on the map.")
             {
-                REQUIRE(state2.Cell_at({18,6}).worm == nullptr);
+                REQUIRE(state2.Worm_at({18,6}) == nullptr);
             }
         }
     }
@@ -118,10 +118,10 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
 
             THEN("The cell is of that type")
             {
-                REQUIRE(state.Cell_at({1,2}).type == CellType::DIRT);
-                REQUIRE(state.Cell_at({2,3}).type == CellType::AIR);
-                REQUIRE(state.Cell_at({4,5}).type == CellType::AIR);
-                REQUIRE(state.Cell_at({3,4}).type == CellType::DEEP_SPACE);
+                REQUIRE(state.CellType_at({1,2}) == CellType::DIRT);
+                REQUIRE(state.CellType_at({2,3}) == CellType::AIR);
+                REQUIRE(state.CellType_at({4,5}) == CellType::AIR);
+                REQUIRE(state.CellType_at({3,4}) == CellType::DEEP_SPACE);
             }
         }
 
@@ -131,9 +131,9 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
 
             THEN("That cell has a powerup...")
             {
-                REQUIRE(state.Cell_at({1,2}).powerup != nullptr);
-                REQUIRE(state.Cell_at({2,3}).powerup == nullptr);
-                REQUIRE(state.Cell_at({3,4}).powerup == nullptr);
+                REQUIRE(state.PowerUp_at({1,2}) != nullptr);
+                REQUIRE(state.PowerUp_at({2,3}) == nullptr);
+                REQUIRE(state.PowerUp_at({3,4}) == nullptr);
             }
 
             AND_THEN("We clear it")
@@ -141,7 +141,7 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
                 state.ClearPowerupAt({1,2});
                 THEN("its gone")
                 {
-                    REQUIRE(state.Cell_at({1,2}).powerup == nullptr);
+                    REQUIRE(state.PowerUp_at({1,2}) == nullptr);
                 }
             }
         }
@@ -152,9 +152,9 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
 
             THEN("That cell has a worm...")
             {
-                REQUIRE(state.Cell_at({1,2}).worm == &state.player1.worms[0]);
-                REQUIRE(state.Cell_at({2,3}).worm == nullptr);
-                REQUIRE(state.Cell_at({3,4}).worm == nullptr);
+                REQUIRE(state.Worm_at({1,2}) == &state.player1.worms[0]);
+                REQUIRE(state.Worm_at({2,3}) == nullptr);
+                REQUIRE(state.Worm_at({3,4}) == nullptr);
             }
         }
 

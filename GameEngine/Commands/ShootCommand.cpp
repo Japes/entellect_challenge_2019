@@ -83,16 +83,15 @@ Worm* ShootCommand::WormOnTarget(const Worm* worm, const std::shared_ptr<GameSta
             return nullptr;
         }
 
-        auto cell = state->Cell_at(pos);
-
-        if (cell.type != CellType::AIR) {
+        if (state->CellType_at(pos) != CellType::AIR) {
             //std::cerr << "HIT DIRT (or deep space)!" << std::endl;
             return nullptr;
         }
 
-        if (cell.worm != nullptr) {
+        Worm* w = state->Worm_at(pos);
+        if (w != nullptr) {
             //std::cerr << "HIT A WORM!" << std::endl;
-            return  cell.worm;
+            return w;
         }
 
         pos += shootvector;
