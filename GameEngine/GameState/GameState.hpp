@@ -7,6 +7,8 @@
 #include "./rapidjson/document.h"
 #include <functional>
 
+#define first_bit_set (0x8000000000000000)
+
 //current state of the game
 class GameState
 {
@@ -20,9 +22,52 @@ class GameState
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
-    CellType CellType_at(Position pos);
-    PowerUp* PowerUp_at(Position pos);
-    Worm* Worm_at(Position pos);
+    inline CellType CellType_at(Position pos)
+    {
+        if(mapDeepSpaces[pos.y] & (first_bit_set >> pos.x) ) {
+            return CellType::DEEP_SPACE;
+        } else if (mapDirts[pos.y] & (first_bit_set >> pos.x)) {
+            return CellType::DIRT;
+        }
+            
+        return CellType::AIR;
+    }
+
+    inline PowerUp* PowerUp_at(Position pos)
+    {
+        if(healthPackPos[0] == pos || healthPackPos[1] == pos) {
+            return &healthPack;
+        }
+
+        return nullptr;
+    }
+
+    inline Worm* Worm_at(Position pos)
+    {
+        Worm* ret = nullptr;
+
+        for(auto & w : player1.worms) {
+            if(w.position == pos && !w.IsDead()) {
+                ret = &w;
+            }
+        }
+        for(auto & w : player2.worms) {
+            if(w.position == pos && !w.IsDead()) {
+                ret = &w;
+            }
+        }
+
+    /*
+        ForAllWorms([&] (Worm& w) {
+            if(w.position == pos && !w.IsDead()) {
+                ret = &w;
+            }
+        });
+        */
+
+        return ret;
+    }
+
     Cell Cell_at(Position pos);
     void SetCellTypeAt(Position pos, CellType type);
     void PlacePowerupAt(Position pos, int powerupIndex);

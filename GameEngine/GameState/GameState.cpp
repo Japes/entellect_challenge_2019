@@ -2,7 +2,6 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 
-#define first_bit_set (0x8000000000000000)
 
 GameState::GameState() :
     player1(this),
@@ -184,52 +183,6 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             }
         }
     }
-}
-
-CellType GameState::CellType_at(Position pos)
-{
-    if(mapDeepSpaces[pos.y] & (first_bit_set >> pos.x) ) {
-        return CellType::DEEP_SPACE;
-    } else if (mapDirts[pos.y] & (first_bit_set >> pos.x)) {
-        return CellType::DIRT;
-    }
-        
-    return CellType::AIR;
-}
-
-PowerUp* GameState::PowerUp_at(Position pos)
-{
-    if(healthPackPos[0] == pos || healthPackPos[1] == pos) {
-        return &healthPack;
-    }
-
-    return nullptr;
-}
-
-Worm* GameState::Worm_at(Position pos)
-{
-    Worm* ret = nullptr;
-
-    for(auto & w : player1.worms) {
-        if(w.position == pos && !w.IsDead()) {
-            ret = &w;
-        }
-    }
-    for(auto & w : player2.worms) {
-        if(w.position == pos && !w.IsDead()) {
-            ret = &w;
-        }
-    }
-
-/*
-    ForAllWorms([&] (Worm& w) {
-        if(w.position == pos && !w.IsDead()) {
-            ret = &w;
-        }
-    });
-    */
-
-    return ret;
 }
 
 Cell GameState::Cell_at(Position pos)
