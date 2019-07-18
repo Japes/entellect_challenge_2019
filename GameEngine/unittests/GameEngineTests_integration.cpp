@@ -53,30 +53,32 @@ std::mutex mtx;
 void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
 {
     while(Get_ns_since_epoch() < stopTime) {
-        mtx.lock();
-        //choose next node
-        auto next_node = mc->NextNode();
-        mtx.unlock();
+        for(unsigned i = 0; i < 100; ++i) {
+            mtx.lock();
+            //choose next node
+            auto next_node = mc->NextNode();
+            mtx.unlock();
 
-        //load the state
-        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-        GameEngine eng(state);
+            //load the state
+            auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
+            GameEngine eng(state);
 
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-        //auto nextMoveFn = [] (bool player1, std::shared_ptr<GameState> gs) -> std::shared_ptr<Command> {return std::make_shared<DoNothingCommand>();};
-        int numplies{0};
-        int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+            //auto nextMoveFn = [] (bool player1, std::shared_ptr<GameState> gs) -> std::shared_ptr<Command> {return std::make_shared<DoNothingCommand>();};
+            int numplies{0};
+            int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
-        mtx.lock();
-        turnCount += numplies;
-        ++gameCount;
+            mtx.lock();
+            turnCount += numplies;
+            ++gameCount;
 
-        next_node->score += thisScore;
-        next_node->w += thisScore > 0? 1 : 0;
-        ++next_node->n;
+            next_node->score += thisScore;
+            next_node->w += thisScore > 0? 1 : 0;
+            ++next_node->n;
 
-        mc->UpdateNumSamples();
-        mtx.unlock();
+            mc->UpdateNumSamples();
+            mtx.unlock();
+        }
     }
 }
 
@@ -150,14 +152,19 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
 
         auto ret = std::make_shared<ShootCommand>(dir);
         return ret;
-
+    } else if (moveType == "banana") {
+        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
+        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
+        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
+        return std::make_shared<BananaCommand>(Position(x,y));
     } else if (moveType == "nothing") {
         return std::make_shared<DoNothingCommand>();
     } else if (moveType == "No") { //"No Command" - invalid
         return std::make_shared<TeleportCommand>(Position(-10,-10)); //always invalid
     } else {
-        std::cerr << moveType << std::endl;
-        throw std::runtime_error("dont understand this move type");
+        std::stringstream msg;
+        msg << "dont understand this move type: " << moveType;
+        throw std::runtime_error(msg.str());
     }
 }
 
@@ -216,6 +223,8 @@ std::shared_ptr<Command> GetCommandFromFile(std::string path)
     }
     std::string cmdString = fileContents.substr(firstColon + 2, endOfLine - (firstColon + 2));
 
+    UNSCOPED_INFO("cmdString: " << cmdString );
+
     return GetCommandFromString(cmdString);
 }
 
@@ -230,6 +239,31 @@ std::string GetRoundFolder(unsigned round)
     }
 
     return "Round " + padding + std::to_string(round) + "/";
+}
+
+std::vector<std::string> GetFoldersInFolder(std::string folder)
+{
+    std::vector<std::string> ret;
+
+    const char* PATH = folder.c_str();
+    DIR *dir = opendir(PATH);
+
+    struct dirent *entry = readdir(dir);
+    while (entry != NULL) {
+        if (entry->d_type == DT_DIR) {
+            //printf("%s\n", entry->d_name);
+            std::string s = entry->d_name;
+            if(s != "." && s != "..") {
+                ret.push_back(folder + std::string("/") + s);
+            }
+        }
+
+        entry = readdir(dir);
+    }
+
+    closedir(dir);
+
+    return ret;
 }
 
 void GetBotFolders(std::string roundFolder, std::string& botA, std::string& botB)
@@ -273,19 +307,21 @@ unsigned GetNumRounds(std::string roundFolder)
 
 TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
 
-    std::vector<std::string> matches;
+    std::vector<std::string> matches = GetFoldersInFolder("../../starter-pack/match-logs");
     matches.push_back("Test_files/matches/2019.06.15.13.50.08/"); //this one is not from the latest engine
     matches.push_back("Test_files/matches/2019.06.22.15.52.10/");
     matches.push_back("Test_files/matches/2019.06.22.15.46.18/");
-    //matches.push_back("../../starter-pack/match-logs/2019.06.22.15.46.18/");
 
-    for(auto const& match: matches) {
+    for(auto & match: matches) {
+        match = match + std::string("/");
 
         INFO(match);
 
         std::string botAFolder, botBFolder;
         GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
+        INFO("botAFolder: " << botAFolder << " botBFolder: " << botBFolder);
         unsigned numRounds = GetNumRounds(match);
+        INFO("numRounds: " << numRounds );
 
         unsigned round = 1;
         auto roundJSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");

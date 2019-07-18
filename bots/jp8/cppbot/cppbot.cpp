@@ -167,28 +167,29 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
 
     while(Get_ns_since_epoch() < stopTime) {
 
-        mtx.lock();
-        //choose next node
-        auto next_node = mc->NextNode();
-        mtx.unlock();
+        for(unsigned i = 0; i < 100; ++i) {
+            mtx.lock();
+            //choose next node
+            auto next_node = mc->NextNode();
+            mtx.unlock();
 
-        //load the state
-        auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-        GameEngine eng(state);
+            //load the state
+            auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
+            GameEngine eng(state);
 
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-        int numplies{0};
-        auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+            int numplies{0};
+            auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
 
-        mtx.lock();
+            mtx.lock();
 
-        next_node->score += thisScore;
-        next_node->w += thisScore;
-        ++next_node->n;
+            next_node->score += thisScore;
+            next_node->w += thisScore;
+            ++next_node->n;
 
-        mc->UpdateNumSamples();
-        mtx.unlock();
-
+            mc->UpdateNumSamples();
+            mtx.unlock();
+        }
     }
 }
 
