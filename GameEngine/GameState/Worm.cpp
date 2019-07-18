@@ -38,6 +38,8 @@ bool Worm::operator==(const Worm &other) const
     //" position: " << (position == other.position) <<
     //" previous_position: " << (previous_position == other.previous_position) <<
     //" weapon: " << (weapon == other.weapon) <<
+    //" banana_bomb: " << (banana_bomb == other.banana_bomb) <<
+    //" banana_bomb_count: " << (banana_bomb_count == other.banana_bomb_count) <<
     //" diggingRange: " << (diggingRange == other.diggingRange) <<
     //" movementRange: " << (movementRange == other.movementRange) <<
     //std::endl;
@@ -49,7 +51,7 @@ bool Worm::operator==(const Worm &other) const
             //previous_position == other.previous_position && //not loaded from state (this operator only used for unit testing)
             weapon == other.weapon &&
             banana_bomb == other.banana_bomb &&
-            banana_bomb_count == other.banana_bomb_count &&
+            //banana_bomb_count == other.banana_bomb_count && //not loaded from state (this operator only used for unit testing)
             diggingRange == other.diggingRange &&
             movementRange == other.movementRange);
 }

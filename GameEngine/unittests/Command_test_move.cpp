@@ -172,10 +172,14 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             Check_valid_move(eng, state, worm_under_test_pos, air_pos3);
         }
 
+        auto healthBefore1 = state->player1.GetWormById(1)->health;
+        auto healthBefore2 = state->player2.GetWormById(1)->health;
+
+        auto pointsBefore1 = state->player1.command_score;
+        auto pointsBefore2 = state->player2.command_score;
+
         THEN("Worm collision works - pushback")
         {
-            auto healthBefore1 = state->player1.GetWormById(1)->health;
-            auto healthBefore2 = state->player2.GetWormById(1)->health;
 
             bool forcePushback = true;
             player1move = TeleportCommand(air_pos3, &forcePushback);
@@ -190,13 +194,12 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 
             CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
             CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
+            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
         }
 
         THEN("Worm collision works - swap")
         {
-            auto healthBefore1 = state->player1.GetWormById(1)->health;
-            auto healthBefore2 = state->player2.GetWormById(1)->health;
-
             bool forcePushback = false; //force swap
             player1move = TeleportCommand(air_pos3, &forcePushback);
             player2move = TeleportCommand(air_pos3, &forcePushback);
@@ -209,7 +212,9 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             CHECK(happy);
 
             CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
-            CHECK(state->player2.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
+            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
         }
 
 

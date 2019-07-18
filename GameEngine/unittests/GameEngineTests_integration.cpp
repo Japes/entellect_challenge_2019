@@ -312,6 +312,9 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     matches.push_back("Test_files/matches/2019.06.22.15.52.10/");
     matches.push_back("Test_files/matches/2019.06.22.15.46.18/");
 
+    //std::vector<std::string> matches;
+    //matches.push_back("../../starter-pack/match-logs/2019.07.15.04.04.01/");
+
     for(auto & match: matches) {
         match = match + std::string("/");
 
@@ -336,8 +339,8 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
             std::shared_ptr<Command> p1Command = GetCommandFromFile(match + GetRoundFolder(round) + botAFolder + "PlayerCommand.txt");
             std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
 
-            //std::cerr << "(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << " p2Command: " << p2Command->GetCommandString() << 
-            //    " p1 score: " << original_state->player1.command_score  << " p2 score: " << original_state->player2.command_score << std::endl;
+            INFO("(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << " p2Command: " << p2Command->GetCommandString() << 
+                " p1 score: " << original_state->player1.command_score  << " p2 score: " << original_state->player2.command_score);
             eng.AdvanceState(*p1Command, *p2Command);
 
             if(round != numRounds) {

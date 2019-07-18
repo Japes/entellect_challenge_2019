@@ -127,7 +127,7 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
 
         WHEN("We place a powerup on a cell")
         {
-            state.PlacePowerupAt({1,2}, 0);
+            state.PlacePowerupAt({1,2});
 
             THEN("That cell has a powerup...")
             {

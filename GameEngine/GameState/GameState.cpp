@@ -10,9 +10,6 @@ GameState::GameState() :
 {
     player1.id = 1;
     player2.id = 2;
-    healthPackPos[0] = Position(-2,-2); //different to default worm space, else confusion
-    healthPackPos[1] = Position(-2,-2);
-
 }
 
 //deep copy of state
@@ -23,8 +20,7 @@ GameState::GameState(const GameState& other) :
     std::memcpy(mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces));
     std::memcpy(mapDirts, other.mapDirts, sizeof(mapDirts));
 
-    healthPackPos[0] = other.healthPackPos[0];
-    healthPackPos[1] = other.healthPackPos[1];
+    healthPackPos = other.healthPackPos;
 
     roundNumber = other.roundNumber;
     healthPack = other.healthPack;
@@ -159,7 +155,6 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
         return;
     }
 
-    int powerupIndex = 0;
     for (rapidjson::Value::ConstValueIterator rowItr = roundJSON["map"].Begin(); rowItr != roundJSON["map"].End(); ++rowItr) {
         for (rapidjson::Value::ConstValueIterator colItr = (*rowItr).Begin(); colItr != (*rowItr).End(); ++colItr) {
             int x = (*colItr)["x"].GetInt();
@@ -178,8 +173,7 @@ void GameState::PopulateMap(rapidjson::Document& roundJSON)
             }
             if((*colItr).HasMember("powerup")) {
                 //TODO this is where we'd distinguish between different types
-                PlacePowerupAt(pos, powerupIndex);
-                ++powerupIndex;
+                PlacePowerupAt(pos);
             }
         }
     }
@@ -202,8 +196,11 @@ Cell GameState::Cell_at(Position pos)
         }
     });
 
-    if(healthPackPos[0] == pos || healthPackPos[1] == pos) {
-        ret.powerup = &healthPack;
+    for(auto const& hpPos : healthPackPos) {
+        if(hpPos == pos) {
+            ret.powerup = &healthPack;
+            break;
+        } 
     }
 
     return ret;
@@ -229,17 +226,21 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
     }
 }
 
-void GameState::PlacePowerupAt(Position pos, int powerupIndex)
+void GameState::PlacePowerupAt(Position pos)
 {
-    healthPackPos[powerupIndex] = pos;
+    healthPackPos.push_back(pos);
 }
 
 void GameState::ClearPowerupAt(Position pos)
 {
-    if(healthPackPos[0] == pos) {
-        healthPackPos[0] = Position(-1,-1);
-    } else if(healthPackPos[1] == pos) {
-        healthPackPos[1] = Position(-1,-1);
+    auto it = healthPackPos.begin();
+
+    while(it != healthPackPos.end()) {
+        if(*it == pos) {
+            healthPackPos.erase(it);
+            return;
+        }
+        ++it;
     }
 }
 
@@ -272,13 +273,19 @@ void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
 
 bool GameState::operator==(const GameState &other) const
 {
-    bool cellsGood = (memcmp ( mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces) ) == 0);
-    cellsGood &= (memcmp ( mapDirts, other.mapDirts, sizeof(mapDirts) ) == 0);
+    bool deepSpacesGood = (memcmp ( mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces) ) == 0);
+    bool dirtsGood = (memcmp ( mapDirts, other.mapDirts, sizeof(mapDirts) ) == 0);
 
-    return cellsGood && 
+    //std::cerr << "(" << __FUNCTION__ << ") deepSpacesGood: " << deepSpacesGood <<
+    //" dirtsGood: " << dirtsGood << 
+    //" healthPackPos == other.healthPackPos: " << (healthPackPos == other.healthPackPos) <<
+    //" roundNumber == other.roundNumber: " << (roundNumber == other.roundNumber) <<
+    //std::endl;
+
+    return deepSpacesGood && 
+            dirtsGood && 
             player1 == other.player1 && 
             player2 == other.player2 &&
-            healthPackPos[0] == other.healthPackPos[0] &&
-            healthPackPos[1] == other.healthPackPos[1] &&
+            healthPackPos == other.healthPackPos &&
             roundNumber == other.roundNumber;
 }

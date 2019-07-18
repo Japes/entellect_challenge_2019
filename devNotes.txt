@@ -1,7 +1,6 @@
 TODO
 
-   optimise
-      bottleneck is now Cell_at
+   simple optimizations: don't use shared ptr
 
    throw bananas more intelligently
       only consider if the points are great
@@ -208,24 +207,22 @@ Engine version: 2019.2.2 tried optimising but actually made things slightly wors
 (wins/draws/losses):     jp7                      jp6                      
 jp7:                     0/0/0                    26/0/20                  (26/0/20)
 
+Engine version: 2019.2.2 more optimization, ~1.6M plies/s-------------------------------------------------------------------------------------------------
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    27/0/16                  (27/0/16)
+
+Engine version: 2019.2.2 more optimization ~1.78M p/s-----------------------------------------------------------------------------------------------------
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    36/0/25                  (36/0/25)
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp8                      jp7                      jp6                      
+jp8:                     0/0/0                    7/1/15                   14/0/9                   (21/1/24)
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp8                      jp7                      jp6                      
+jp8:                     0/0/0                    11/0/7                   9/0/9                    (20/0/16)
+jp7:                     7/0/11                   0/0/0                    13/0/5                   (20/0/16)
+jp6:                     9/0/9                    5/0/13                   0/0/0                    (14/0/22)
+
 ////////////////
-
-making gamestate
-making gamestate
-making gamestate
-making gamestate
-
-nextTurn:199
-nextTurn:185
-rand
-
-celltype_at (getvalidteleportdigs)
-
-worm_at
-worm_at
-worm_at
-worm_at
-
-getResult
-
-getvalidteleportdigs
