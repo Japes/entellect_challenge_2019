@@ -3,10 +3,10 @@ TODO
    upload bot!
 
    run compare over LOTS of matches
+      fix engine bugs
 
    WHY IS JP8 WORSE THAN JP7?
-      is it a bias against player 1?
-      fix engine bugs and try again
+      WTF I WAS OPTIMISING THE WRONG GUY - RUN TESTS AGAIN
 
    throw bananas more intelligently
       only consider if the points are great

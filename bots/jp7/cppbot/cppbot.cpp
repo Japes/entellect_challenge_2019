@@ -163,7 +163,8 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
             closestDist = dist;
         }
     }
-    int distToConsider = std::max(closestDist, 7);
+    //int distToConsider = std::max(closestDist, 7);
+    int distToConsider = -1;
 
     while(Get_ns_since_epoch() < stopTime) {
 
@@ -178,7 +179,7 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
 
         auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
         int numplies{0};
-        auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
+        auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, distToConsider, playthroughDepth, numplies);
 
         mtx.lock();
 

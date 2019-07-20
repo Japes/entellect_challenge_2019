@@ -106,6 +106,19 @@ class GameState
 
         return ret;
     }
+
+    inline int DirtsBananaWillHit(const Position& pos) {
+        return 0;
+        /*
+        int ret = 0;
+        if(!pos.IsOnMap() || CellType_at(pos) == CellType::DEEP_SPACE ) {
+            return ret;
+        }
+        auto dirtsHit = mapDirts[pos.y] & pos.x;
+        //ret += 
+        uint64_t mapDirts[MAP_SIZE] = {0};
+        */
+    }
 };
 
 #endif
