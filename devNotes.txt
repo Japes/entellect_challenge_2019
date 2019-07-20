@@ -1,17 +1,27 @@
 TODO
 
-   simple optimizations: don't use shared ptr
+   UPGRADE SCRIPT
+      make tourneys 50/50 p1/p2
+
+   why do my bots not use the whole cpu?
+
+   WHY IS JP8 WORSE THAN JP7?
+      is it a bias against player 1?
+      fix engine bugs and try again
+
+
 
    throw bananas more intelligently
       only consider if the points are great
 
    add select!
 
+   simple optimizations: don't use shared ptr
+
    fix agent runaway
    heavier playthroughs (biases)
+      bias towards shooting (for opponent)
 
-   make tourneys 50/50 p1/p2
-   scrape match logs for stats
 
    2 weird cases:
       end of game showdown, i have more health - why not shoot him??
@@ -66,9 +76,11 @@ sort out deployment---------------
 
 MISC NOTES--------------------
 to scan match logs for No Commands:
+   find . -wholename "*JP3/PlayerCommand*" -exec grep -A 1 "No Command" {} +
+   find . -wholename "*JP3/PlayerCommand*" -exec grep -A 1 "nothing" {} +
 
-find . -wholename "*JP3/PlayerCommand*" -exec grep -A 1 "No Command" {} +
-find . -wholename "*JP3/PlayerCommand*" -exec grep -A 1 "nothing" {} +
+to count number of moves of a certain type (note this isn't a true count, but its ok for relative comparisons)
+   find . -wholename "*UltraSnob/PlayerCommand*" -exec grep -A 1 "Command: move" {} + | wc -l
 
 BRAINSTORMING---------------------------------------------------------------------------------------
 
@@ -120,6 +132,7 @@ jp4 - jp3 with optimizations to GetRandomMoveForWorm and added multithreading.  
 jp5 - jp4 with simple bananas - consider chucking at any enemies in range
 jp6 - added radius of worms to consider (but it doesn't help, so set infinite.)  Added weighted playthroughs
 jp7 - optimised version of jp6
+jp8 - optimised version of jp7
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -225,4 +238,6 @@ jp8:                     0/0/0                    11/0/7                   9/0/9
 jp7:                     7/0/11                   0/0/0                    13/0/5                   (20/0/16)
 jp6:                     9/0/9                    5/0/13                   0/0/0                    (14/0/22)
 
+//fixed some minor engine bugs, added dodgy banana hack-------------------------------------------------------------------------------------------------------
+(it was worse, still always beat ref bot tho )
 ////////////////
