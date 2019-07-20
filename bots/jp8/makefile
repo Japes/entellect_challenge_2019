@@ -51,6 +51,6 @@ $(OBJ_DIR):
 -include $(HEADER_DEPS)
 	
 clean:
-	rm -f ./bin/*
+	rm -rf ./bin/*
 	rm -f $(OBJ_FILES)
 	rm -f $(HEADER_DEPS)
