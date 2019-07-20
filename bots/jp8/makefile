@@ -1,11 +1,12 @@
 SRC_DIR := cppbot
 OBJ_DIR := bin
-ENGINE_SRC_DIR := ../../GameEngine
+MY_LIBS_SRC_DIR := ../../src
+ENGINE_SRC_DIR := $(MY_LIBS_SRC_DIR)/GameEngine
 #need to add a line here for every subfoler in GameEngine
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
-RNG_SRC_DIR := ../../pcg-cpp-0.98/include
-UTILS_SRC_DIR := ../../Utilities
+RNG_SRC_DIR := $(MY_LIBS_SRC_DIR)/pcg-cpp-0.98/include
+UTILS_SRC_DIR := $(MY_LIBS_SRC_DIR)/Utilities
 
 EXENAME=cppbot.exe
 
@@ -18,7 +19,7 @@ INCLUDE+=-I$(UTILS_SRC_DIR)
 
 CXX=g++
 #these are the flags that I always want
-CXXFLAGS+=-Wall -std=c++14 -fPIC -O2 -pthread
+CXXFLAGS+=-Wall -std=c++14 -fPIC -O3 -pthread -flto
 
 #grab all source files of interest
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)

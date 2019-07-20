@@ -1,11 +1,12 @@
 SRC_DIR := cppbot
 OBJ_DIR := bin
-ENGINE_SRC_DIR := ../../GameEngine
+MY_LIBS_SRC_DIR := ../../src
+ENGINE_SRC_DIR := $(MY_LIBS_SRC_DIR)/GameEngine
 #need to add a line here for every subfoler in GameEngine
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
-RNG_SRC_DIR := ../../pcg-cpp-0.98/include
-UTILS_SRC_DIR := ../../Utilities
+RNG_SRC_DIR := $(MY_LIBS_SRC_DIR)/pcg-cpp-0.98/include
+UTILS_SRC_DIR := $(MY_LIBS_SRC_DIR)/Utilities
 
 EXENAME=cppbot.exe
 
