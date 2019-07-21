@@ -184,8 +184,6 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
         }
     }
 
-    ret |= GetBananaMiningTargets(worm, state, 8);
-
     return ret;
 }
 
