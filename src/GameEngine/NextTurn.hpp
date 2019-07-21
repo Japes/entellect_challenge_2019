@@ -17,11 +17,12 @@ class NextTurn
     
     static void Initialise();
 
-    static std::bitset<8> GetValidTeleportDigs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
+    static std::bitset<8> GetValidTeleportDigs(Worm* worm, std::shared_ptr<GameState> state, bool trimStupidMoves);
     static std::shared_ptr<Command> GetTeleportDig(bool player1, std::shared_ptr<GameState> state, unsigned index);
     static std::bitset<8> GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
+    static std::bitset<121> GetBananaMiningTargets(Worm* worm, std::shared_ptr<GameState> state, int thresh);
     static std::bitset<121> GetValidBananas(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetBanana(bool player1, std::shared_ptr<GameState> state, unsigned index);
+    static std::shared_ptr<Command> GetBanana(Worm* worm, std::shared_ptr<GameState> state, unsigned index);
 
     static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);    
     static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);

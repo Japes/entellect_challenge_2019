@@ -6,6 +6,7 @@
 #include "Cell.hpp"
 #include "./rapidjson/document.h"
 #include <functional>
+#include <bitset>
 
 #define first_bit_set (0x8000000000000000)
 
@@ -36,10 +37,12 @@ class GameState
     bool operator==(const GameState &other) const;
 
     private:
-    
-    //TODO can use 32bits here if I treat some of the deep space blocks as blocks in the rows that have more than 32 spaces
-    uint64_t mapDeepSpaces[MAP_SIZE] = {0}; //TODO no need to store this actually, it is always the same
-    uint64_t mapDirts[MAP_SIZE] = {0};
+
+    //for bitsets [0] is the LSB.  So it is stored x/y flipped with respect to map coords, to make calcs easier.    
+    std::bitset<MAP_SIZE*MAP_SIZE> mapDeepSpaces; //TODO no need to store this actually, it is always the same
+    std::bitset<MAP_SIZE*MAP_SIZE> mapDirts;
+    static std::bitset<MAP_SIZE*MAP_SIZE> bananaBombOverlay;
+    static int bananaBombOverlayCentre;
     std::vector<Position> healthPackPos;
 
     void UpdateRefs();
@@ -61,9 +64,10 @@ class GameState
 
     inline CellType CellType_at(Position pos)
     {
-        if(mapDeepSpaces[pos.y] & (first_bit_set >> pos.x) ) {
+        auto posBit = (MAP_SIZE*pos.y + pos.x);
+        if(mapDeepSpaces[posBit]) {
             return CellType::DEEP_SPACE;
-        } else if (mapDirts[pos.y] & (first_bit_set >> pos.x)) {
+        } else if(mapDirts[posBit]) {
             return CellType::DIRT;
         }
             
@@ -85,6 +89,7 @@ class GameState
     {
         Worm* ret = nullptr;
 
+        //not using ForAllWorms here for performance reasons
         for(auto & w : player1.worms) {
             if(w.position == pos && !w.IsDead()) {
                 ret = &w;
@@ -96,28 +101,23 @@ class GameState
             }
         }
 
-    /*
-        ForAllWorms([&] (Worm& w) {
-            if(w.position == pos && !w.IsDead()) {
-                ret = &w;
-            }
-        });
-        */
-
         return ret;
     }
 
     inline int DirtsBananaWillHit(const Position& pos) {
-        return 0;
-        /*
+        
         int ret = 0;
+        
         if(!pos.IsOnMap() || CellType_at(pos) == CellType::DEEP_SPACE ) {
             return ret;
         }
-        auto dirtsHit = mapDirts[pos.y] & pos.x;
-        //ret += 
-        uint64_t mapDirts[MAP_SIZE] = {0};
-        */
+
+        auto posBit = (MAP_SIZE*pos.y + pos.x);
+
+        if(posBit > bananaBombOverlayCentre) {
+            return (mapDirts & (bananaBombOverlay << (posBit - bananaBombOverlayCentre)) ).count();
+        }
+        return (mapDirts & (bananaBombOverlay >> (bananaBombOverlayCentre - posBit)) ).count();
     }
 };
 

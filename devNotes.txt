@@ -1,12 +1,5 @@
 TODO
 
-   the Cell class is no longer used...
-
-   WHY IS JP8 WORSE THAN JP7?
-      WTF I WAS OPTIMISING THE WRONG GUY - RUN TESTS AGAIN
-
-   upload bot!
-
    throw bananas more intelligently
       only consider if the points are great
       remember to evaluate with reference bot

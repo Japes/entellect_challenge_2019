@@ -3,6 +3,9 @@
 #include "rapidjson/stringbuffer.h"
 #include <cmath>
 
+std::bitset<MAP_SIZE*MAP_SIZE> GameState::bananaBombOverlay;
+int GameState::bananaBombOverlayCentre;
+
 GameState::GameState() :
     player1(this),
     player2(this),
@@ -10,21 +13,45 @@ GameState::GameState() :
 {
     player1.id = 1;
     player2.id = 2;
+
+    if(bananaBombOverlay.none()) {
+        //initialise to the shadow of a bomb in the topish leftish corner
+        bananaBombOverlay.set(2);
+
+        bananaBombOverlay.set(MAP_SIZE + 1);
+        bananaBombOverlay.set(MAP_SIZE + 2);
+        bananaBombOverlay.set(MAP_SIZE + 3);
+
+        bananaBombOverlay.set(MAP_SIZE*2);
+        bananaBombOverlay.set(MAP_SIZE*2 + 1);
+        bananaBombOverlay.set(MAP_SIZE*2 + 2);
+        bananaBombOverlay.set(MAP_SIZE*2 + 3);
+        bananaBombOverlay.set(MAP_SIZE*2 + 4);
+
+        bananaBombOverlay.set(MAP_SIZE*3 + 1);
+        bananaBombOverlay.set(MAP_SIZE*3 + 2);
+        bananaBombOverlay.set(MAP_SIZE*3 + 3);
+
+        bananaBombOverlay.set(MAP_SIZE*4 + 2);
+
+        bananaBombOverlayCentre = MAP_SIZE*2 + 2;
+
+        //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay: " << bananaBombOverlay << std::endl;
+        //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay << 1: " << (bananaBombOverlay << 1) << std::endl;
+        //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay << -1: " << (bananaBombOverlay << -1) << std::endl;
+    }
 }
 
 //deep copy of state
 GameState::GameState(const GameState& other) :
     player1{other.player1},
-    player2{other.player2}
+    player2{other.player2},
+    roundNumber{other.roundNumber},
+    healthPack{other.healthPack},
+    mapDeepSpaces{other.mapDeepSpaces},
+    mapDirts{other.mapDirts},
+    healthPackPos{other.healthPackPos}
 {
-    std::memcpy(mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces));
-    std::memcpy(mapDirts, other.mapDirts, sizeof(mapDirts));
-
-    healthPackPos = other.healthPackPos;
-
-    roundNumber = other.roundNumber;
-    healthPack = other.healthPack;
-
     UpdateRefs();
 }
 
@@ -207,20 +234,20 @@ Cell GameState::Cell_at(Position pos)
 
 void GameState::SetCellTypeAt(Position pos, CellType type)
 {
-    auto posField = (first_bit_set >> pos.x);
+    auto posBit = (MAP_SIZE*pos.y + pos.x);
 
     switch(type) {
         case CellType::AIR:
-            mapDeepSpaces[pos.y] &= ~posField;
-            mapDirts[pos.y] &= ~posField;
+            mapDeepSpaces.reset(posBit);
+            mapDirts.reset(posBit);
         break;
         case CellType::DEEP_SPACE:
-            mapDeepSpaces[pos.y] |= posField;
-            mapDirts[pos.y] &= ~posField;
+            mapDeepSpaces.set(posBit);
+            mapDirts.reset(posBit);
         break;
         case CellType::DIRT:
-            mapDeepSpaces[pos.y] &= ~posField;
-            mapDirts[pos.y] |= posField;
+            mapDeepSpaces.reset(posBit);
+            mapDirts.set(posBit);
         break;
     }
 }
@@ -272,17 +299,14 @@ void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
 
 bool GameState::operator==(const GameState &other) const
 {
-    bool deepSpacesGood = (memcmp ( mapDeepSpaces, other.mapDeepSpaces, sizeof(mapDeepSpaces) ) == 0);
-    bool dirtsGood = (memcmp ( mapDirts, other.mapDirts, sizeof(mapDirts) ) == 0);
-
     //std::cerr << "(" << __FUNCTION__ << ") deepSpacesGood: " << deepSpacesGood <<
     //" dirtsGood: " << dirtsGood << 
     //" healthPackPos == other.healthPackPos: " << (healthPackPos == other.healthPackPos) <<
     //" roundNumber == other.roundNumber: " << (roundNumber == other.roundNumber) <<
     //std::endl;
 
-    return deepSpacesGood && 
-            dirtsGood && 
+    return mapDeepSpaces == other.mapDeepSpaces && 
+            mapDirts == other.mapDirts && 
             player1 == other.player1 && 
             player2 == other.player2 &&
             healthPackPos == other.healthPackPos &&

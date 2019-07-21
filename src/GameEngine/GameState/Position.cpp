@@ -45,7 +45,7 @@ bool Position::BananaCanReach(const Position &other) const
     0   .   .   .   .   .   .   .   .   .   .
     1   .   5   6   7   8   .   .   .   .   .
     2   .   4   5   6   7   8   .   .   .   .
-    3   .   3   4   5   6   x   8   .   .   .
+    3   .   3   4   5   6   7   8   .   .   .
     4   .   2   3   4   5   6   7   .   .   .
     5   .   1   2   3   4   5   6   .   .   .
     6   .   W   1   2   3   4   5   .   .   .

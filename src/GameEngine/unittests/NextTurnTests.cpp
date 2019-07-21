@@ -83,41 +83,36 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
 
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        place_worm(true, 1, {5,5}, state);
-        place_worm(true, 2, {6,5}, state);
+        Worm* worm11 = place_worm(true, 1, {5,5}, state);
+        Worm* worm12 = place_worm(true, 2, {6,5}, state);
         place_worm(true, 3, {3,3}, state);
         place_worm(false, 1, {5,6}, state);
-        place_worm(false, 2, {4,1}, state);
+        Worm* worm22 = place_worm(false, 2, {4,1}, state);
         place_worm(false, 3, {5,3}, state);
         state->SetCellTypeAt({5, 4}, CellType::DIRT);
         state->SetCellTypeAt({4, 5}, CellType::DIRT);
         state->SetCellTypeAt({4, 6}, CellType::DIRT);
         state->SetCellTypeAt({7, 5}, CellType::DEEP_SPACE);
 
-        THEN("Valid moves for player 1 are as expected")
+        THEN("Valid moves for worm 11 are as expected")
         {
-            auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
+            auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
             INFO("moves: " << moves);
             REQUIRE(moves == 0b10101111);
         }
 
-        THEN("Valid moves for player 2 are as expected")
+        THEN("Valid moves for worm 22 are as expected")
         {
-            auto moves = NextTurn::GetValidTeleportDigs(false, state, false);
+            auto moves = NextTurn::GetValidTeleportDigs(worm22, state, false);
             INFO("moves: " << moves);
             REQUIRE(moves == 0b11111001);
         }
 
-        AND_THEN("Progressing the game forward 1 turn")
+        THEN("Valid moves for worm 12 are as expected")
         {
-            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-
-            THEN("Valid moves for player 1 are as expected")
-            {
-                auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
-                INFO("moves: " << moves);
-                REQUIRE(moves == 0b11000111);
-            }
+            auto moves = NextTurn::GetValidTeleportDigs(worm12, state, false);
+            INFO("moves: " << moves);
+            REQUIRE(moves == 0b11000111);
         }
 
         AND_THEN("Moving a dude, and cycling to his turn again")
@@ -128,7 +123,7 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
+                auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
                 INFO("moves: " << moves);
                 REQUIRE(moves == 0b11111010);
             }
@@ -148,14 +143,14 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         */
 
         auto state = std::make_shared<GameState>();
-        place_worm(true, 1, {1,1}, state);
+        Worm* worm11 = place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {2,1}, state);
         place_worm(false, 2, {2,2}, state);
         state->SetCellTypeAt({0, 0}, CellType::DIRT);
         state->SetCellTypeAt({2, 0}, CellType::DIRT);
         state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
-        auto moves = NextTurn::GetValidTeleportDigs(true, state, false);
+        auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
         REQUIRE(moves == 0b01100111);
 
         REQUIRE(NextTurn::GetTeleportDig(true, state, 0)->GetCommandString() == "dig 0 0");
@@ -233,7 +228,7 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         
-        place_worm(true, 3, {31,15}, state); //agent
+        Worm* worm13 = place_worm(true, 3, {31,15}, state); //agent
         place_worm(true, 1, {30,15}, state); //friendly right next to us
         place_worm(true, 2, {0,0}, state); //friendly far away
 
@@ -266,8 +261,8 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
                     REQUIRE(ret.test(16));
                     REQUIRE(ret.test(36));
                     REQUIRE(!ret.test(56)); //returned this when i confused x with y
-                    REQUIRE(NextTurn::GetBanana(true, state, 16)->GetCommandString() == "banana 31 11");
-                    REQUIRE(NextTurn::GetBanana(true, state, 36)->GetCommandString() == "banana 29 13");            
+                    REQUIRE(NextTurn::GetBanana(worm13, state, 16)->GetCommandString() == "banana 31 11");
+                    REQUIRE(NextTurn::GetBanana(worm13, state, 36)->GetCommandString() == "banana 29 13");            
                 }
             }
             AND_WHEN("He has no bananas")
@@ -279,6 +274,72 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
                     INFO("shoots: " << ret)
                     REQUIRE(ret.count() == 0);
                 }
+            }
+        }
+    }
+}
+
+TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
+{
+    GIVEN("A semi realistic game state")
+    {
+        /* stars show the extent of a worms reach
+        0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17
+        0   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        1   .   .   .   .   .   *   *   *   *   *   *   *   .   .   .   .   .
+        2   .   .   .   .   *   .   .   .   .   .   .   .   *   .   .   .   .
+        3   .   .   .   *   .   .   .   .   .   .   .   .   .   *   .   .   .
+        4   .   .   .   *   .   D   .   .   .   .   .   .   .   *   .   .   .
+        5   .   .   .   *   D   D   D   .   .   .   .   .   .   *   .   .   .
+        6   .   .   .   *D  D   D   D   D   W   .   .   .   .   *   .   .   .
+        7   .   .   .   *   D   D   D   .   .   .   .   .   .   *   .   .   .    
+        8   .   .   .   *   .   D   .   .   .   .   .   .   .   *   .   .   .    
+        9   .   .   .   *   .   .   .   .   .   .   .   .   .   *   .   .   .    
+        10  .   .   .   .   *   .   .   .   .   .   .   .   *   .   .   .   .    
+        11  .   .   .   .   .   *   *   *   *   *   *   *   .   .   .   .   .    
+        12  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        */
+
+        auto state = std::make_shared<GameState>();
+        auto thrower = place_worm(true, 3, {9,6}, state);
+
+        state->SetCellTypeAt({6, 4}, CellType::DIRT);
+
+        state->SetCellTypeAt({5, 5}, CellType::DIRT);
+        state->SetCellTypeAt({6, 5}, CellType::DIRT);
+        state->SetCellTypeAt({7, 5}, CellType::DIRT);
+
+        state->SetCellTypeAt({4, 6}, CellType::DIRT);
+        state->SetCellTypeAt({5, 6}, CellType::DIRT);
+        state->SetCellTypeAt({6, 6}, CellType::DIRT);
+        state->SetCellTypeAt({7, 6}, CellType::DIRT);
+        state->SetCellTypeAt({8, 6}, CellType::DIRT);
+
+        state->SetCellTypeAt({5, 7}, CellType::DIRT);
+        state->SetCellTypeAt({6, 7}, CellType::DIRT);
+        state->SetCellTypeAt({7, 7}, CellType::DIRT);
+
+        state->SetCellTypeAt({6, 8}, CellType::DIRT);
+
+        WHEN("He has bananas")
+        {
+            THEN("GetBananaMiningTargets returns correct")
+            {
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 13);
+                INFO("bananas: " << ret)
+                REQUIRE(ret.count() == 1);
+                REQUIRE(ret.test(57));
+                REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");            
+            }
+        }
+
+        WHEN("He has no bananas")
+        {
+            thrower->banana_bomb_count = 0;
+            THEN("GetBananaMiningTargets returns zero")
+            {
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 1);
+                REQUIRE(ret.count() == 0);
             }
         }
     }
