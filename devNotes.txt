@@ -142,6 +142,7 @@ jp5 - jp4 with simple bananas - consider chucking at any enemies in range
 jp6 - added radius of worms to consider (but it doesn't help, so set infinite.)  Added weighted playthroughs
 jp7 - optimised version of jp6
 jp8 - optimised version of jp7
+jp9 - added banana mining heuristic
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -261,3 +262,15 @@ jp8:                     0/0/0                    51/2/36                    (3/
 
 (is there a player1 bias?)
 
+//added heuristic for mining with banana----------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2 -- 2019_July_21__05_02_48 -- ParallelID: 
+(wins/draws/losses):     reference-bot            jp9                      
+reference-bot:           0/0/0                    0/0/10                   (0/0/10)
+
+Engine version: 2019.2.2 -- 2019_July_21__05_27_38 -- ParallelID: 
+(wins/draws/losses):     jp9                      jp8                      
+jp9:                     0/0/0                    2/0/0                    (2/0/0)
+
+Engine version: 2019.2.2 -- 2019_July_21__05_26_35 -- ParallelID: 1
+(wins/draws/losses):     jp8                      jp9                      
+jp8:                     0/0/0                    2/0/5                    (2/0/5)
