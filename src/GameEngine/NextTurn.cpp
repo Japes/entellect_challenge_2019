@@ -206,9 +206,8 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
     return ret;
 }
 
-std::shared_ptr<Command> NextTurn::GetTeleportDig(bool player1, std::shared_ptr<GameState> state, unsigned index)
+std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
 {
-    Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
     Position targetPos{worm->position + _surroundingWormSpaces[index]};
 
     if(state->Worm_at(targetPos) == nullptr) {
@@ -252,7 +251,7 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std
 
     if(mean < static_cast<int>(moves.count())) {
         unsigned index = IndexOfIthSetBit(moves, mean);
-        return GetTeleportDig(player1, state, index);
+        return GetTeleportDig(worm, state, index);
     } else if (mean < static_cast<int>(moves.count() + shoots.count())) {
         mean -= moves.count();
         unsigned index = IndexOfIthSetBit(shoots, mean);
@@ -273,7 +272,7 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
     auto moves = NextTurn::GetValidTeleportDigs (worm, state, trimStupidMoves);
     for(unsigned i = 0; i < 8; ++i ) {
         if(moves[i]) {
-            ret.push_back(NextTurn::GetTeleportDig(player1, state, i));
+            ret.push_back(NextTurn::GetTeleportDig(worm, state, i));
         }
     }
 
