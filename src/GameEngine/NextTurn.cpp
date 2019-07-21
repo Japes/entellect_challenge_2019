@@ -1,4 +1,5 @@
 #include "NextTurn.hpp"
+#include "GameEngine.hpp"
 #include <algorithm>
 
 std::shared_ptr<pcg32> NextTurn::_rng;
@@ -291,4 +292,42 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
     }
 
     return ret;
+}
+
+//checks if a select should happen (based on a heuristic...)
+//if so, progresses gamestate until it's that worm's turn, and returns a non-empty string with the "select" command that should be applied.
+std::string NextTurn::TryApplySelect(bool player1, std::shared_ptr<GameState> state)
+{
+    if(GetValidShoots(player1, state, true).any()) {
+        return "";
+    }
+
+    auto myState = std::make_shared<GameState>(*state); //no idea why it needs to be done this way
+
+    Player* player = myState->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
+    if(player->remainingWormSelections <= 0) {
+        return "";
+    }
+
+    GameEngine myEng(myState);
+    myEng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+    int numAdvancesApplied = 1;
+
+    while(player->GetCurrentWorm() != worm) {
+
+        if(GetValidShoots(player1, myState, true).any()) {
+            //cool we have a candidate.  project the given state forward so the caller can use it
+            GameEngine eng(state);
+            for(int i = 0; i < numAdvancesApplied; ++i) {
+                eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+            }
+            return (std::string("select ") + std::to_string(player->GetCurrentWorm()->id) + ";");
+        }
+
+        myEng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        ++numAdvancesApplied;
+    }
+
+    return "";
 }

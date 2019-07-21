@@ -97,10 +97,14 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
     NextTurn::Initialise();
 
     //do some heuristics
-    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, 9);
+    //banana mine
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, 10);
     if(bananaMove != nullptr) {
         std::cerr << "(" << __FUNCTION__ << ") this should never be printed it's just here to the compiler doesn't optimise it out" << std::endl;
     }
+    //select
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1);
+
     auto heuristic_time = Get_ns_since_epoch();
     INFO("heuristic_time: " << (heuristic_time - start_time)/1000000 << "ms")
 

@@ -6,7 +6,8 @@ Player::Player(GameState* _state) :
     command_score{0},
     health{0},
     currentWormId{1},
-    consecutiveDoNothingCount{0}
+    consecutiveDoNothingCount{0},
+    remainingWormSelections{GameConfig::wormSelectTokens}
 {
     //not sure why the usual vector constructors aren't working here...
     Worm worm1(state);
@@ -28,6 +29,7 @@ Player::Player(const Player& other)
     health = other.health;
     currentWormId = other.currentWormId;
     consecutiveDoNothingCount = other.consecutiveDoNothingCount;
+    remainingWormSelections = other.remainingWormSelections;
 
     for(auto& otherworm : other.worms) {
         worms.push_back(otherworm);
@@ -55,6 +57,7 @@ void Player::UpdateCurrentWorm()
     }
 
     ++currentWormId;
+
     if(currentWormId > static_cast<int>(worms.size())) {
         currentWormId = 1;
     }
@@ -108,5 +111,6 @@ bool Player::operator==(const Player &other) const
             health == other.health &&
             //this isn't in the state files, shouldn't make a difference (this operator is only for unit tests)
             //consecutiveDoNothingCount == other.consecutiveDoNothingCount && 
+            remainingWormSelections == other.remainingWormSelections &&
             currentWormId == other.currentWormId; //1-indexed
 }

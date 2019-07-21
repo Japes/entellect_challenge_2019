@@ -58,7 +58,8 @@ struct GameConfig
     static const int pushbackDamage =  20;
     static const int mapSize = MAP_SIZE;
     static const int healthPackHp =  10;
-    static const int totalHealthPacks =  2;
+    static const int totalHealthPacks = 2;
+    static const int wormSelectTokens = 5;
     static const Scores scores;
 };
 

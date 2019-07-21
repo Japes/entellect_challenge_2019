@@ -18,6 +18,7 @@ struct Player
     int health;
     int currentWormId; //1-indexed
     int consecutiveDoNothingCount;
+    int remainingWormSelections;
     std::vector<Worm> worms;
 
     Player(GameState* _state);

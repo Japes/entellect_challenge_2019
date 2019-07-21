@@ -205,25 +205,22 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     NextTurn::Initialise();
 
-    //do some heuristics
+    //do some heuristics---------------------------------------------------------------
+    //banana mine
     auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, 10);
     if(bananaMove != nullptr) {
         return bananaMove->GetCommandString();
     }
+    //select
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1);
 
+    //begin monte carlo----------------------------------------------------------------
     float c = std::sqrt(2);
     auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), c);
 
     //we'll adjust playthrough depth based on how many enemy worms are around us.
     unsigned playthroughDepth = 24;
-    //Player* myPlayer = ImPlayer1? &state1->player1 : &state1->player2;
-    //Player* enemyPlayer = ImPlayer1? &state1->player2 : &state1->player1;
-    //for(auto const& enemyWorm: enemyPlayer->worms) {
-    //    if(myPlayer->GetCurrentWorm()->position.MovementDistanceTo(enemyWorm.position) < 5) {
-    //        playthroughDepth = 7;
-    //    }
-    //}
-    //std::cerr << "playthroughDepth: " << playthroughDepth << std::endl;
+
 
     std::thread t1(runMC, start_time + 880000000, mc, state1, ImPlayer1, playthroughDepth);
     std::thread t2(runMC, start_time + 880000000, mc, state1, ImPlayer1, playthroughDepth);
@@ -235,7 +232,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     std::cerr << "JP10:" << std::endl;
     mc->PrintState();
 
-    return best_move->GetCommandString();
+    return selectPrefix + best_move->GetCommandString();
 }
 
 std::string executeRound(std::string& roundNumber)

@@ -393,6 +393,75 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
 }
 
 //just made this to confirm that random moves are actually random
+TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
+{
+    GIVEN("A semi realistic game state")
+    {
+
+        //    0   1   2   3   4   5   5   6   7   
+        //0   .   .   .   .   .   .   .   .   .   
+        //1   .   11  .   .   .   .   .   .   .   
+        //2   .   .   .   .   .   .   .   .   .      
+        //3   .   .   .   .   .   .   .   13  .   
+        //4   .   .   .   .   .   .   .   .   .   
+        //5   .   .   .   .   .   .   .   .   .   
+        //6   .   .   21  .   .   .   .   .   .   
+        //7   .   12  .   .   .   .   .   22  .   
+        //8   .   .   .   .   .   .   .   .   .   
+        //9   .   .   .   .   .   .   .   .   .   
+
+        auto state = std::make_shared<GameState>();
+        place_worm(true, 1, {1,1}, state);
+        place_worm(true, 2, {1,7}, state);
+        place_worm(true, 3, {6,3}, state);
+        place_worm(false, 1, {2,6}, state);
+        place_worm(false, 2, {6,7}, state);
+
+        REQUIRE(state->player1.remainingWormSelections > 0);
+        REQUIRE(state->player2.remainingWormSelections > 0);
+
+        WHEN("our heuristic should kick in")
+        {
+            auto selectStatement = NextTurn::TryApplySelect(true, state);
+
+            //worm 1's turn, we should select either worm 2 or 3
+            THEN("It does")
+            {
+                INFO(selectStatement);
+                REQUIRE( (selectStatement == "select 2;" || selectStatement == "select 3;") );
+
+            }
+            AND_THEN("It projects the game state forward so it looks like it's that guy's turn")
+            {
+                INFO("current worm: " << state->player1.GetCurrentWorm()->id);
+                REQUIRE( (state->player1.GetCurrentWorm()->id == 2 || state->player1.GetCurrentWorm()->id == 3) );
+            }
+        }
+
+        WHEN("We have no selects left")
+        {
+            state->player1.remainingWormSelections = 0;
+            THEN("Heuristic should not kick in")
+            {
+                REQUIRE(NextTurn::TryApplySelect(true, state) == "");
+            }
+        }
+
+        WHEN("our heuristic SHOULDN'T kick in")
+        {
+            GameEngine eng(state);
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+            THEN("It doesn't")
+            {
+                //worm 2's turn - he is in trouble already
+                REQUIRE(NextTurn::TryApplySelect(true, state) == "");
+            }
+        }
+    }
+}
+
+//just made this to confirm that random moves are actually random
 TEST_CASE( "Get random move", "[get_random_move][.statistics]" )
 {
     GIVEN("A semi realistic game state")

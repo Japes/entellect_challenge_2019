@@ -109,6 +109,7 @@ void GameState::PopulatePlayer(Player& player, const rapidjson::Value& playerJso
     player.command_score = playerJson["score"].GetInt();
     player.health = 0; //player.health = playerJson["health"].GetInt(); only myPlayer has this
     player.currentWormId = playerJson["currentWormId"].GetInt();
+    player.remainingWormSelections = playerJson["remainingWormSelections"].GetInt();
 
     auto wormsJson = playerJson.GetObject()["worms"].GetArray();
     for (rapidjson::Value::ConstValueIterator itr = wormsJson.Begin(); itr != wormsJson.End(); ++itr) {

@@ -61,7 +61,7 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
         auto original_state = std::make_shared<GameState>(roundJSON);
         auto copied_state = std::make_shared<GameState>(*original_state);
 
-        THEN("A true deep-copy happens")
+        THEN("A true deep copy happens")
         {
             //reference consistency
             REQUIRE(copied_state.get() != original_state.get());
@@ -93,6 +93,7 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
             REQUIRE(copied_state->roundNumber == original_state->roundNumber);
             REQUIRE(copied_state->player1.GetCurrentWorm()->id == original_state->player1.GetCurrentWorm()->id);
             REQUIRE(copied_state->player1.GetAverageWormHealth() == original_state->player1.GetAverageWormHealth());
+            REQUIRE(copied_state->player1.remainingWormSelections == original_state->player1.remainingWormSelections);
             
             REQUIRE(copied_state->player1.worms[0].IsDead() == original_state->player1.worms[0].IsDead());
             REQUIRE(copied_state->player1.worms[1].IsDead() == original_state->player1.worms[1].IsDead());

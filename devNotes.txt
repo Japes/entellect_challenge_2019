@@ -1,25 +1,22 @@
 TODO
 
-   throw bananas more intelligently
-      only consider if the points are great
-      remember to evaluate with reference bot
-
-   add select!
-
    add some carry-over state
       ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
          currently always assuming he has 3 - it's not in the state file
       consecutivedonothing count for opponent isnt in file!
       previousposition is wrong when loading file!
 
-   heavier playthroughs (biases)
-      bias towards shooting (for opponent)
-
    Tuning
        make bot tunable via config file
        update tournament script
        upload after doing this if better
 
+   heavier playthroughs (biases)
+      bias towards shooting (for opponent)
+
+   throw bananas more intelligently
+      only consider if the points are great
+      remember to evaluate with reference bot
 
 
    run compare over LOTS of matches
@@ -31,6 +28,10 @@ TODO
       better yet use heuristic
 
    simple optimizations: don't use shared ptr
+
+   update reference bot so it's more usefull...
+      use bananas
+      use select
 
    2 weird cases:
       end of game showdown, i have more health - why not shoot him??
