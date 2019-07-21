@@ -14,6 +14,7 @@
 #include "MonteCarlo.hpp"
 #include <thread>
 #include <mutex>
+#include <cmath>
 
 uint64_t Get_ns_since_epoch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();

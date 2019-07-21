@@ -1,28 +1,49 @@
 TODO
 
-   upload bot!
-
-   run compare over LOTS of matches
-      fix engine bugs
+   the Cell class is no longer used...
 
    WHY IS JP8 WORSE THAN JP7?
       WTF I WAS OPTIMISING THE WRONG GUY - RUN TESTS AGAIN
 
+   upload bot!
+
    throw bananas more intelligently
       only consider if the points are great
+      remember to evaluate with reference bot
 
    add select!
 
-   simple optimizations: don't use shared ptr
+   add some carry-over state
+      ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
+         currently always assuming he has 3 - it's not in the state file
+      consecutivedonothing count for opponent isnt in file!
+      previousposition is wrong when loading file!
 
-   fix agent runaway
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
+
+   Tuning
+       make bot tunable via config file
+       update tournament script
+       upload after doing this if better
+
+
+
+   run compare over LOTS of matches
+      fix engine bugs
+
+   handle monte carlo ties
+      make wins/losses comparable as well - will reduce ties
+      make monte carlo choose random if tie
+      better yet use heuristic
+
+   simple optimizations: don't use shared ptr
 
    2 weird cases:
       end of game showdown, i have more health - why not shoot him??
          cant see till the end of the game, points wise makes sense to rather dodge
       my (not last) worm about to die - why not evade?
+
 
    Need to avoid getting lost
       try using seed/jippo'd game state to reproduce this
@@ -31,20 +52,7 @@ TODO
          aim for big clump of dirt if health looking bad
          go for enemies if health looking good
          run away if at a points advantage
-
-   Tuning
-       make bot tunable via config file
-       update tournament script
-       upload after doing this if better
-
-   add some carry-over state
-      ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
-         currently always assuming he has 3 - it's not in the state file
-      consecutivedonothing count for opponent isnt in file!
-      previousposition is wrong when loading file!
-
-   make monte carlo choose random if tie
-
+   
    explicit exclude of potential game ending move
       explicit exclude of all chances for opponent to shoot?
          add unit tests for this
@@ -76,9 +84,11 @@ sort out deployment---------------
          zip it up
 
         known issue: with cell.cpp (global method)
-        known issue: with std::ceil line
-           c++ std?
+        known issue: with std::sqrt NEED TO INCLUDE <CMATH> EVERYWHERE YOU DO THIS
         known issue: incorrect case in header includes
+
+
+
 
 MISC NOTES--------------------
 to scan match logs for No Commands:
@@ -246,4 +256,15 @@ jp6:                     9/0/9                    5/0/13                   0/0/0
 
 //fixed some minor engine bugs, added dodgy banana hack-------------------------------------------------------------------------------------------------------
 (it was worse, still always beat ref bot tho )
-////////////////
+
+//realised i may have optimised jp7 instead of jp8.
+//fixed that, doing parallel runs now:------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2 -- 2019_July_20__02_20_04 -- ParallelID: 
+(wins/draws/losses):     jp7                      jp8                      
+jp7:                     0/0/0                    43/2/45                    (3/0/1)
+Engine version: 2019.2.2 -- 2019_July_20__02_23_06 -- ParallelID: 1
+(wins/draws/losses):     jp8                      jp7                      
+jp8:                     0/0/0                    51/2/36                    (3/0/2)
+
+(is there a player1 bias?)
+

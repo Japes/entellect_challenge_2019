@@ -2,6 +2,7 @@
 #include "GameConfig.hpp"
 #include <algorithm>
 #include <iostream>
+#include <cmath>
 
 Position::Position() : x{0}, y{0}
 {

@@ -70,6 +70,7 @@ checkBuild(outputFolder)
 
 zipName = outputFolder[:-1] + ".zip"
 print("Zipping up to ", zipName)
-os.system("zip -rq " + zipName + " " + outputFolder)
+print("zip -FSrq " + zipName + " " + outputFolder)
+os.system("zip -FSrq " + zipName + " " + outputFolder)
 print("done.")
  

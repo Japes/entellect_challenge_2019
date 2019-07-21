@@ -1,4 +1,5 @@
 #include "MonteCarlo.hpp"
+#include <cmath>
 
 MonteCarlo::MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c) : _N{0}, _c{c}
 {

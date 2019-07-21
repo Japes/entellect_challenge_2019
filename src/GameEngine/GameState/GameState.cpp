@@ -1,7 +1,7 @@
 #include "GameState.hpp"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
-
+#include <cmath>
 
 GameState::GameState() :
     player1(this),
@@ -120,8 +120,7 @@ void GameState::PopulateWeapon(Weapon& weapon, const rapidjson::Value& wJson)
     auto weaponJson = wJson.GetObject();
     weapon.damage = wJson["damage"].GetInt();
     weapon.range = wJson["range"].GetInt();
-    //weapon.diagRange = std::ceil(std::sqrt((weapon.range*weapon.range)/2)); //inverse of euclidian SEEMS TO BE A PROBLEM WITH THIS WHEN i SUBMIT...
-    weapon.diagRange = 3;
+    weapon.diagRange = std::ceil(std::sqrt((weapon.range*weapon.range)/2)); //inverse of euclidian SEEMS TO BE A PROBLEM WITH THIS WHEN i SUBMIT...
 }
 
 void GameState::PopulateBanana(BananaBomb& banana, const rapidjson::Value& wJson)
