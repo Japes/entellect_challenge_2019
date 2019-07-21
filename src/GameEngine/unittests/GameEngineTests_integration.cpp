@@ -54,7 +54,7 @@ std::mutex mtx;
 void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
 {
     while(Get_ns_since_epoch() < stopTime) {
-        for(unsigned i = 0; i < 100; ++i) {
+        for(unsigned i = 0; i < 50; ++i) {
             mtx.lock();
             //choose next node
             auto next_node = mc->NextNode();
@@ -96,6 +96,13 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     NextTurn::Initialise();
 
+    //do some heuristics
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, 9);
+    if(bananaMove != nullptr) {
+        std::cerr << "(" << __FUNCTION__ << ") this should never be printed it's just here to the compiler doesn't optimise it out" << std::endl;
+    }
+    auto heuristic_time = Get_ns_since_epoch();
+    INFO("heuristic_time: " << (heuristic_time - start_time)/1000000 << "ms")
 
 //from the bot---------------------------------------------------------
 
