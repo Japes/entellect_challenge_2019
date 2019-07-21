@@ -303,7 +303,11 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
         */
 
         auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
         auto thrower = place_worm(true, 3, {9,6}, state);
+        //make it the agent's turn...
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
         //big clump to the W
         state->SetCellTypeAt({6, 4}, CellType::DIRT);
@@ -332,6 +336,7 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
                 REQUIRE(ret.count() == 1);
                 REQUIRE(ret.test(57));
                 REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");
+
             }
 
             THEN("GetBananaMiningTargets returns correct")
@@ -353,6 +358,20 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
                 REQUIRE(NextTurn::GetBanana(thrower, state, 28)->GetCommandString() == "banana 10 3");            
                 REQUIRE(ret.count() > 6); //can see at LEAST 6 in that ascii picture
             }
+
+            THEN("Banana prospecting returns correct")
+            {
+                auto bananaCommand = NextTurn::GetBananaProspect(true, state, 12);
+                REQUIRE(bananaCommand != nullptr);
+                bool happy = bananaCommand->GetCommandString() == "banana 6 6" || bananaCommand->GetCommandString() == "banana 9 11";
+                REQUIRE(happy);
+            }
+
+            THEN("Banana prospecting returns correct")
+            {
+                auto bananaCommand = NextTurn::GetBananaProspect(true, state, 4);
+                REQUIRE(bananaCommand != nullptr);
+            }
         }
 
         WHEN("He has no bananas")
@@ -362,6 +381,12 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
             {
                 auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 1);
                 REQUIRE(ret.count() == 0);
+            }
+
+            THEN("Banana prospecting returns correct")
+            {
+                auto bananaCommand = NextTurn::GetBananaProspect(true, state, 13);
+                REQUIRE(bananaCommand == nullptr);
             }
         }
     }

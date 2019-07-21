@@ -101,6 +101,25 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
     return ret;
 }
 
+std::shared_ptr<Command> NextTurn::GetBananaProspect(bool player1, std::shared_ptr<GameState> state, int thresh)
+{
+    Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
+
+    std::bitset<121> bananas = std::bitset<121>(GetBananaMiningTargets(worm, state, thresh));
+
+    //choose random one
+    int totalNumMoves = bananas.count();
+    if(totalNumMoves == 0) {
+        return nullptr;
+    }
+
+    std::uniform_int_distribution<int> uniform_dist(0, totalNumMoves-1);
+    int mean = uniform_dist(*_rng.get());
+
+    unsigned index = IndexOfIthSetBit(bananas, mean);
+    return GetBanana(worm, state, index);
+}
+
 //returns banana moves that will hit at least [thresh] dirts
 //uses same format as GetValidBananas
 std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, std::shared_ptr<GameState> state, int thresh)
