@@ -72,5 +72,8 @@ zipName = outputFolder[:-1] + ".zip"
 print("Zipping up to ", zipName)
 print("zip -FSrq " + zipName + " " + outputFolder)
 os.system("zip -FSrq " + zipName + " " + outputFolder)
+
+shutil.rmtree(outputFolder)
+
 print("done.")
  
