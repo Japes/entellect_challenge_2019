@@ -275,3 +275,8 @@ jp9:                     0/0/0                    2/0/0                    (2/0/
 Engine version: 2019.2.2 -- 2019_July_21__05_26_35 -- ParallelID: 1
 (wins/draws/losses):     jp8                      jp9                      
 jp8:                     0/0/0                    2/0/5                    (2/0/5)
+
+//added heuristic for select------------------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2 -- 2019_July_21__09_28_53 -- ParallelID: 
+(wins/draws/losses):     reference-bot            jp9                     
+jp10:                    11/0/0                   4/0/1
