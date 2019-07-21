@@ -1,15 +1,14 @@
 TODO
 
-   add some carry-over state
-      ISSUE: I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
-         currently always assuming he has 3 - it's not in the state file
-      consecutivedonothing count for opponent isnt in file!
-      previousposition is wrong when loading file!
-
    Tuning
-       make bot tunable via config file
-       update tournament script
-       upload after doing this if better
+      make bot tunable via config file
+      update tournament script
+      upload after doing this if better
+      TUNE:
+         playthroughDepth
+         banana score threshold
+         C value
+         playthrough weights
 
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
@@ -22,12 +21,19 @@ TODO
    run compare over LOTS of matches
       fix engine bugs
 
+   add some carry-over state
+      could make the banana one better?
+      consecutivedonothing count for opponent isnt in file!
+      previousposition is wrong when loading file!
+
    handle monte carlo ties
       make wins/losses comparable as well - will reduce ties
       make monte carlo choose random if tie
       better yet use heuristic
 
    simple optimizations: don't use shared ptr
+
+   don't expect worm3 to be agent...
 
    update reference bot so it's more usefull...
       use bananas
@@ -144,6 +150,8 @@ jp6 - added radius of worms to consider (but it doesn't help, so set infinite.) 
 jp7 - optimised version of jp6
 jp8 - optimised version of jp7
 jp9 - added banana mining heuristic
+jp10 - added select heuristic
+jp11 - try to guess if opponent threw banana
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement

@@ -194,14 +194,51 @@ void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<Ga
     }
 }
 
+std::shared_ptr<GameState> last_round_state{nullptr};
+
+void AdjustOpponentBananaCount(bool player1, std::shared_ptr<GameState> state1)
+{
+    //try to figure out if the opponent threw a banana (rough heuristic here)
+    if(last_round_state != nullptr) {
+        Player* opposingPlayerNow = player1? &state1->player2 : &state1->player1;
+        Player* opposingPlayerPreviously = player1? &last_round_state->player2 : &last_round_state->player1;
+
+        opposingPlayerNow->worms[2].banana_bomb_count = opposingPlayerPreviously->worms[2].banana_bomb_count;
+
+        if(opposingPlayerNow->worms[2].banana_bomb_count <= 0) {
+            opposingPlayerNow->worms[2].banana_bomb_count = 0; //in case it somehow went negative
+            return;
+        }
+
+        std::cerr << "(" << __FUNCTION__ << ") --------BANANA COUNT: " << opposingPlayerNow->worms[2].banana_bomb_count << std::endl;
+
+        auto opponentScoreDiff = opposingPlayerNow->command_score - opposingPlayerPreviously->command_score;
+
+        int pointsForDig = 7;
+        int pointsForShot = 16;
+        int pointsForKillShot = 56;
+        if(opponentScoreDiff > pointsForDig && 
+            opponentScoreDiff != pointsForShot && 
+            opponentScoreDiff != pointsForKillShot && 
+            opposingPlayerNow->worms[2].banana_bomb_count > 0) {
+            --opposingPlayerNow->worms[2].banana_bomb_count;
+            std::cerr << "(" << __FUNCTION__ << ") I RECKON OPPONENT THREW A BANANA----------------COUNT NOW " << opposingPlayerNow->worms[2].banana_bomb_count << std::endl;
+        }
+    }
+}
+
 //expects command string to be returned e.g. "dig 5 6"
 std::string runStrategy(rapidjson::Document& roundJSON)
 {
+    //Setup---------------------------------------------------------------------------
     uint64_t start_time = Get_ns_since_epoch();
 
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
 
     auto state1 = std::make_shared<GameState>(roundJSON);
+
+    AdjustOpponentBananaCount(ImPlayer1, state1);
+    last_round_state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
 
     NextTurn::Initialise();
 
@@ -227,6 +264,7 @@ std::string runStrategy(rapidjson::Document& roundJSON)
     t1.join();
     t2.join();
 
+    //output result--------------------------------------------------------------------
     //choose the best move and do it
     auto best_move = mc->GetBestMove();
     std::cerr << "JP11:" << std::endl;
