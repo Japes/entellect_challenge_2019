@@ -86,8 +86,8 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
         Worm* worm11 = place_worm(true, 1, {5,5}, state);
         Worm* worm12 = place_worm(true, 2, {6,5}, state);
         place_worm(true, 3, {3,3}, state);
-        place_worm(false, 1, {5,6}, state);
-        Worm* worm22 = place_worm(false, 2, {4,1}, state);
+        Worm* worm21 = place_worm(false, 1, {5,6}, state);
+        place_worm(false, 2, {4,1}, state);
         place_worm(false, 3, {5,3}, state);
         state->SetCellTypeAt({5, 4}, CellType::DIRT);
         state->SetCellTypeAt({4, 5}, CellType::DIRT);
@@ -101,9 +101,9 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
             REQUIRE(moves == 0b10101111);
         }
 
-        THEN("Valid moves for worm 22 are as expected")
+        THEN("Valid moves for worm 21 are as expected")
         {
-            auto moves = NextTurn::GetValidTeleportDigs(worm22, state, false);
+            auto moves = NextTurn::GetValidTeleportDigs(worm21, state, false);
             INFO("moves: " << moves);
             REQUIRE(moves == 0b11111001);
         }
@@ -286,40 +286,42 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
         /* stars show the extent of a worms reach
         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17
         0   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
-        1   .   .   .   .   .   *   *   *   *   *   *   *   .   .   .   .   .
+        1   .   .   .   .   .   *   *   *   *   D   *   *   .   .   .   .   .
         2   .   .   .   .   *   .   .   .   .   .   .   .   *   .   .   .   .
-        3   .   .   .   *   .   .   .   .   .   .   .   .   .   *   .   .   .
+        3   .   .   .   *   .   .   .   D   .   .   .   D   .   *   .   .   .
         4   .   .   .   *   .   D   .   .   .   .   .   .   .   *   .   .   .
-        5   .   .   .   *   D   D   D   .   .   .   .   .   .   *   .   .   .
+        5   .   .   .   *   D   D   D   .   .   D   .   .   .   *   .   .   .
         6   .   .   .   *D  D   D   D   D   W   .   .   .   .   *   .   .   .
         7   .   .   .   *   D   D   D   .   .   .   .   .   .   *   .   .   .    
         8   .   .   .   *   .   D   .   .   .   .   .   .   .   *   .   .   .    
-        9   .   .   .   *   .   .   .   .   .   .   .   .   .   *   .   .   .    
-        10  .   .   .   .   *   .   .   .   .   .   .   .   *   .   .   .   .    
-        11  .   .   .   .   .   *   *   *   *   *   *   *   .   .   .   .   .    
-        12  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
+        9   .   .   .   *   .   .   .   .   D   .   .   .   .   *   .   .   .    
+        10  .   .   .   .   *   .   .   D   D   D   .   .   *   .   .   .   .    
+        11  .   .   .   .   .   *   *D  *D  *  *D  *D  *   .   .   .   .   .    
+        12  .   .   .   .   .   .   .   D   D   D   .   .   .   .   .   .   .
+        13  .   .   .   .   .   .   .   .   D   .   .   .   .   .   .   .   .
+        14  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
         */
 
         auto state = std::make_shared<GameState>();
         auto thrower = place_worm(true, 3, {9,6}, state);
 
+        //big clump to the W
         state->SetCellTypeAt({6, 4}, CellType::DIRT);
-
-        state->SetCellTypeAt({5, 5}, CellType::DIRT);
-        state->SetCellTypeAt({6, 5}, CellType::DIRT);
-        state->SetCellTypeAt({7, 5}, CellType::DIRT);
-
-        state->SetCellTypeAt({4, 6}, CellType::DIRT);
-        state->SetCellTypeAt({5, 6}, CellType::DIRT);
-        state->SetCellTypeAt({6, 6}, CellType::DIRT);
-        state->SetCellTypeAt({7, 6}, CellType::DIRT);
-        state->SetCellTypeAt({8, 6}, CellType::DIRT);
-
-        state->SetCellTypeAt({5, 7}, CellType::DIRT);
-        state->SetCellTypeAt({6, 7}, CellType::DIRT);
-        state->SetCellTypeAt({7, 7}, CellType::DIRT);
-
+        state->SetCellTypeAt({5, 5}, CellType::DIRT); state->SetCellTypeAt({6, 5}, CellType::DIRT); state->SetCellTypeAt({7, 5}, CellType::DIRT);
+        state->SetCellTypeAt({4, 6}, CellType::DIRT); state->SetCellTypeAt({5, 6}, CellType::DIRT); state->SetCellTypeAt({6, 6}, CellType::DIRT); state->SetCellTypeAt({7, 6}, CellType::DIRT); state->SetCellTypeAt({8, 6}, CellType::DIRT);
+        state->SetCellTypeAt({5, 7}, CellType::DIRT); state->SetCellTypeAt({6, 7}, CellType::DIRT); state->SetCellTypeAt({7, 7}, CellType::DIRT);
         state->SetCellTypeAt({6, 8}, CellType::DIRT);
+
+        //sparse four to the NE
+        state->SetCellTypeAt({10, 1}, CellType::DIRT); state->SetCellTypeAt({8, 3}, CellType::DIRT);
+        state->SetCellTypeAt({12, 3}, CellType::DIRT); state->SetCellTypeAt({10, 5}, CellType::DIRT);
+
+        //big clump to the S
+        state->SetCellTypeAt({9, 9}, CellType::DIRT);
+        state->SetCellTypeAt({8, 10}, CellType::DIRT); state->SetCellTypeAt({9, 10}, CellType::DIRT); state->SetCellTypeAt({10, 10}, CellType::DIRT);
+        state->SetCellTypeAt({7, 11}, CellType::DIRT); state->SetCellTypeAt({8, 11}, CellType::DIRT); state->SetCellTypeAt({10, 11}, CellType::DIRT); state->SetCellTypeAt({11, 11}, CellType::DIRT);
+        state->SetCellTypeAt({8, 12}, CellType::DIRT); state->SetCellTypeAt({9, 12}, CellType::DIRT); state->SetCellTypeAt({10, 12}, CellType::DIRT);
+        state->SetCellTypeAt({9, 13}, CellType::DIRT);
 
         WHEN("He has bananas")
         {
@@ -329,7 +331,27 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
                 INFO("bananas: " << ret)
                 REQUIRE(ret.count() == 1);
                 REQUIRE(ret.test(57));
-                REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");            
+                REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");
+            }
+
+            THEN("GetBananaMiningTargets returns correct")
+            {
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 12);
+                INFO("bananas: " << ret)
+                REQUIRE(ret.count() == 2);
+                REQUIRE(ret.test(57));
+                REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");
+                REQUIRE(ret.test(115));
+                REQUIRE(NextTurn::GetBanana(thrower, state, 115)->GetCommandString() == "banana 9 11");            
+            }
+
+            THEN("GetBananaMiningTargets returns correct")
+            {
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 4);
+                INFO("bananas: " << ret)
+                REQUIRE(ret.test(28));
+                REQUIRE(NextTurn::GetBanana(thrower, state, 28)->GetCommandString() == "banana 10 3");            
+                REQUIRE(ret.count() > 6); //can see at LEAST 6 in that ascii picture
             }
         }
 
