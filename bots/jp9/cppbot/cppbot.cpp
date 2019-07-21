@@ -205,6 +205,12 @@ std::string runStrategy(rapidjson::Document& roundJSON)
 
     NextTurn::Initialise();
 
+    //do some heuristics
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, 9);
+    if(bananaMove != nullptr) {
+        return bananaMove->GetCommandString();
+    }
+
     float c = std::sqrt(2);
     auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), c);
 
