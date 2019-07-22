@@ -288,3 +288,22 @@ jp8:                     0/0/0                    2/0/5                    (2/0/
 Engine version: 2019.2.2 -- 2019_July_21__09_28_53 -- ParallelID: 
 (wins/draws/losses):     reference-bot            jp9                     
 jp10:                    11/0/0                   4/0/1
+
+//added counting of opponent bananas
+Engine version: 2019.2.2 -- 2019_July_21__11_34_27 -- ParallelID: 1
+(wins/draws/losses):     jp10                     jp11                     
+jp10:                    0/0/0                    0/0/2                    (0/0/2)
+
+Engine version: 2019.2.2 -- 2019_July_21__11_30_22 -- ParallelID: 
+(wins/draws/losses):     jp11                     jp10                     
+jp11:                    0/0/0                    3/0/3                    (1/0/3)
+
+//added keeping track of opponent banana count---------------------------------------------------------------------------------------------------------------------
+//added counting of opponent bananas
+Engine version: 2019.2.2 -- 2019_July_22__08_21_00 -- ParallelID: 
+(wins/draws/losses):     jp11                     jp10                     
+jp11:                    0/0/0                    105/0/38 
+
+Engine version: 2019.2.2 -- 2019_July_22__08_11_44 -- ParallelID: 1
+(wins/draws/losses):     jp8                      jp11                     
+jp8:                     0/0/0                    2/1/54                   (2/1/54)
