@@ -1,5 +1,16 @@
 TODO
 
+   add starcraft-style graphs for the game, points over time, health, bananas used, selects used, etc
+
+   store MC results of first level
+   get opponent turn subsystem (check forum if it's coming)
+   look at opponent log files
+
+   need to try to get more into the monta carlos.  off-by-one banana hits aren't considered...
+
+   heavier playthroughs (biases)
+      bias towards shooting (for opponent)
+
    Tuning
       make bot tunable via config file
       update tournament script
@@ -10,13 +21,9 @@ TODO
          C value
          playthrough weights
 
-   heavier playthroughs (biases)
-      bias towards shooting (for opponent)
-
    throw bananas more intelligently
       only consider if the points are great
       remember to evaluate with reference bot
-
 
    run compare over LOTS of matches
       fix engine bugs
@@ -31,7 +38,9 @@ TODO
       make monte carlo choose random if tie
       better yet use heuristic
 
-   simple optimizations: don't use shared ptr
+   optimization
+      simple optimizations: don't use shared ptr
+      do more than 1 playthrough for each tip
 
    don't expect worm3 to be agent...
 
@@ -307,3 +316,10 @@ jp11:                    0/0/0                    105/0/38
 Engine version: 2019.2.2 -- 2019_July_22__08_11_44 -- ParallelID: 1
 (wins/draws/losses):     jp8                      jp11                     
 jp8:                     0/0/0                    2/1/54                   (2/1/54)
+
+/Tuning:-------------------------------------------------------------------------------------------------------------------------------------------------------
+//bot submitted to 2nd round, playing with search depths:
+(wins/draws/losses):     jp11                     jp11_depth_48            jp11_depth_12
+jp11:                    0/0/0                    38/1/35                  44/2/28
+jp11_depth_48:                                                             35/1/38
+

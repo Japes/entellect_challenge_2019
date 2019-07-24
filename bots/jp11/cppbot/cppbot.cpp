@@ -214,9 +214,9 @@ void AdjustOpponentBananaCount(bool player1, std::shared_ptr<GameState> state1)
 
         auto opponentScoreDiff = opposingPlayerNow->command_score - opposingPlayerPreviously->command_score;
 
-        int pointsForDig = 7;
-        int pointsForShot = 16;
-        int pointsForKillShot = 56;
+        int pointsForDig = GameConfig::scores.dig;
+        int pointsForShot = GameConfig::commandoWorms.weapon.damage*2;
+        int pointsForKillShot = GameConfig::commandoWorms.weapon.damage*2 + GameConfig::scores.killShot;
         if(opponentScoreDiff > pointsForDig && 
             opponentScoreDiff != pointsForShot && 
             opponentScoreDiff != pointsForKillShot && 

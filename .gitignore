@@ -30,3 +30,7 @@ cmakeBuildDir
 Matches/
 runMatchesResults/
 Test_files/matches/
+
+jpenv
+jp11_long
+jp11_short
