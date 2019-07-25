@@ -1,5 +1,44 @@
 TODO
 
+cd dev\entellect_challenge_2019
+python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
+
+   Need to prevent getting lost
+   
+   Need to prevent getting danced
+
+   WILLIE:
+      playing style:
+         looks like he's doing a monte carlo search
+      why did he beat me?
+         got me in a shooting dance! used a select to make it so the dancer played on the same turn, and that just made my points collection bad
+      selects:
+         he did a select so that he was playing at the same time as the dude he was in combat with! then he started dancing.  was this deliberate?
+
+   ANDRE MAKAAL
+      playing style:
+         heuristic
+            systematically digs all dirt around his position, then moves towards centre
+            if it sees an enemy nearby, goes for it
+            might be retreating once enemy health is low, not sure
+            looks like he might have some gang up logic
+      why did he beat me?
+         ganged up on 1 worm midgame, both worms were getting hits every turn, this pushed his points up massively
+         also got 2 kills on me
+      selects:
+         he only used one, right at the start so banana guy can go first
+
+   MALLIN
+      playing style:
+         looks like he might be doing some kind of search, but he doesn't get lost
+      why did he beat me?
+         he got a kill right at the end, score boost won it for him
+      selects:
+         he used some at the end, i think in an attempt to grab the last few dirts      
+
+   LEON
+      in the end i think it was my dudes getting lost that did it
+
    add starcraft-style graphs for the game, points over time, health, bananas used, selects used, etc
 
    store MC results of first level
@@ -323,3 +362,7 @@ jp8:                     0/0/0                    2/1/54                   (2/1/
 jp11:                    0/0/0                    38/1/35                  44/2/28
 jp11_depth_48:                                                             35/1/38
 
+Engine version: 2019.2.2 -- 2019_July_25__09_20_52 -- ParallelID: 
+(wins/draws/losses):     jp11                     jp11_long                jp11_short               
+jp11:                    0/0/0                    34/2/7                   34/0/9
+jp11_long:               5/1/16                   0/0/0                    29/2/12

@@ -91,15 +91,22 @@ while os.path.exists(roundFolder):
 
 print("playerA: ", playerA, ", playerB: ", playerB)
 
+fig, ax = plt.subplots()
+
 playerASelects = [i for i, m in enumerate(playerAMoves) if m == "sel"]
+playerABananas = [i for i, m in enumerate(playerAMoves) if m == "ban"]
+ax.plot(rounds, playerAScores, ">", ls='-', label=playerA + " selects", color='red', markevery=playerASelects)
+ax.plot(rounds, playerAScores, "o", ls='-', label=playerA + " bananas", color='red', markevery=playerABananas)
+
 playerBSelects = [i for i, m in enumerate(playerBMoves) if m == "sel"]
+playerBBananas = [i for i, m in enumerate(playerBMoves) if m == "ban"]
+ax.plot(rounds, playerBScores, '<', ls='-', label=playerB + " selects", color='blue', markevery=playerBSelects)
+ax.plot(rounds, playerBScores, 'o', ls='-', label=playerB + " bananas", color='blue', markevery=playerBBananas)
+
+
 print("playerASelects: ", playerASelects, ", playerBSelects: ", playerBSelects)
 
-fig, ax = plt.subplots()
-ax.plot(rounds, playerAScores, 'o', ls='-', label=playerA, color='red', markevery=playerASelects)
-ax.plot(rounds, playerBScores, 'o', ls='-', label=playerB, color='blue', markevery=playerBSelects)
 ax.set(title='Player scores')
-
 ax.grid()
 ax.legend()
 #fig.savefig("test.png")
