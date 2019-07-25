@@ -8,16 +8,6 @@ import numpy as np
 
 #script scrapes match logs for interesting metrics, and draws graphs
 
-def getData(filename):
-    file = open(filename, "r")
-    lines = file.readlines()
-    file.close()
-
-    for i, line in enumerate(lines):
-        if(line == "MY_LIBS_SRC_DIR := ../../src\n"):
-            print("making change to makefile...")
-            lines[i] = "MY_LIBS_SRC_DIR := ./src\n"
-
 def getRoundFolder(roundNumber) :
     ret = "Round "
     if(roundNumber < 100) :
@@ -29,6 +19,18 @@ def getRoundFolder(roundNumber) :
 
     return ret
 
+def getPlayerCommandData(filename) :
+    file = open(filename, "r")
+    lines = file.readlines()
+    file.close()
+
+    command = ""
+    for i, line in enumerate(lines):
+        if "Command:" in line:
+           command =  line[9:12]
+
+    return command
+
 def getJsonMapData(JsonMapFilePath) :
     ret = {}
     json_map = json.load(open(JsonMapFilePath, 'r'))
@@ -36,7 +38,9 @@ def getJsonMapData(JsonMapFilePath) :
     return ret
 
 def getPlayerData(playerFolder) :
-    return getJsonMapData(playerFolder + "/JsonMap.json")
+    ret = getJsonMapData(playerFolder + "/JsonMap.json")
+    ret["move"] = getPlayerCommandData(playerFolder + "/PlayerCommand.txt")
+    return ret
 
 def getRoundData(roundFolder) :
     playerFolders = [d for d in os.listdir(roundFolder)]
@@ -65,7 +69,9 @@ if not os.path.exists(matchFolder):
 playerA = ""
 playerB = ""
 playerAScores = []
+playerAMoves = []
 playerBScores = []
+playerBMoves = []
 rounds = []
 
 roundNumber = 1
@@ -73,24 +79,33 @@ roundFolder = matchFolder + "/" + getRoundFolder(roundNumber)
 while os.path.exists(roundFolder):
     playerA, playerB, playerAData, playerBData = getRoundData(roundFolder)
     rounds.append(roundNumber)
+
     playerAScores.append(playerAData["score"])
+    playerAMoves.append(playerAData["move"])
+
     playerBScores.append(playerBData["score"])
+    playerBMoves.append(playerBData["move"])
+
     roundNumber += 1
     roundFolder = matchFolder + "/" + getRoundFolder(roundNumber)
 
 print("playerA: ", playerA, ", playerB: ", playerB)
 
+playerASelects = [i for i, m in enumerate(playerAMoves) if m == "sel"]
+playerBSelects = [i for i, m in enumerate(playerBMoves) if m == "sel"]
+print("playerASelects: ", playerASelects, ", playerBSelects: ", playerBSelects)
 
 fig, ax = plt.subplots()
-ax.plot(rounds, playerAScores, label=playerA, color='red')
-ax.plot(rounds, playerBScores, label=playerB, color='blue')
+ax.plot(rounds, playerAScores, 'o', ls='-', label=playerA, color='red', markevery=playerASelects)
+ax.plot(rounds, playerBScores, 'o', ls='-', label=playerB, color='blue', markevery=playerBSelects)
 ax.set(title='Player scores')
+
 ax.grid()
 ax.legend()
 #fig.savefig("test.png")
 plt.show()
 
-#graph of score over time
+#TODO
 #graph of health over time
 #mark when banana bombs were used
 #mark when selects were used
