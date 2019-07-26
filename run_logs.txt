@@ -1,0 +1,182 @@
+
+bot description --------------------------------------------------------------------
+jp2 - what i submitted for Early Bird.  basic monte carlo, buggy
+jp3 - jp2 with various bug fixes
+jp4 - jp3 with optimizations to GetRandomMoveForWorm and added multithreading.  Plies/s up from ~600k to 1.2M
+jp5 - jp4 with simple bananas - consider chucking at any enemies in range
+jp6 - added radius of worms to consider (but it doesn't help, so set infinite.)  Added weighted playthroughs
+jp7 - optimised version of jp6
+jp8 - optimised version of jp7
+jp9 - added banana mining heuristic
+jp10 - added select heuristic
+jp11 - try to guess if opponent threw banana (this is what was submitted for round 2)
+jp11_short/long - placeholders for various tunings for jp11
+
+results analysis --------------------------------------------------------------------
+increasing depth to 24 - no noticable improvement
+   reducing to 15 - seems to actually be a bit worse
+   reducing to 7 - noticably better than jp2, and does better against reference bot
+
+using scorediff, and modifying c to 4, putting playthrough depth back to 24
+   lost every game think i did it wrong....
+   looking at UCT scores, looks like it converges too quickly, so try raising c to 8
+   Need to get back to this after bug fixes
+
+upped the time limit to 3s, improvement not great.  beats reference bot and 1s jp2 66% of the time
+   (wins/draws/losses):     reference-bot            jp2                      jp3                      
+   reference-bot:           0/0/0                    15/0/5                   5/0/15                   (20/0/20)
+   jp2:                     5/0/15                   0/0/0                    6/0/14                   (11/0/29)
+   jp3:                     15/0/5                   14/0/6                   0/0/0                    (29/0/11)
+
+after fixing some edge case bugs in the engine and putting playthrough depth back to 24 (engine version 2019.2.1):
+   (wins/draws/losses):     reference-bot            jp2                      jp3                      
+   reference-bot:           0/0/0                    84/0/53                  70/0/67                  (154/0/120)
+   jp2:                     53/0/84                  0/0/0                    17/0/120                 (70/0/204)
+   jp3:                     67/0/70                  120/0/17                 0/0/0                    (187/0/87)
+
+after optimising engine and adding multithreading (depth still 24) (engine version 2019.2.2)
+(wins/draws/losses):     reference-bot            jp3                      jp2                      
+reference-bot:           0/0/0                    10/0/23                  17/0/16                  (27/0/39)
+jp3:                     23/0/10                  0/0/0                    19/0/14                  (42/0/24)
+jp2:                     16/0/17                  14/0/19                  0/0/0                    (30/0/36)
+
+some more of the same^ but redirecting std::err to /dev/null (suspect foul play by jp2)
+
+(wins/draws/losses):     reference-bot            jp3                      jp2                      
+reference-bot:           0/0/0                    16/0/16                  16/0/16                  (32/0/32)
+jp3:                     16/0/16                  0/0/0                    20/0/12                  (36/0/28)
+jp2:                     16/0/16                  12/0/20                  0/0/0                    (28/0/36)
+
+bringing back the old one as jp3 and making current one jp4:
+
+Engine version: 2019.2.2
+(wins/draws/losses):     reference-bot            jp2                      jp3                      jp4                      
+reference-bot:           0/0/0                    26/0/19                  21/0/24                  18/0/27                  (65/0/70)
+jp2:                     19/0/26                  0/0/0                    4/2/39                   6/2/37                   (29/4/102)
+jp3:                     24/0/21                  39/2/4                   0/0/0                    9/0/36                   (72/2/61)
+jp4:                     27/0/18                  37/2/6                   36/0/9                   0/0/0                    (100/2/33)
+
+Added banana bombs! still has bugs tho
+Engine version: 2019.2.2
+(wins/draws/losses):     jp5                      jp4                      
+jp5:                     0/0/0                    29/0/12                  (29/0/12)
+jp4:                     12/0/29                  0/0/0                    (12/0/29)
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp5                      jp3                      jp2                      reference-bot            
+jp5:                     0/0/0                    12/0/6                   18/0/0                   18/0/0                   (48/0/6)
+jp3:                     6/0/12                   0/0/0                    11/0/7                   13/0/5                   (30/0/24)
+jp2:                     0/0/18                   7/0/11                   0/0/0                    8/0/10                   (15/0/39)
+reference-bot:           0/0/18                   5/0/13                   10/0/8                   0/0/0                    (15/0/39)
+
+added radius, seems to make things worse :/ same code with infinite radius:------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      reference-bot            
+jp6:                     0/0/0                    19/0/12                  27/0/4                   (46/0/16)
+
+made radius (distance to nearest enemy)*2---------------------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      jp4                      reference-bot            
+jp6:                     0/0/0                    0/0/32                   16/0/16                  26/0/6                   (42/0/54)
+
+infinite radius - seems to be no different to jp5 :/ -------------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      jp4                      reference-bot            
+jp6:                     0/0/0                    21/0/24                  42/0/3                   43/0/2                   (106/0/29)
+
+add weighted playthroughs... (combined more than 1 run's results here)----------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp6                      jp5                      reference-bot            
+jp6:                     0/0/0                    48/0/24                  31/0/0           
+
+OPTIMISE (supersnob)-(1.5M plies/s)---------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    46/0/20                  (32/0/12)
+
+Engine version: 2019.2.2 tried optimising but actually made things slightly worse (1M plies/s)-------------------------------------------
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    26/0/20                  (26/0/20)
+
+Engine version: 2019.2.2 more optimization, ~1.6M plies/s-------------------------------------------------------------------------------------------------
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    27/0/16                  (27/0/16)
+
+Engine version: 2019.2.2 more optimization ~1.78M p/s-----------------------------------------------------------------------------------------------------
+(wins/draws/losses):     jp7                      jp6                      
+jp7:                     0/0/0                    36/0/25                  (36/0/25)
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp8                      jp7                      jp6                      
+jp8:                     0/0/0                    7/1/15                   14/0/9                   (21/1/24)
+
+Engine version: 2019.2.2
+(wins/draws/losses):     jp8                      jp7                      jp6                      
+jp8:                     0/0/0                    11/0/7                   9/0/9                    (20/0/16)
+jp7:                     7/0/11                   0/0/0                    13/0/5                   (20/0/16)
+jp6:                     9/0/9                    5/0/13                   0/0/0                    (14/0/22)
+
+//fixed some minor engine bugs, added dodgy banana hack-------------------------------------------------------------------------------------------------------
+(it was worse, still always beat ref bot tho )
+
+//realised i may have optimised jp7 instead of jp8.
+//fixed that, doing parallel runs now:------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2 -- 2019_July_20__02_20_04 -- ParallelID: 
+(wins/draws/losses):     jp7                      jp8                      
+jp7:                     0/0/0                    43/2/45                    (3/0/1)
+Engine version: 2019.2.2 -- 2019_July_20__02_23_06 -- ParallelID: 1
+(wins/draws/losses):     jp8                      jp7                      
+jp8:                     0/0/0                    51/2/36                    (3/0/2)
+
+(is there a player1 bias?)
+
+//added heuristic for mining with banana----------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2 -- 2019_July_21__05_02_48 -- ParallelID: 
+(wins/draws/losses):     reference-bot            jp9                      
+reference-bot:           0/0/0                    0/0/10                   (0/0/10)
+
+Engine version: 2019.2.2 -- 2019_July_21__05_27_38 -- ParallelID: 
+(wins/draws/losses):     jp9                      jp8                      
+jp9:                     0/0/0                    2/0/0                    (2/0/0)
+
+Engine version: 2019.2.2 -- 2019_July_21__05_26_35 -- ParallelID: 1
+(wins/draws/losses):     jp8                      jp9                      
+jp8:                     0/0/0                    2/0/5                    (2/0/5)
+
+//added heuristic for select------------------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.2.2 -- 2019_July_21__09_28_53 -- ParallelID: 
+(wins/draws/losses):     reference-bot            jp9                     
+jp10:                    11/0/0                   4/0/1
+
+//added counting of opponent bananas
+Engine version: 2019.2.2 -- 2019_July_21__11_34_27 -- ParallelID: 1
+(wins/draws/losses):     jp10                     jp11                     
+jp10:                    0/0/0                    0/0/2                    (0/0/2)
+
+Engine version: 2019.2.2 -- 2019_July_21__11_30_22 -- ParallelID: 
+(wins/draws/losses):     jp11                     jp10                     
+jp11:                    0/0/0                    3/0/3                    (1/0/3)
+
+//added keeping track of opponent banana count---------------------------------------------------------------------------------------------------------------------
+//added counting of opponent bananas
+Engine version: 2019.2.2 -- 2019_July_22__08_21_00 -- ParallelID: 
+(wins/draws/losses):     jp11                     jp10                     
+jp11:                    0/0/0                    105/0/38 
+
+Engine version: 2019.2.2 -- 2019_July_22__08_11_44 -- ParallelID: 1
+(wins/draws/losses):     jp8                      jp11                     
+jp8:                     0/0/0                    2/1/54                   (2/1/54)
+
+/Tuning:-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//bot submitted to 2nd round, playing with search depths:----------------
+(wins/draws/losses):     jp11                     jp11_depth_48            jp11_depth_12
+jp11:                    0/0/0                    38/1/35                  44/2/28
+jp11_depth_48:                                                             35/1/38
+
+Engine version: 2019.2.2 -- 2019_July_25__09_20_52 -- ParallelID: 
+(wins/draws/losses):     jp11                     jp11_depth_36            jp11_depth_9               
+jp11:                    0/0/0                    34/2/7                   34/0/9
+jp11_depth_36            5/1/16                   0/0/0                    29/2/12
+
+
