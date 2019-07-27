@@ -1,17 +1,20 @@
-TODO
-
 cd dev\entellect_challenge_2019
 python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
 
+TODO
+
    Need to prevent getting lost
    
+   handle monte carlo ties
+      make wins/losses comparable as well - will reduce ties
+      make monte carlo choose random if tie
+      better yet use heuristic
+   
    Need to prevent getting danced
-
-   add starcraft-style graphs for the game, points over time, health, bananas used, selects used, etc
+      get opponent turn subsystem (check forum if it's coming)
+      opponent move tracking
 
    store MC results of first level
-   get opponent turn subsystem (check forum if it's coming)
-   look at opponent log files
 
    need to try to get more into the monta carlos.  off-by-one banana hits aren't considered...
 
@@ -24,26 +27,14 @@ python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
       upload after doing this if better
       TUNE:
          playthroughDepth
+            DOESN'T SEEM TO MAKE A DIFFERENCE? my monte carlo must not be doing anything valuable
          banana score threshold
          C value
          playthrough weights
 
-   throw bananas more intelligently
-      only consider if the points are great
-      remember to evaluate with reference bot
-
    run compare over LOTS of matches
       fix engine bugs
 
-   add some carry-over state
-      could make the banana one better?
-      consecutivedonothing count for opponent isnt in file!
-      previousposition is wrong when loading file!
-
-   handle monte carlo ties
-      make wins/losses comparable as well - will reduce ties
-      make monte carlo choose random if tie
-      better yet use heuristic
 
    optimization
       simple optimizations: don't use shared ptr

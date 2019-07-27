@@ -8,6 +8,45 @@ import numpy as np
 
 #script scrapes match logs for interesting metrics, and draws graphs
 
+class PlayerData :
+    def __init__(self):
+        self.name = ""
+        self.scores = []
+        self.moves = []
+        self.moveTimes = []
+
+    def AppendData(self, data):
+        self.scores.append(data["score"])
+        self.moves.append(data["move"])
+        self.moveTimes.append(data["executionTime"])
+
+    def PlotData(self, axes, xValues, playerA):
+        selects = [i for i, m in enumerate(self.moves) if m == "sel"]
+        bananas = [i for i, m in enumerate(self.moves) if m == "ban"]
+        teleports = [i for i, m in enumerate(self.moves) if m == "mov"]
+        digs = [i for i, m in enumerate(self.moves) if m == "dig"]
+        shoots = [i for i, m in enumerate(self.moves) if m == "sho"]
+
+        color = 'red'
+        timeColor = '#FFbbbb'
+        playerThatIAm = "Player A"
+        selectIndicator = ">"
+
+        if not playerA:
+            color = 'blue'
+            timeColor = '#bbbbFF'
+            playerThatIAm = "Player B"
+            selectIndicator = "<"
+
+        axes.plot(xValues, self.scores, selectIndicator, ls='-', label=self.name + " selects", color=color, markevery=selects)
+        axes.plot(xValues, self.scores, "o", ls='-', label=self.name + " bananas", color=color, markevery=bananas)
+        axes.plot(xValues, self.moveTimes, ls='-', label=self.name + " execution time", color=timeColor)
+
+        print(playerThatIAm, " selects: ",  selects, "(" + str(len(selects)) + ")")
+        totalOtherMoves = len(xValues) - (len(teleports) + len(digs) + len(bananas) + len(selects) + len(shoots))
+        print(playerThatIAm, " moves: ",  len(teleports), " digs: ", len(digs), " INVALIDS/NO_MOVES: ", totalOtherMoves)
+
+
 def getRoundFolder(roundNumber) :
     ret = "Round "
     if(roundNumber < 100) :
@@ -25,11 +64,15 @@ def getPlayerCommandData(filename) :
     file.close()
 
     command = ""
+    exeTime = 0
     for i, line in enumerate(lines):
         if "Command:" in line:
            command =  line[9:12]
 
-    return command
+        if "Execution time:" in line:
+            exeTime = int(line[16:-3])
+
+    return command, exeTime
 
 def getJsonMapData(JsonMapFilePath) :
     ret = {}
@@ -39,7 +82,7 @@ def getJsonMapData(JsonMapFilePath) :
 
 def getPlayerData(playerFolder) :
     ret = getJsonMapData(playerFolder + "/JsonMap.json")
-    ret["move"] = getPlayerCommandData(playerFolder + "/PlayerCommand.txt")
+    ret["move"], ret["executionTime"] = getPlayerCommandData(playerFolder + "/PlayerCommand.txt")
     return ret
 
 def getRoundData(roundFolder) :
@@ -66,45 +109,28 @@ if not os.path.exists(matchFolder):
     print("can't find that folder.")
     exit()
 
-playerA = ""
-playerB = ""
-playerAScores = []
-playerAMoves = []
-playerBScores = []
-playerBMoves = []
+playerA = PlayerData()
+playerB = PlayerData()
 rounds = []
 
 roundNumber = 1
 roundFolder = matchFolder + "/" + getRoundFolder(roundNumber)
 while os.path.exists(roundFolder):
-    playerA, playerB, playerAData, playerBData = getRoundData(roundFolder)
+    playerA.name, playerB.name, playerAData, playerBData = getRoundData(roundFolder)
     rounds.append(roundNumber)
 
-    playerAScores.append(playerAData["score"])
-    playerAMoves.append(playerAData["move"])
-
-    playerBScores.append(playerBData["score"])
-    playerBMoves.append(playerBData["move"])
+    playerA.AppendData(playerAData)
+    playerB.AppendData(playerBData)
 
     roundNumber += 1
     roundFolder = matchFolder + "/" + getRoundFolder(roundNumber)
 
-print("playerA: ", playerA, ", playerB: ", playerB)
+print("playerA: ", playerA.name, ", playerB: ", playerB.name)
 
 fig, ax = plt.subplots()
 
-playerASelects = [i for i, m in enumerate(playerAMoves) if m == "sel"]
-playerABananas = [i for i, m in enumerate(playerAMoves) if m == "ban"]
-ax.plot(rounds, playerAScores, ">", ls='-', label=playerA + " selects", color='red', markevery=playerASelects)
-ax.plot(rounds, playerAScores, "o", ls='-', label=playerA + " bananas", color='red', markevery=playerABananas)
-
-playerBSelects = [i for i, m in enumerate(playerBMoves) if m == "sel"]
-playerBBananas = [i for i, m in enumerate(playerBMoves) if m == "ban"]
-ax.plot(rounds, playerBScores, '<', ls='-', label=playerB + " selects", color='blue', markevery=playerBSelects)
-ax.plot(rounds, playerBScores, 'o', ls='-', label=playerB + " bananas", color='blue', markevery=playerBBananas)
-
-
-print("playerASelects: ", playerASelects, ", playerBSelects: ", playerBSelects)
+playerA.PlotData(ax, rounds, True)
+playerB.PlotData(ax, rounds, False)
 
 ax.set(title='Player scores')
 ax.grid()
@@ -114,9 +140,6 @@ plt.show()
 
 #TODO
 #graph of health over time
-#mark when banana bombs were used
-#mark when selects were used
-#get time to make command
 
 
 print("done.")
