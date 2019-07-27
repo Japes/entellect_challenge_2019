@@ -11,6 +11,7 @@ class Utilities
     public:
     static std::string ReadFile(std::string path);
     static rapidjson::Document ReadJsonFile(std::string filePath);
+    static uint64_t Get_ns_since_epoch();
 };
 
 #endif
