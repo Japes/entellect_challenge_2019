@@ -179,4 +179,8 @@ Engine version: 2019.2.2 -- 2019_July_25__09_20_52 -- ParallelID:
 jp11:                    0/0/0                    34/2/7                   34/0/9
 jp11_depth_36            5/1/16                   0/0/0                    29/2/12
 
-
+//playing with number of dirts to hit with banana threshold
+Engine version: 2019.2.2 -- 2019_July_27__03_48_53 -- ParallelID: 1
+(wins/draws/losses):     jp11                     jp11_long                jp11_short               
+jp11:                    0/0/0                    37/0/21                  36/0/22 
+jp11_long:                                        0/0/0                    34/0/24 
