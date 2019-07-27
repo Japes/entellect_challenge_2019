@@ -20,31 +20,42 @@ class PlayerData :
         self.moves.append(data["move"])
         self.moveTimes.append(data["executionTime"])
 
+        self.selects = [i for i, m in enumerate(self.moves) if m == "sel"]
+        self.bananas = [i for i, m in enumerate(self.moves) if m == "ban"]
+        self.teleports = [i for i, m in enumerate(self.moves) if m == "mov"]
+        self.digs = [i for i, m in enumerate(self.moves) if m == "dig"]
+        self.shoots = [i for i, m in enumerate(self.moves) if m == "sho"]
+
     def PlotData(self, axes, xValues, playerA):
-        selects = [i for i, m in enumerate(self.moves) if m == "sel"]
-        bananas = [i for i, m in enumerate(self.moves) if m == "ban"]
-        teleports = [i for i, m in enumerate(self.moves) if m == "mov"]
-        digs = [i for i, m in enumerate(self.moves) if m == "dig"]
-        shoots = [i for i, m in enumerate(self.moves) if m == "sho"]
 
         color = 'red'
         timeColor = '#FFbbbb'
-        playerThatIAm = "Player A"
         selectIndicator = ">"
 
         if not playerA:
             color = 'blue'
             timeColor = '#bbbbFF'
-            playerThatIAm = "Player B"
             selectIndicator = "<"
 
-        axes.plot(xValues, self.scores, selectIndicator, ls='-', label=self.name + " selects", color=color, markevery=selects)
-        axes.plot(xValues, self.scores, "o", ls='-', label=self.name + " bananas", color=color, markevery=bananas)
+        axes.plot(xValues, self.scores, selectIndicator, ls='-', label=self.name + " selects", color=color, markevery=self.selects)
+        axes.plot(xValues, self.scores, "o", ls='-', label=self.name + " bananas", color=color, markevery=self.bananas)
         axes.plot(xValues, self.moveTimes, ls='-', label=self.name + " execution time", color=timeColor)
 
-        print(playerThatIAm, " selects: ",  selects, "(" + str(len(selects)) + ")")
-        totalOtherMoves = len(xValues) - (len(teleports) + len(digs) + len(bananas) + len(selects) + len(shoots))
-        print(playerThatIAm, " moves: ",  len(teleports), " digs: ", len(digs), " INVALIDS/NO_MOVES: ", totalOtherMoves)
+        axes.set(title='Player scores')
+        axes.grid()
+        axes.legend()
+
+    def PlotMovesPie(self, axes, playerA):
+        totalOtherMoves = len(self.moves) - (len(self.teleports) + len(self.digs) + len(self.bananas) + len(self.selects) + len(self.shoots))
+        pieData = [len(self.selects), len(self.bananas), len(self.teleports), len(self.digs), len(self.shoots), totalOtherMoves]
+        pieLabels = ['selects', 'bananas', 'moves', 'digs', 'shoots', 'OTHER(!)']
+
+        axes.pie(pieData, labels=pieLabels, autopct='%1.1f%%', shadow=True, startangle=90)
+
+        axes.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        
+        axes.set(title=self.name)
+        axes.legend()
 
 
 def getRoundFolder(roundNumber) :
@@ -132,9 +143,10 @@ fig, ax = plt.subplots()
 playerA.PlotData(ax, rounds, True)
 playerB.PlotData(ax, rounds, False)
 
-ax.set(title='Player scores')
-ax.grid()
-ax.legend()
+fig2, [pieAxA, pieAxB] = plt.subplots(1,2)
+playerA.PlotMovesPie(pieAxA, True)
+playerB.PlotMovesPie(pieAxB, False)
+
 #fig.savefig("test.png")
 plt.show()
 
