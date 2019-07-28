@@ -33,6 +33,15 @@ int Position::EuclideanDistanceTo(const Position &other) const
     return static_cast<int>(std::sqrt((xdist*xdist) + (ydist*ydist)));
 }
 
+//adjusts position so that it is on the map
+void Position::ClampToMap()
+{
+    if(x < 0)               { x = 0; }
+    if(x > (MAP_SIZE - 1))  { x = (MAP_SIZE - 1); }
+    if(y < 0)               { y = 0; }
+    if(y > (MAP_SIZE - 1))  { y = (MAP_SIZE - 1); }
+}
+
 bool Position::IsOnMap() const
 {
     return x >= 0 && y >= 0 && x < GameConfig::mapSize && y < GameConfig::mapSize;

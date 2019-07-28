@@ -43,7 +43,6 @@ class GameEngine
     bool DoCommand(const Command& command, bool player1, bool valid);
     void ApplyPowerups();
     void UpdateWinCondition();
-    std::vector<Worm*> WormsWithinDistance(Position pos, int dist);
 
     std::shared_ptr<GameState> _state;
     GameResult _currentResult;

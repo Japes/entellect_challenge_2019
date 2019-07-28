@@ -229,3 +229,70 @@ TEST_CASE( "DirtsBananaWillHit", "[DirtsBananaWillHit]" ) {
         }
     }
 }
+
+TEST_CASE( "Closest_dirt", "[Closest_dirt]" ) {
+    GIVEN("A contrived situation with NO DIRTS at first")
+    {
+        /*
+            0   1   2   3   4   5   6   7   8
+        0   .   .   .   D   .   .   .   .   .
+        1   .   .   .   .   .   .   .   D   .
+        2   .   .   .   .   .   .   .   .   .   
+        3   .   .   .   .   .   .   .   .   .
+        4   .   .   .   .   .   .   .   .   .
+        5   .   .   .   .   .   .   .   .   .
+        6   11  .   .   .   .   .   .   .   .
+        7   .   .   .   .   .   .   .   .   .
+        8   .   .   .   .   .   .   .   .   .            
+        9   .   .   .   .   .   .   .   .   .            
+        10  .   .   .   .   .   .   .   .   .            
+        */
+
+        auto state = std::make_shared<GameState>();
+        Position fromPos(0,6);
+
+        THEN("Closest_dirt behaves correctly...")
+        {
+            REQUIRE(state->Closest_dirt(fromPos) == Position(-1,-1));
+        }
+
+        WHEN("We add the furthest dirt")
+        {
+            state->SetCellTypeAt({32, 5}, CellType::DIRT);
+            THEN("Closest_dirt returns it")
+            {
+                REQUIRE(state->Closest_dirt(fromPos) == Position(32, 5));
+            }
+        }
+
+        WHEN("We add some dirts")
+        {
+            state->SetCellTypeAt({3, 0}, CellType::DIRT);
+            state->SetCellTypeAt({7, 1}, CellType::DIRT);
+
+            THEN("Closest_dirt returns the closest")
+            {
+                REQUIRE(state->Closest_dirt(fromPos) == Position(3,0));
+            }
+
+            AND_THEN("We add some closer dirts")
+            {
+                state->SetCellTypeAt({2, 8}, CellType::DIRT);
+                THEN("Closest_dirt returns the closest")
+                {
+                    REQUIRE(state->Closest_dirt(fromPos) == Position(2,8));
+                }
+            }
+        }
+
+        WHEN("We check things from the opposite side of the map")
+        {
+            fromPos = Position(32,32);
+            state->SetCellTypeAt({0, 0}, CellType::DIRT);
+            THEN("Closest_dirt returns it")
+            {
+                REQUIRE(state->Closest_dirt(fromPos) == Position(0, 0));
+            }
+        }
+    }
+}

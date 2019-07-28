@@ -11,7 +11,7 @@
 class Bot
 {
 	public:
-    Bot(unsigned playthroughDepth, unsigned dirtsForBanana, uint64_t mcTime_ns, float mc_c, unsigned mc_runsBeforeClockCheck);
+    Bot(unsigned playthroughDepth, unsigned dirtsForBanana, unsigned distanceForLost, uint64_t mcTime_ns, float mc_c, unsigned mc_runsBeforeClockCheck);
 
     std::string runStrategy(rapidjson::Document& roundJSON);
 
@@ -22,6 +22,7 @@ class Bot
 
     unsigned _playthroughDepth;
     unsigned _dirtsForBanana;
+    unsigned _distanceForLost;
     uint64_t _mc_Time_ns;
     float _mc_c;
     unsigned _mc_runsBeforeClockCheck;

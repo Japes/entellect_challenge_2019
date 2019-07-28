@@ -16,6 +16,7 @@ struct Position
     int EuclideanDistanceTo(const Position &other) const;
     bool IsOnMap() const;
     bool BananaCanReach(const Position &other) const;
+    void ClampToMap();
     Position Normalized() const;
 
     //fun shootingDistance(other: Point): Double = floor(euclideanDistance(other))

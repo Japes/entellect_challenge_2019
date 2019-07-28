@@ -298,6 +298,88 @@ void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
     }
 }
 
+//returns closest dirt in terms of move distance
+//returns {-1, -1} if no dirts
+Position GameState::Closest_dirt(const Position& fromPos) 
+{
+    //spiral around from worm and return the first dirt u find
+    unsigned extents = 1;
+    while(extents < (MAP_SIZE)) {
+
+        Position NW = fromPos + Position(-extents,-extents);
+        NW.ClampToMap();
+        Position NE = fromPos + Position( extents,-extents);
+        NE.ClampToMap();
+        Position SE = fromPos + Position( extents, extents);
+        SE.ClampToMap();
+        Position SW = fromPos + Position(-extents, extents);
+        SW.ClampToMap();
+
+        for(Position pos = NW; pos != NE; ++pos.x) {
+             if(CellType_at(pos) == CellType::DIRT) {
+                return pos;
+            }   
+        }
+        for(Position pos = NE; pos != SE; ++pos.y) {
+             if(CellType_at(pos) == CellType::DIRT) {
+                return pos;
+            }   
+        }
+        for(Position pos = SE; pos != SW; --pos.x) {
+             if(CellType_at(pos) == CellType::DIRT) {
+                return pos;
+            }   
+        }
+        for(Position pos = SW; pos != NW; --pos.y) {
+             if(CellType_at(pos) == CellType::DIRT) {
+                return pos;
+            }   
+        }
+
+        ++extents;
+    }
+
+    return {-1,-1};
+}
+
+int GameState::Dist_to_closest_enemy(bool player1) 
+{
+    //get distance to closest enemy
+    //pos of my worm:
+    Player * me = GetPlayer(player1);
+    Worm * worm = me->GetCurrentWorm();
+    Position myWormPos = worm->position;
+
+    //now calc
+    Player * enemy = GetPlayer(!player1);
+    int closestDist = 9999;
+    for(auto const & worm : enemy->worms) {
+        if(worm.IsDead() || !worm.position.IsOnMap()) {
+            continue;
+        }
+        auto dist = myWormPos.EuclideanDistanceTo(worm.position);
+        if(dist < closestDist){
+            closestDist = dist;
+        }
+    }
+
+    return closestDist;
+}
+
+//return all worms if dist is -1
+std::vector<Worm*> GameState::WormsWithinDistance(Position pos, int dist)
+{
+    std::vector<Worm*> ret;
+
+    ForAllWorms([&](Worm& worm) {
+        if(dist < 0 || (!worm.IsDead() && pos.EuclideanDistanceTo(worm.position) <= dist)) {
+            ret.push_back(&worm);
+        }
+    });
+
+    return ret;
+}
+
 bool GameState::operator==(const GameState &other) const
 {
     //std::cerr << "(" << __FUNCTION__ << ") deepSpacesGood: " << deepSpacesGood <<

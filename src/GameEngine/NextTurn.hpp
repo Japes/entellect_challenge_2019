@@ -29,6 +29,7 @@ class NextTurn
     static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
     
     //heuristic related stuff
+    static std::shared_ptr<Command> GetNearestDirtHeuristic(bool player1, std::shared_ptr<GameState> state, int distanceForLost);
     static std::shared_ptr<Command> GetBananaProspect(bool player1, std::shared_ptr<GameState> state, int thresh);
     static std::string TryApplySelect(bool player1, std::shared_ptr<GameState> state);
 

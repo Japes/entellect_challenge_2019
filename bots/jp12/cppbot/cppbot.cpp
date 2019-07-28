@@ -21,11 +21,12 @@ int main(int argc, char** argv)
 {
     unsigned playThroughDepth{24};
     unsigned dirtsForBanana{10};
+    unsigned clearSpaceForHeuristic{7}; //if everything is clear for this distance, use heuristic
     uint64_t mcTime_ns{880000000};
     float mc_c{std::sqrt(2)};
     unsigned mc_runsBeforeClockCheck{50};
 
-    Bot bot(playThroughDepth, dirtsForBanana, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+    Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     for (std::string roundNumber; std::getline(std::cin, roundNumber);) 
     {

@@ -34,6 +34,10 @@ class GameState
     Player* GetPlayer(bool player1);
     void ForAllWorms(std::function<void(Worm&)> wormFn);
 
+    std::vector<Worm*> WormsWithinDistance(Position pos, int dist);
+    Position Closest_dirt(const Position& fromPos);
+    int Dist_to_closest_enemy(bool player1);
+
     bool operator==(const GameState &other) const;
 
     private:

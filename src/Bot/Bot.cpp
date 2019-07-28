@@ -5,9 +5,10 @@
 #include "EvaluationFunctions.hpp"
 #include <thread>
 
-Bot::Bot(unsigned playthroughDepth, unsigned dirtsForBanana, uint64_t mcTime_ns, float mc_c, unsigned mc_runsBeforeClockCheck) :
+Bot::Bot(unsigned playthroughDepth, unsigned dirtsForBanana, unsigned distanceForLost, uint64_t mcTime_ns, float mc_c, unsigned mc_runsBeforeClockCheck) :
     _playthroughDepth{playthroughDepth},
     _dirtsForBanana{dirtsForBanana},
+    _distanceForLost{distanceForLost},
     _mc_Time_ns{mcTime_ns},
     _mc_c{mc_c},
     _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck}
@@ -29,23 +30,24 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
 
 
     //do some heuristics---------------------------------------------------------------
-    //banana mine
-    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
-    if(bananaMove != nullptr) {
-        return bananaMove->GetCommandString();
-    }
-    //heuristic to avoid getting lost
-    //int closestEnemy = Dist_to_closest_enemy();
-
     //select
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1);
 
+    //banana mine
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
+    if(bananaMove != nullptr) {
+        return selectPrefix + bananaMove->GetCommandString();
+    }
+
+    //heuristic to avoid getting lost
+    auto nearestDirtMove = NextTurn::GetNearestDirtHeuristic(ImPlayer1, state1, _distanceForLost);
+    if(nearestDirtMove != nullptr) {
+        std::cerr << "(" << __FUNCTION__ << ") USING HEURISTIC TO PREVENT GETTING LOST" << std::endl;
+        return selectPrefix + nearestDirtMove->GetCommandString();
+    }
+
     //begin monte carlo----------------------------------------------------------------
     auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), _mc_c);
-
-    //we'll adjust playthrough depth based on how many enemy worms are around us.
-    
-
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc, state1, ImPlayer1, _playthroughDepth);
     std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc, state1, ImPlayer1, _playthroughDepth);
     t1.join();
@@ -92,29 +94,6 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_p
             _mtx.unlock();
         }
     }
-}
-
-int Bot::Dist_to_closest_enemy(std::shared_ptr<GameState> state1, bool player1) {
-    //get distance to closest enemy
-    //pos of my worm:
-    Player * me = state1->GetPlayer(player1);
-    Worm * worm = me->GetCurrentWorm();
-    Position myWormPos = worm->position;
-
-    //now calc
-    Player * enemy = state1->GetPlayer(!player1);
-    int closestDist = 9999;
-    for(auto const & worm : enemy->worms) {
-        if(worm.IsDead()) {
-            continue;
-        }
-        auto dist = myWormPos.EuclideanDistanceTo(worm.position);
-        if(dist < closestDist){
-            closestDist = dist;
-        }
-    }
-
-    return closestDist;
 }
 
 void Bot::AdjustOpponentBananaCount(bool player1, std::shared_ptr<GameState> state1)

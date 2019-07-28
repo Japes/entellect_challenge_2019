@@ -392,6 +392,151 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
     }
 }
 
+TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
+{
+    GIVEN("A contrived game state")
+    {
+
+        //    0   1   2   3   4 
+        //0   .   .   .   .   .
+        //1   .   11  .   .   .
+        //2   .   .   .   .   .
+        //3   .   .   .   .   .
+        //4   .   .   .   .   .
+
+        auto state = std::make_shared<GameState>();
+
+        bool player1 = GENERATE(true, false);
+        int distanceForLost = GENERATE(2, 5, 10, 25);
+
+        Worm* playerWorm = place_worm(player1, 1, {1,1}, state);
+
+        WHEN("there is an enemy worm within the range limit")
+        {
+            auto enemyWormPos = playerWorm->position + Position(distanceForLost - 1, distanceForLost/2);
+            place_worm(player1, 1, enemyWormPos, state);
+
+            THEN("the heuristic doesn't kick in")
+            {
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                REQUIRE(cmd == nullptr);
+            }
+        }
+
+        WHEN("there is dirt within the range limit")
+        {
+            auto dirtPos = playerWorm->position + Position(distanceForLost/2, distanceForLost/2);
+            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+
+            //do a generate for places all around the circle
+            THEN("the heuristic doesn't kick in")
+            {
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                REQUIRE(cmd == nullptr);
+            }
+
+            AND_THEN("there is an enemy worm nearby")
+            {
+                auto enemyWormPos = playerWorm->position + Position(distanceForLost - 1, distanceForLost/2);
+                place_worm(player1, 1, enemyWormPos, state);
+                THEN("the heuristic doesn't kick in")
+                {
+                    auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                    REQUIRE(cmd == nullptr);
+                }   
+            }
+        }
+
+        WHEN("there is no dirt at all")
+        {
+            THEN("the heuristic doesn't kick in")
+            {
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                REQUIRE(cmd == nullptr);
+            }
+        }
+
+        WHEN("there is no enemy or dirt within the range limit (but dirt on the map)")
+        {
+            auto dirtPos = playerWorm->position + Position(distanceForLost+2, distanceForLost+5);
+            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+
+            THEN("The heuristic kicks in")
+            {
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                REQUIRE(cmd != nullptr);
+
+                AND_THEN("The given direction is correct")
+                {
+                    REQUIRE(cmd->GetCommandString() == "move 2 2");
+                }
+            }
+
+            AND_THEN("There is an ally close by")
+            {
+                auto friendlyPos = playerWorm->position + Position(distanceForLost - 1, distanceForLost/2);
+                place_worm(player1, 2, friendlyPos, state);
+                THEN("The heuristic kicks in")
+                {
+                    auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                    REQUIRE(cmd != nullptr);
+
+                    AND_THEN("The given direction is correct")
+                    {
+                        REQUIRE(cmd->GetCommandString() == "move 2 2");
+                    }
+                }   
+            }
+        }
+
+        //bunch more for direction confirmation
+        WHEN("We try to confirm direction...")
+        {
+            auto dirtPos = playerWorm->position + Position(distanceForLost+2, 0);
+            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("The given direction is correct")
+            {
+                REQUIRE(cmd->GetCommandString() == "move 2 1");
+            }
+        }
+        WHEN("We try to confirm direction...")
+        {
+            auto dirtPos = playerWorm->position + Position(0, distanceForLost+2);
+            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            
+            THEN("The given direction is correct")
+            {
+                REQUIRE(cmd->GetCommandString() == "move 1 2");
+            }
+        }
+        WHEN("We try to confirm direction...")
+        {
+            auto dirtPos = playerWorm->position + Position(distanceForLost / 2, distanceForLost+2);
+            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            
+            THEN("The given direction is correct")
+            {
+                REQUIRE(cmd->GetCommandString() == "move 2 2");
+            }
+        }
+        WHEN("We try to confirm direction...")
+        {
+            auto dirtPos = playerWorm->position + Position(distanceForLost + 2, distanceForLost/2);
+            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            
+            THEN("The given direction is correct")
+            {
+                REQUIRE(cmd->GetCommandString() == "move 2 2");
+            }
+        }
+    }
+}
+
 //just made this to confirm that random moves are actually random
 TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
 {

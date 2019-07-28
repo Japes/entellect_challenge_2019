@@ -4,7 +4,10 @@ python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
 TODO
 
    Need to prevent getting lost
-   
+
+   use heuristic if all monte carlos are tied
+      or off by <numplaythroughs>
+      
    handle monte carlo ties
       make wins/losses comparable as well - will reduce ties
       make monte carlo choose random if tie

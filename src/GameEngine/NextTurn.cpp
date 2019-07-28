@@ -102,6 +102,30 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
     return ret;
 }
 
+//returns nullptr if there is a dirt or an enemy within distanceForLost
+std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, std::shared_ptr<GameState> state, int distanceForLost)
+{
+    int closestEnemy = state->Dist_to_closest_enemy(player1);
+    if(closestEnemy <= distanceForLost) {
+        return nullptr;
+    }
+
+    auto worm = state->GetPlayer(player1)->GetCurrentWorm();
+    Position closestDirt = state->Closest_dirt(worm->position);
+    if(closestDirt == Position(-1,-1)) {
+        return nullptr;
+    }
+
+    if(worm->position.MovementDistanceTo(closestDirt) <= distanceForLost) {
+        return nullptr;
+    }
+
+    Position dir = (closestDirt - worm->position).Normalized();
+    Position moveTarget = worm->position + dir;
+    //return move towards dirt
+    return std::make_shared<TeleportCommand>(moveTarget);
+}
+
 std::shared_ptr<Command> NextTurn::GetBananaProspect(bool player1, std::shared_ptr<GameState> state, int thresh)
 {
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();

@@ -87,20 +87,6 @@ void GameEngine::ApplyPowerups()
     });
 }
 
-//return all worms if dist is -1
-std::vector<Worm*> GameEngine::WormsWithinDistance(Position pos, int dist)
-{
-    std::vector<Worm*> ret;
-
-    _state->ForAllWorms([&](Worm& worm) {
-        if(dist < 0 || (!worm.IsDead() && pos.EuclideanDistanceTo(worm.position) <= dist)) {
-            ret.push_back(&worm);
-        }
-    });
-
-    return ret;
-}
-
 //do a random playthrough to the end and return:
 //+1 if player wins
 //-1 if player loses
@@ -117,7 +103,7 @@ float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     //filter out worms too far away:
     Player* player = _state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
-    std::vector<Worm*> considered_worms = WormsWithinDistance(worm->position, radiusToConsider);
+    std::vector<Worm*> considered_worms = _state->WormsWithinDistance(worm->position, radiusToConsider);
 
     auto filteredNextMoveFn = [&] (bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> {
         Player* player = state->GetPlayer(player1);
