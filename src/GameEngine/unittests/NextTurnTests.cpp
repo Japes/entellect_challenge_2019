@@ -488,6 +488,27 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
                 }   
             }
         }
+    }
+}
+
+TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDirtHeuristicDirection]" )
+{
+    GIVEN("A contrived game state")
+    {
+
+        //    0   1   2   3   4 
+        //0   .   .   .   .   .
+        //1   .   11  .   .   .
+        //2   .   .   .   .   .
+        //3   .   .   .   .   .
+        //4   .   .   .   .   .
+
+        auto state = std::make_shared<GameState>();
+
+        bool player1 = GENERATE(true, false);
+        int distanceForLost = GENERATE(2, 5, 10, 25);
+
+        Worm* playerWorm = place_worm(player1, 1, {1,1}, state);
 
         //bunch more for direction confirmation
         WHEN("We try to confirm direction...")
@@ -532,6 +553,169 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
             THEN("The given direction is correct")
             {
                 REQUIRE(cmd->GetCommandString() == "move 2 2");
+            }
+        }
+    }
+}
+
+
+TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDirtHeuristic_avoid_deepSpace]" )
+{
+    GIVEN("A game state")
+    {
+        auto state = std::make_shared<GameState>();
+
+        bool player1 = GENERATE(true, false);
+        int wormIndex = GENERATE(1,2,3);
+        int distanceForLost = 2;
+
+        WHEN("We set things up for a crash (1)")
+        {
+            //    0   1   2   3   4 
+            //0   D   .   .   .   .
+            //1   .   .   .   .   .
+            //2   .   .   .   .   .
+            //3   .   .   .   .   .
+            //4   S   .   .   .   .
+            //5   S   11  .   .   .
+
+            place_worm(player1, wormIndex, {1,5}, state);
+            state->SetCellTypeAt({0,0}, CellType::DIRT);
+            state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into dirt")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 0 4");
+                REQUIRE(cmd->GetCommandString() == "move 1 4");
+            }
+        }
+
+        WHEN("We set things up for a crash (2)")
+        {
+            //    0   1   2   3   4 
+            //0   S   S   .   .   D
+            //1   11  .   .   .   .
+            //2   .   .   .   .   .
+            //3   .   .   .   .   .
+            //4   .   .   .   .   .
+            //5   .   .   .   .   .
+
+            place_worm(player1, wormIndex, {1,5}, state);
+            state->SetCellTypeAt({4,0}, CellType::DIRT);
+            state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into dirt")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 1 0");
+                REQUIRE(cmd->GetCommandString() == "move 1 1");
+            }
+        }
+
+        WHEN("We set things up for a crash (3)")
+        {
+            //    0   1   2   3   4 
+            //0   .   .   .   .   .
+            //1   .   .   .   .   .
+            //2   .   .   .   .   .
+            //3   .   .   .   .   .
+            //4   11  .   .   .   .
+            //5   S   S   .   .   D
+
+            place_worm(player1, wormIndex, {0,4}, state);
+            state->SetCellTypeAt({4,5}, CellType::DIRT);
+            state->SetCellTypeAt({1,5}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into dirt")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 1 5");
+                REQUIRE(cmd->GetCommandString() == "move 1 4");
+            }
+        }
+
+        WHEN("We set things up for a crash into a worm (1)")
+        {
+            //    0   1   2   3   4 
+            //0   D   .   .   .   .
+            //1   .   .   .   .   .
+            //2   .   .   .   .   .
+            //3   .   .   .   .   .
+            //4   12  .   .   .   .
+            //5   S   11  .   .   .
+
+            place_worm(player1, 1, {1,5}, state);
+            place_worm(player1, 2, {0,4}, state);
+            state->SetCellTypeAt({0,0}, CellType::DIRT);
+            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into the friendly worm")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 0 4");
+                REQUIRE(cmd->GetCommandString() == "move 1 4");
+            }
+        }
+
+        WHEN("We set things up for a crash into a worm (2)")
+        {
+            //    0   1   2   3   4 
+            //0   D   .   .   .   .
+            //1   .   .   .   .   .
+            //2   .   .   .   .   .
+            //3   .   .   .   .   .
+            //4   S   12  .   .   .
+            //5   S   11  .   .   .
+
+            place_worm(player1, 1, {1,5}, state);
+            place_worm(player1, 2, {1,4}, state);
+            state->SetCellTypeAt({0,0}, CellType::DIRT);
+            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into the friendly worm")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 0 4");
+                REQUIRE(cmd->GetCommandString() == "move 1 4");
+            }
+        }
+
+        WHEN("We set things up for a crash into a worm (3)")
+        {
+            //    0   1   2   3   4 
+            //0   D   .   .   .   .
+            //1   .   .   .   .   .
+            //2   .   .   .   .   .
+            //3   .   .   .   .   .
+            //4   S   12  13  .   .
+            //5   S   11  .   .   .
+            //5   .   .   .   .   .
+
+            place_worm(player1, 1, {1,5}, state);
+            place_worm(player1, 2, {1,4}, state);
+            place_worm(player1, 3, {2,4}, state);
+            state->SetCellTypeAt({0,0}, CellType::DIRT);
+            state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into the friendly worm, and at least makes a move")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 0 4");
+                REQUIRE(cmd->GetCommandString() != "move 0 5");
+                REQUIRE(cmd->GetCommandString() != "move 1 4");
+                REQUIRE(cmd->GetCommandString() != "move 2 4");
+                REQUIRE(cmd->Order() == 1); //i.e. confirm it's a move
             }
         }
     }

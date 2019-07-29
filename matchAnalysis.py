@@ -25,8 +25,10 @@ class PlayerData :
         self.teleports = [i for i, m in enumerate(self.moves) if m == "mov"]
         self.digs = [i for i, m in enumerate(self.moves) if m == "dig"]
         self.shoots = [i for i, m in enumerate(self.moves) if m == "sho"]
+        self.invalid_moves = [i for i, m in enumerate(self.moves) if m != "sel" and m != "ban" and m != "mov" and m != "dig" and m != "sho" ]
 
     def PlotData(self, axes, xValues, playerA):
+        global _matchFolder
 
         color = 'red'
         timeColor = '#FFbbbb'
@@ -39,16 +41,16 @@ class PlayerData :
 
         axes.plot(xValues, self.scores, selectIndicator, ls='-', label=self.name + " selects", color=color, markevery=self.selects)
         axes.plot(xValues, self.scores, "o", ls='-', label=self.name + " bananas", color=color, markevery=self.bananas)
+        axes.plot(xValues, self.scores, "x", ls='-', label=self.name + " invalid/no moves", color=color, markevery=self.invalid_moves)
         axes.plot(xValues, self.moveTimes, ls='-', label=self.name + " execution time", color=timeColor)
 
-        axes.set(title='Player scores')
+        axes.set(title='Player scores ' + _matchFolder )
         axes.grid()
         axes.legend()
 
     def PlotMovesPie(self, axes, playerA):
-        totalOtherMoves = len(self.moves) - (len(self.teleports) + len(self.digs) + len(self.bananas) + len(self.selects) + len(self.shoots))
-        pieData = [len(self.selects), len(self.bananas), len(self.teleports), len(self.digs), len(self.shoots), totalOtherMoves]
-        pieLabels = ['selects', 'bananas', 'moves', 'digs', 'shoots', 'OTHER(!)']
+        pieData = [len(self.selects), len(self.bananas), len(self.teleports), len(self.digs), len(self.shoots), len(self.invalid_moves)]
+        pieLabels = ['selects', 'bananas', 'moves', 'digs', 'shoots', 'OTHER(' + str(len(self.invalid_moves)) + ')']
 
         axes.pie(pieData, labels=pieLabels, autopct='%1.1f%%', shadow=True, startangle=90)
 
@@ -113,10 +115,10 @@ def getRoundData(roundFolder) :
 if len(sys.argv) < 2:
     print("Give me a match folder: \"matchAnalysis.py [MATCH_FOLDER]\"")
 
-matchFolder = sys.argv[1]
-print("Scraping ", matchFolder, "...")
+_matchFolder = sys.argv[1]
+print("Scraping ", _matchFolder, "...")
 
-if not os.path.exists(matchFolder):
+if not os.path.exists(_matchFolder):
     print("can't find that folder.")
     exit()
 
@@ -125,7 +127,7 @@ playerB = PlayerData()
 rounds = []
 
 roundNumber = 1
-roundFolder = matchFolder + "/" + getRoundFolder(roundNumber)
+roundFolder = _matchFolder + "/" + getRoundFolder(roundNumber)
 while os.path.exists(roundFolder):
     playerA.name, playerB.name, playerAData, playerBData = getRoundData(roundFolder)
     rounds.append(roundNumber)
@@ -134,7 +136,7 @@ while os.path.exists(roundFolder):
     playerB.AppendData(playerBData)
 
     roundNumber += 1
-    roundFolder = matchFolder + "/" + getRoundFolder(roundNumber)
+    roundFolder = _matchFolder + "/" + getRoundFolder(roundNumber)
 
 print("playerA: ", playerA.name, ", playerB: ", playerB.name)
 

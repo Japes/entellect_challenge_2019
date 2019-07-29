@@ -7,6 +7,9 @@ TODO
 
    use heuristic if all monte carlos are tied
       or off by <numplaythroughs>
+
+   runMatches script takes long because it wipes the copy of starter-pack, which could have loads of matches in it.
+      maybe should dump all the matches in one place
       
    handle monte carlo ties
       make wins/losses comparable as well - will reduce ties
