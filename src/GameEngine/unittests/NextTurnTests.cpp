@@ -468,7 +468,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
 
                 AND_THEN("The given direction is correct")
                 {
-                    REQUIRE(cmd->GetCommandString() == "move 2 2");
+                    REQUIRE(cmd->GetCommandString() == "move 1 2");
                 }
             }
 
@@ -483,7 +483,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
 
                     AND_THEN("The given direction is correct")
                     {
-                        REQUIRE(cmd->GetCommandString() == "move 2 2");
+                        REQUIRE(cmd->GetCommandString() == "move 1 2");
                     }
                 }   
             }
@@ -535,24 +535,24 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
         }
         WHEN("We try to confirm direction...")
         {
-            auto dirtPos = playerWorm->position + Position(distanceForLost / 2, distanceForLost+2);
+            auto dirtPos = playerWorm->position + Position(distanceForLost + 1, distanceForLost+2);
             state->SetCellTypeAt(dirtPos, CellType::DIRT);
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
             
             THEN("The given direction is correct")
             {
-                REQUIRE(cmd->GetCommandString() == "move 2 2");
+                REQUIRE(cmd->GetCommandString() == "move 1 2");
             }
         }
         WHEN("We try to confirm direction...")
         {
-            auto dirtPos = playerWorm->position + Position(distanceForLost + 2, distanceForLost/2);
+            auto dirtPos = playerWorm->position + Position(distanceForLost + 2, distanceForLost + 1);
             state->SetCellTypeAt(dirtPos, CellType::DIRT);
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
             
             THEN("The given direction is correct")
             {
-                REQUIRE(cmd->GetCommandString() == "move 2 2");
+                REQUIRE(cmd->GetCommandString() == "move 2 1");
             }
         }
     }
@@ -566,7 +566,7 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
         auto state = std::make_shared<GameState>();
 
         bool player1 = GENERATE(true, false);
-        int wormIndex = GENERATE(1,2,3);
+        int wormIndex = 1;
         int distanceForLost = 2;
 
         WHEN("We set things up for a crash (1)")
@@ -583,7 +583,6 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             state->SetCellTypeAt({0,0}, CellType::DIRT);
             state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
             state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
-
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
 
             THEN("It doesn't crash us into dirt")
@@ -603,7 +602,7 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //4   .   .   .   .   .
             //5   .   .   .   .   .
 
-            place_worm(player1, wormIndex, {1,5}, state);
+            place_worm(player1, wormIndex, {0,1}, state);
             state->SetCellTypeAt({4,0}, CellType::DIRT);
             state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
             state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
@@ -682,10 +681,9 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
 
-            THEN("It doesn't crash us into the friendly worm")
+            THEN("The heuristic gives up - path is too complicated")
             {
-                REQUIRE(cmd->GetCommandString() != "move 0 4");
-                REQUIRE(cmd->GetCommandString() == "move 1 4");
+                REQUIRE(cmd == nullptr);
             }
         }
 
@@ -709,17 +707,23 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
 
-            THEN("It doesn't crash us into the friendly worm, and at least makes a move")
+            THEN("The heuristic gives up - path is too complicated")
             {
-                REQUIRE(cmd->GetCommandString() != "move 0 4");
-                REQUIRE(cmd->GetCommandString() != "move 0 5");
-                REQUIRE(cmd->GetCommandString() != "move 1 4");
-                REQUIRE(cmd->GetCommandString() != "move 2 4");
-                REQUIRE(cmd->Order() == 1); //i.e. confirm it's a move
+                REQUIRE(cmd == nullptr);
             }
         }
     }
 }
+
+
+
+
+
+//TODO find out why it always does invalids at the end of the game
+
+
+
+
 
 //just made this to confirm that random moves are actually random
 TEST_CASE( "TryApplySelect", "[TryApplySelect]" )

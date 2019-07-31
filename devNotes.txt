@@ -3,7 +3,8 @@ python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
 
 TODO
 
-   Need to prevent getting lost
+   find out why/if im doing invalids 
+      use leon's script
 
    use heuristic if all monte carlos are tied
       or off by <numplaythroughs>

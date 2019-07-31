@@ -5,6 +5,9 @@ import os
 import sys
 
 def Count_moves(filename):
+    if not os.path.exists(filename):
+        return
+        
     mv_count = defaultdict(int)
     with open(filename) as f:
         for line in f.readlines()[2:]:
@@ -32,8 +35,12 @@ def Output_game_result(res):
     print(f'win: {res[2][15]}', end=' ')
 
 def Count_selects_file(filename, mvs):
+    if not os.path.exists(filename):
+        return
     with open(filename) as f:
         lines = f.readlines()
+        if(len(lines) == 0) :
+            return
         if 'select' in lines[0]:
             mvs['select'] += 1
 
@@ -46,7 +53,7 @@ def Count_selects(root, amvs, bmvs):
                 Count_selects_file(os.path.join(subdir, path, 'PlayerCommand.txt'), bmvs)
 
 def Summarize_match(root):
-    #game_result = None
+    game_result = None
     for subdir, dirs, files in os.walk(root):
         for filename in files:
             if filename == 'endGameState.txt':
@@ -58,6 +65,9 @@ def Summarize_match(root):
                 bmvs = Count_moves(os.path.join(subdir, filename))
         for path in dirs:
             Count_selects(os.path.join(subdir, path), amvs, bmvs)
+
+    if game_result == None :
+        return
 
     Output_game_result(game_result)
     af = game_result[4].split(':')

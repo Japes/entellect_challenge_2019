@@ -120,8 +120,28 @@ std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, std::sh
         return nullptr;
     }
 
-    Position dir = (closestDirt - worm->position).Normalized();
+    Position dir = (closestDirt - worm->position);
+
+    //simple heuristic to get a heading...
+    //(luckily the obstacles are confined to the edges, so we don't have to do propper A*)
+    auto xMag = std::abs(dir.x);
+    auto yMag = std::abs(dir.y);
+    if (xMag > yMag) {
+        dir.x /= xMag;
+        dir.y = 0;
+    } else if (yMag > xMag) {
+        dir.y /= yMag;
+        dir.x = 0;
+    } else {//they're the same
+        dir = dir.Normalized();
+    }
     Position moveTarget = worm->position + dir;
+
+    if(state->Worm_at(moveTarget) != nullptr) {
+        //woops, friendly worm here.  Just move somewhere random - MC will handle that
+        return nullptr;
+    }
+
     //return move towards dirt
     return std::make_shared<TeleportCommand>(moveTarget);
 }
