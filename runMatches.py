@@ -14,7 +14,7 @@ import glob
 #hardcoded stuff #############################
 _botsPath = "./bots/" #relative path to bots from script position
 _staterPackPath = "./starter-pack" #relative path to starterpack from script position
-_matchLogsPath = "./match-logs" #relative path to match logs FROM STARTER PACK (this gets put in the game runner config)
+_matchLogsPath = "../match-logs" #relative path to match logs FROM STARTER PACK (this gets put in the game runner config)
 _startingPath = "" #path script is run from
 _resultsFolder = "runMatchesResults"
 
@@ -328,6 +328,10 @@ print("Running with paralellID: \"" + _parallelID + "\" BOTS: " + str(_bots))
 
 allMatchesFilePath, summaryFilePath = GetOutputPaths()
 
+_matchLogsPath = _matchLogsPath + "/RunMatchesBatch_" + dateString
+if not os.path.exists(_matchLogsPath):
+    os.makedirs(_matchLogsPath)
+
 #adjustments if we're running in parallel...
 if(_parallelID != ""):
     newStarterPack = _staterPackPath + _parallelID
@@ -335,7 +339,6 @@ if(_parallelID != ""):
         shutil.rmtree(newStarterPack)
     copy(_staterPackPath, newStarterPack, 'match-logs')
     _staterPackPath = newStarterPack
-    _matchLogsPath += _parallelID
 
 #run matches
 grid_summary = GetSummaryGrid()
