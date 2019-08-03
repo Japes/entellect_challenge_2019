@@ -3,6 +3,9 @@ python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
 
 TODO
 
+   snowball
+      you can select away from the snowballed guy
+      
    find out why/if im doing invalids 
       use leon's script
 

@@ -468,7 +468,9 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
 
                 AND_THEN("The given direction is correct")
                 {
-                    REQUIRE(cmd->GetCommandString() == "move 1 2");
+                    auto cmdStr = cmd->GetCommandString();
+                    INFO(cmdStr)
+                    REQUIRE( ((cmdStr == "move 0 2") || (cmdStr == "move 1 2") || (cmdStr == "move 2 1") || (cmdStr == "move 2 2")) ) ;
                 }
             }
 
@@ -483,7 +485,9 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
 
                     AND_THEN("The given direction is correct")
                     {
-                        REQUIRE(cmd->GetCommandString() == "move 1 2");
+                        auto cmdStr = cmd->GetCommandString();
+                        INFO(cmdStr)
+                        REQUIRE( ((cmdStr == "move 0 2") || (cmdStr == "move 1 2") || (cmdStr == "move 2 1") || (cmdStr == "move 2 2")) ) ;
                     }
                 }   
             }
@@ -519,7 +523,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
 
             THEN("The given direction is correct")
             {
-                REQUIRE(cmd->GetCommandString() == "move 2 1");
+                auto cmdStr = cmd->GetCommandString();
+                REQUIRE( ((cmdStr == "move 2 0") || (cmdStr == "move 2 1") || (cmdStr == "move 2 2")) ) ;
             }
         }
         WHEN("We try to confirm direction...")
@@ -530,7 +535,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
             
             THEN("The given direction is correct")
             {
-                REQUIRE(cmd->GetCommandString() == "move 1 2");
+                auto cmdStr = cmd->GetCommandString();
+                REQUIRE( ((cmdStr == "move 0 2") || (cmdStr == "move 1 2") || (cmdStr == "move 2 2")) ) ;
             }
         }
         WHEN("We try to confirm direction...")
@@ -541,7 +547,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
             
             THEN("The given direction is correct")
             {
-                REQUIRE(cmd->GetCommandString() == "move 1 2");
+                auto cmdStr = cmd->GetCommandString();
+                REQUIRE( ((cmdStr == "move 2 1") || (cmdStr == "move 2 2") || (cmdStr == "move 1 2")) ) ;
             }
         }
         WHEN("We try to confirm direction...")
@@ -552,7 +559,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
             
             THEN("The given direction is correct")
             {
-                REQUIRE(cmd->GetCommandString() == "move 2 1");
+                auto cmdStr = cmd->GetCommandString();
+                REQUIRE( ((cmdStr == "move 2 1") || (cmdStr == "move 2 2") || (cmdStr == "move 1 2")) ) ;
             }
         }
     }
@@ -587,8 +595,8 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             THEN("It doesn't crash us into dirt")
             {
-                REQUIRE(cmd->GetCommandString() != "move 0 4");
-                REQUIRE(cmd->GetCommandString() == "move 1 4");
+                auto cmdStr = cmd->GetCommandString();
+                REQUIRE( ( (cmdStr == "move 1 4") || (cmdStr == "move 2 4") ) ) ;
             }
         }
 
@@ -635,8 +643,36 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             THEN("It doesn't crash us into dirt")
             {
-                REQUIRE(cmd->GetCommandString() != "move 1 5");
-                REQUIRE(cmd->GetCommandString() == "move 1 4");
+                auto cmdStr = cmd->GetCommandString();
+                INFO(cmdStr)
+                REQUIRE( ( (cmdStr == "move 1 4") || (cmdStr == "move 1 3") ) ) ;
+            }
+        }
+
+        WHEN("We set things up for a crash (observed in match)")
+        {
+            //     0   1   2   3   4    5   6   7
+            //21   12  .   .   .   .    .   .   .
+            //22   S   .   .   .   .    .   .   .
+            //23   S   .   .   .   .    .   .   .
+            //24   S   .   .   .   .    .   .   .
+            //25   S   S   .   .   .    .   .   .
+            //26   S   S   S   .   .    .   .   .
+            //27   S   S   S   .   .    .   .   .
+            //28   S   S   S   .   .    .   .   .
+            //29   S   S   S   .   .    .   .   .
+            //30   S   S   S   .   .    .   .   D
+
+            place_worm(player1, wormIndex, {0,21}, state);
+            state->SetCellTypeAt({7,30}, CellType::DIRT);
+            state->SetCellTypeAt({0,22}, CellType::DEEP_SPACE);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't crash us into dirt")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 0 22");
+                REQUIRE(cmd->GetCommandString() == "move 1 22");
             }
         }
 
@@ -677,13 +713,16 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             place_worm(player1, 1, {1,5}, state);
             place_worm(player1, 2, {1,4}, state);
             state->SetCellTypeAt({0,0}, CellType::DIRT);
+            state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
             state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
 
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
 
-            THEN("The heuristic gives up - path is too complicated")
+            THEN("It doesn't crash us into the friendly worm")
             {
-                REQUIRE(cmd == nullptr);
+                auto cmdStr = cmd->GetCommandString();
+                INFO(cmdStr)
+                REQUIRE( ( (cmdStr == "move 2 4") ) ) ;
             }
         }
 
@@ -707,9 +746,11 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
 
-            THEN("The heuristic gives up - path is too complicated")
+            THEN("The heuristic does the best it can")
             {
-                REQUIRE(cmd == nullptr);
+                auto cmdStr = cmd->GetCommandString();
+                INFO(cmdStr)
+                REQUIRE( ( (cmdStr == "move 2 5") ) ) ;
             }
         }
     }
