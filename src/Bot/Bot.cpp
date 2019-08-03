@@ -5,7 +5,7 @@
 #include "EvaluationFunctions.hpp"
 #include <thread>
 
-Bot::Bot(unsigned playthroughDepth, unsigned dirtsForBanana, unsigned distanceForLost, uint64_t mcTime_ns, float mc_c, unsigned mc_runsBeforeClockCheck) :
+Bot::Bot(int playthroughDepth, int dirtsForBanana, int distanceForLost, uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
     _playthroughDepth{playthroughDepth},
     _dirtsForBanana{dirtsForBanana},
     _distanceForLost{distanceForLost},
@@ -62,7 +62,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     return selectPrefix + best_move->GetCommandString();
 }
 
-void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
+void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, int playthroughDepth)
 {
     //int closestDist = Dist_to_closest_enemy();
     //int distToConsider = std::max(closestDist, 7);
@@ -70,7 +70,7 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_p
 
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 
-        for(unsigned i = 0; i < _mc_runsBeforeClockCheck; ++i) {
+        for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
             _mtx.lock();
             //choose next node
             auto next_node = mc->NextNode();

@@ -19,12 +19,12 @@ std::string executeRound(Bot& bot, std::string& roundNumber)
 
 int main(int argc, char** argv)
 {
-    unsigned playThroughDepth{24};
-    unsigned dirtsForBanana{10};
-    unsigned clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+    int playThroughDepth{24};
+    int dirtsForBanana{10};
+    int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     uint64_t mcTime_ns{880000000};
     float mc_c{std::sqrt(2)};
-    unsigned mc_runsBeforeClockCheck{50};
+    int mc_runsBeforeClockCheck{50};
 
     Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
