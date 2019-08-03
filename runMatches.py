@@ -326,11 +326,15 @@ print("_engineVer: " +  _engineVer + " -- " + dateString)
 parseArgs()
 print("Running with paralellID: \"" + _parallelID + "\" BOTS: " + str(_bots))
 
-allMatchesFilePath, summaryFilePath = GetOutputPaths()
-
 _matchLogsPath = _matchLogsPath + "/RunMatchesBatch_" + dateString
 if not os.path.exists(_matchLogsPath):
     os.makedirs(_matchLogsPath)
+
+allMatchesFilePath = _staterPackPath + "/" + _matchLogsPath + "/" + "AllMatches.txt"
+summaryFilePath = _staterPackPath + "/" + _matchLogsPath + "/" + "Summary.txt"
+
+print('allMatchesFilePath: ', allMatchesFilePath)
+print('summaryFilePath: ', summaryFilePath)
 
 #adjustments if we're running in parallel...
 if(_parallelID != ""):
