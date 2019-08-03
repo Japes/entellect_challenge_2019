@@ -105,6 +105,10 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
 //returns nullptr if there is a dirt or an enemy within distanceForLost
 std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, std::shared_ptr<GameState> state, int distanceForLost)
 {
+    if(distanceForLost = -1) {
+        return;
+    }
+    
     int closestEnemy = state->Dist_to_closest_enemy(player1);
     if(closestEnemy <= distanceForLost) {
         return nullptr;

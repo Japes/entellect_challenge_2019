@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 {
     unsigned playThroughDepth{24};
     unsigned dirtsForBanana{10};
-    unsigned clearSpaceForHeuristic{7}; //if everything is clear for this distance, use heuristic
+    unsigned clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     uint64_t mcTime_ns{880000000};
     float mc_c{std::sqrt(2)};
     unsigned mc_runsBeforeClockCheck{50};
