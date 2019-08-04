@@ -1,7 +1,7 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, id{0}, position{-1,-1}, movedThisRound{0}
+Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, id{0}, position{-1,-1}, movedThisRound{0}, roundsUntilUnfrozen{0}
 {
     SetProffession(_proffession);
 }

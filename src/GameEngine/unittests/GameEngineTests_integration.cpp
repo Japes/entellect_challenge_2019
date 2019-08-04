@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "../GameEngine.hpp"
+#include "../GameState/GameStateLoader.hpp"
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
@@ -28,7 +29,7 @@ TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
     auto start_time = Get_ns_since_epoch();
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-    auto original_state = std::make_shared<GameState>(roundJSON);
+    auto original_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
 
     while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
     //while(true) {
@@ -92,7 +93,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"); //todo need to make sure there are bots in range
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = std::make_shared<GameState>(roundJSON);
+    auto state1 = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
 
     NextTurn::Initialise();
 
@@ -340,7 +341,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
 
         unsigned round = 1;
         auto roundJSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-        auto original_state = std::make_shared<GameState>(roundJSON);
+        auto original_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
         GameEngine eng(original_state);
 
         while(round <= numRounds) {
@@ -358,7 +359,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
             if(round != numRounds) {
                 ++round;
                 auto round2JSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-                auto next_state = std::make_shared<GameState>(round2JSON);
+                auto next_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(round2JSON));
 
                 REQUIRE(original_state->player1 == next_state->player1);
                 REQUIRE(original_state->player2 == next_state->player2);
@@ -406,7 +407,7 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
     GIVEN("A realistic game state and engine")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        auto state = std::make_shared<GameState>(roundJSON);
+        auto state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
         GameEngine eng(state);
         
         WHEN("We do a playthrough to a depth -1")
@@ -427,7 +428,7 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
         for(unsigned i = 0; i < 30000; i++)
         {
             auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-            auto state1 = std::make_shared<GameState>(roundJSON);
+            auto state1 = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
             auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
             GameEngine eng(state);
 

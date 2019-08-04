@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "../GameState/GameState.hpp"
+#include "../GameState/GameStateLoader.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "Utilities.hpp"
 #include "Command.hpp"
@@ -18,7 +19,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
     GIVEN("A game state file with a dead worm in it")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state(roundJSON);
+        GameState state = GameStateLoader::LoadGameState(roundJSON);
 
         THEN("That worm isn't on the map")
         {
@@ -50,7 +51,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
         WHEN("We convert it to a command")
         {
-            auto cmd = GameState::Str2Cmd(move);
+            auto cmd = GameStateLoader::Str2Cmd(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -66,7 +67,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
         WHEN("We convert it to a command")
         {
-            auto cmd = GameState::Str2Cmd(move);
+            auto cmd = GameStateLoader::Str2Cmd(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -82,7 +83,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
         WHEN("We convert it to a command")
         {
-            auto cmd = GameState::Str2Cmd(move);
+            auto cmd = GameStateLoader::Str2Cmd(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -103,7 +104,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
             );
         WHEN("We ignore the select part and just convert the move") //not sure how we'll use this info, can update in future
         {
-            auto cmd = GameState::Str2Cmd(move);
+            auto cmd = GameStateLoader::Str2Cmd(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -118,16 +119,19 @@ TEST_CASE( "GameState load worms from file", "[state_load_worms]" ) {
     GIVEN("A game state file with different kinds of worms")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state(roundJSON);
+        GameState state = GameStateLoader::LoadGameState(roundJSON);
 
         THEN("We create the worms correctly")
         {
             REQUIRE(state.player1.worms[0].id == 1);
             REQUIRE(state.player1.worms[0].proffession == Worm::Proffession::COMMANDO);
+            REQUIRE(state.player1.worms[0].roundsUntilUnfrozen == 3);
             REQUIRE(state.player1.worms[1].id == 2);
             REQUIRE(state.player1.worms[1].proffession == Worm::Proffession::AGENT);
+            REQUIRE(state.player1.worms[1].roundsUntilUnfrozen == 0);
             REQUIRE(state.player1.worms[2].id == 3);
             REQUIRE(state.player1.worms[2].proffession == Worm::Proffession::TECHNOLOGIST);
+            REQUIRE(state.player1.worms[2].roundsUntilUnfrozen == 0);
         }
     }
 }
@@ -136,7 +140,7 @@ TEST_CASE( "GameState load previous command", "[state_load_previous_cmd][.broken
     GIVEN("A game state file")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state(roundJSON);
+        GameState state = GameStateLoader::LoadGameState(roundJSON);
 
         THEN("Previous command is read correctly")
         {
@@ -152,7 +156,7 @@ TEST_CASE( "GameState load lava", "[state_load_lava]" ) {
     GIVEN("A game state file")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state(roundJSON);
+        GameState state = GameStateLoader::LoadGameState(roundJSON);
 
         THEN("Cell types are loaded correctly")
         {
@@ -168,7 +172,7 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
     WHEN("We make a copy of a state")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        auto original_state = std::make_shared<GameState>(roundJSON);
+        auto original_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
         auto copied_state = std::make_shared<GameState>(*original_state);
 
         THEN("A true deep copy happens")

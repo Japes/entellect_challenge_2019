@@ -358,10 +358,9 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
 }
 
 TEST_CASE( "Get command string", "[banana]" ) {
-    auto state = std::make_shared<GameState>();
-    ShootCommand move(ShootCommand::ShootDirection::S);
-    //REQUIRE(move.GetCommandString() == "shoot S");
+    BananaCommand move(Position(5,6));
+    REQUIRE(move.GetCommandString() == "banana 5 6");
 
-    ShootCommand move1(ShootCommand::ShootDirection::NE);
-    //REQUIRE(move1.GetCommandString() == "shoot NE");
+    BananaCommand move1(Position(15,26));
+    REQUIRE(move1.GetCommandString() == "banana 15 26");
 }

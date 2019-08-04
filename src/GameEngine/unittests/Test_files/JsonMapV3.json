@@ -27,7 +27,7 @@
                 },
                 "diggingRange": 1,
                 "movementRange": 1,
-                "roundsUntilUnfrozen": 0,
+                "roundsUntilUnfrozen": 3,
                 "profession": "Commando"
             },
             {

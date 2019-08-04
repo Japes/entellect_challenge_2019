@@ -33,6 +33,8 @@ struct Worm
     int movementRange;
     Proffession proffession;
     bool movedThisRound;
+    int roundsUntilUnfrozen;
+
 
     Worm(GameState* _state, Worm::Proffession _proffession = Worm::Proffession::COMMANDO);
 

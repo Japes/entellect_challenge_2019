@@ -54,21 +54,6 @@ class GameState
     void UpdateRefs();
     void UpdateRefs(Player& player);
 
-    void PrintJson(const rapidjson::Value& json);
-
-    void PopulatePlayers(rapidjson::Document& roundJSON);
-    void PopulatePlayer(Player& player, const rapidjson::Value& playerJson);
-    void PopulateWorm(Worm& worm, const rapidjson::Value& wormJson);
-    void PopulateWeapon(Weapon& weapon, const rapidjson::Value& weaponJson);
-    void PopulateBanana(BananaBomb& banana, const rapidjson::Value& wJson);
-    void PopulateSnowBall(SnowBall& snowball, const rapidjson::Value& wJson);
-
-    void PopulateMap(rapidjson::Document& roundJSON);
-
-    void PopulatePosition(Position& pos, const rapidjson::Value& posJson);
-
-    static Position GetCommandPosition(std::string str);
-
     public:
 
     inline CellType CellType_at(Position pos)
