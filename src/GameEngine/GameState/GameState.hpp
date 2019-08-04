@@ -67,6 +67,8 @@ class GameState
 
     void PopulatePosition(Position& pos, const rapidjson::Value& posJson);
 
+    static Position GetCommandPosition(std::string str);
+
     public:
 
     inline CellType CellType_at(Position pos)

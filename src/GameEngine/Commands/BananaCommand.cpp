@@ -113,7 +113,7 @@ bool BananaCommand::IsValid(bool player1, std::shared_ptr<GameState> state) cons
         return false;
     }
 
-    if(!worm->position.BananaCanReach(_pos)) {
+    if(!worm->position.BananaSnowballCanReach(_pos)) {
         std::cerr << latestBot << " (" << __FUNCTION__ << ") " << _pos << " is too far to throw a banana from " << worm->position << "!" << std::endl;
         return false;
     }

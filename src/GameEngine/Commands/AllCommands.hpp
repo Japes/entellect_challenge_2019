@@ -3,3 +3,4 @@
 #include "ShootCommand.hpp"
 #include "TeleportCommand.hpp"
 #include "BananaCommand.hpp"
+#include "SnowballCommand.hpp"

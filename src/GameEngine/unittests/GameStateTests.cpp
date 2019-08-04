@@ -36,18 +36,15 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
     }
 }
 
-TEST_CASE( "Convert string to command", "[str2cmd][.broken]" ) {
+TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
-    //TODO
-
-    /*
     GIVEN("A string for a command...")
     {
         std::string move = GENERATE(
             std::string{"move 5 27"}, 
             std::string{"dig 22 13"}, 
             std::string{"shoot NE"}, 
-            std::string{"banana 30 20"}
+            std::string{"banana 30 20"},
             std::string{"snowball 13 14"}
             );
 
@@ -56,6 +53,7 @@ TEST_CASE( "Convert string to command", "[str2cmd][.broken]" ) {
             auto cmd = GameState::Str2Cmd(move);
             THEN("It converts correctly...")
             {
+                INFO(move);
                 REQUIRE(cmd != nullptr);
                 REQUIRE(cmd->GetCommandString() == move);
             }
@@ -71,14 +69,49 @@ TEST_CASE( "Convert string to command", "[str2cmd][.broken]" ) {
             auto cmd = GameState::Str2Cmd(move);
             THEN("It converts correctly...")
             {
+                INFO(move);
                 REQUIRE(cmd != nullptr);
                 REQUIRE(cmd->GetCommandString() == "nothing");
             }
         }
     }
-    */
-    //todo handle selects `select 1;move 1 1`
-    //todo handle invalids
+
+    GIVEN("the format of an invalid move...")
+    {
+        std::string move{"invalid"};
+
+        WHEN("We convert it to a command")
+        {
+            auto cmd = GameState::Str2Cmd(move);
+            THEN("It converts correctly...")
+            {
+                INFO(move);
+                REQUIRE(cmd != nullptr);
+                REQUIRE(cmd->GetCommandString() == "nothing");
+            }
+        }
+    }
+
+    GIVEN("a select...")
+    {
+        std::string move = GENERATE(
+            std::string{"select 1;move 5 27"}, 
+            std::string{"select 2;dig 22 13"}, 
+            std::string{"select 3;shoot NE"}, 
+            std::string{"select 1;banana 30 20"},
+            std::string{"select 2;snowball 13 14"}
+            );
+        WHEN("We ignore the select part and just convert the move") //not sure how we'll use this info, can update in future
+        {
+            auto cmd = GameState::Str2Cmd(move);
+            THEN("It converts correctly...")
+            {
+                INFO(move);
+                REQUIRE(cmd != nullptr);
+                REQUIRE(cmd->GetCommandString() == move.substr(9, move.length() - 9));
+            }
+        }
+    }
 }
 
 TEST_CASE( "GameState load worms from file", "[state_load_worms]" ) {

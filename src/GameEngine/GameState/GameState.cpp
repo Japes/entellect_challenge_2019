@@ -126,20 +126,53 @@ void GameState::PopulatePlayer(Player& player, const rapidjson::Value& playerJso
     player.previousCommand = Str2Cmd(playerJson["previousCommand"].GetString());
 }
 
+//gets the x/y part of commands that use it
+Position GameState::GetCommandPosition(std::string str)
+{
+    std::size_t firstSpace = str.find(" ", 0);
+    std::size_t secondSpace = str.find(" ", firstSpace + 1);
+
+    int x = std::stoi(str.substr(firstSpace, secondSpace - firstSpace));
+    int y = std::stoi(str.substr(secondSpace + 1, str.size() - secondSpace + 1));
+
+    return {x,y};
+}
+
 std::shared_ptr<Command> GameState::Str2Cmd(std::string str)
 {
-
-
-    //TODO
-
-
+    if(str.find("select") != std::string::npos){
+        str = str.substr(9, str.length() - 9); //ignore the select bit
+    }
 
     if(str.find("move") != std::string::npos){
-        std::size_t secondSpace = str.find(" ", 5); //start from 5th char
-        int x = std::stoi(str.substr(4, secondSpace - 4));
-        int y = std::stoi(str.substr(secondSpace + 1, str.size() - secondSpace + 1));
-        return std::make_shared<TeleportCommand>(Position(x,y));
+        return std::make_shared<TeleportCommand>(GetCommandPosition(str));
     }
+    if(str.find("dig") != std::string::npos){
+        return std::make_shared<DigCommand>(GetCommandPosition(str));
+    }
+    if(str.find("banana") != std::string::npos){
+        return std::make_shared<BananaCommand>(GetCommandPosition(str));
+    }
+    if(str.find("shoot") != std::string::npos){
+        std::string dirStr = str.substr(6, str.size() - 6);
+        ShootCommand::ShootDirection dir;
+        if(dirStr == "N") { dir = ShootCommand::ShootDirection::N; }
+        if(dirStr == "NE") { dir = ShootCommand::ShootDirection::NE; }
+        if(dirStr == "E") { dir = ShootCommand::ShootDirection::E; }
+        if(dirStr == "SE") { dir = ShootCommand::ShootDirection::SE; }
+        if(dirStr == "S") { dir = ShootCommand::ShootDirection::S; }
+        if(dirStr == "SW") { dir = ShootCommand::ShootDirection::SW; }
+        if(dirStr == "W") { dir = ShootCommand::ShootDirection::W; }
+        if(dirStr == "NW") { dir = ShootCommand::ShootDirection::NW; }
+        return std::make_shared<ShootCommand>(dir);
+    }
+    if(str.find("nothing") != std::string::npos || str.find("invalid") != std::string::npos){
+        return std::make_shared<DoNothingCommand>();
+    }
+    if(str.find("snowball") != std::string::npos){
+        return std::make_shared<SnowballCommand>(GetCommandPosition(str));
+    }
+
     return nullptr;
 }
 

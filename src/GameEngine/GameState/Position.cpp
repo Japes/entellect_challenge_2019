@@ -47,7 +47,7 @@ bool Position::IsOnMap() const
     return x >= 0 && y >= 0 && x < GameConfig::mapSize && y < GameConfig::mapSize;
 }
 
-bool Position::BananaCanReach(const Position &other) const
+bool Position::BananaSnowballCanReach(const Position &other) const
 {
        /*xdist + ydist in bananas radius:
     0   1   2   3   4   5   6   7   8   9   10
@@ -64,7 +64,7 @@ bool Position::BananaCanReach(const Position &other) const
     auto distX = std::abs(x - other.x);
     auto distY = std::abs(y - other.y);
     bool isInTheCorner = (distX + distY) > 8;
-    return !isInTheCorner && (MaximumDimension(other) <= GameConfig::agentWorms.banana.range);
+    return !isInTheCorner && (MaximumDimension(other) <= GameConfig::agentWorms.banana.range); //BIG ASSUMPTION HERE: BANANA IS THE SAME AS SNOWBALL
 }
 
 Position Position::Normalized() const

@@ -186,7 +186,7 @@ std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, std::shared_ptr<Ga
             ++target.x;
             ++retIndex;
             //std::cerr << "(" << __FUNCTION__ << ") target " << target << " retIndex " << retIndex << std::endl;
-            if(!worm->position.BananaCanReach(target)) {
+            if(!worm->position.BananaSnowballCanReach(target)) {
                 //std::cerr << "(" << __FUNCTION__ << ") no thanks... " << std::endl;
                 continue;
             }
@@ -238,7 +238,7 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
     auto enemyWorms = player1? &(state->player2.worms) : &(state->player1.worms);
 
     for(auto const & enemyWorm : (*enemyWorms)) {
-        if(worm->position.BananaCanReach(enemyWorm.position)) {
+        if(worm->position.BananaSnowballCanReach(enemyWorm.position)) {
             Position posDiff = enemyWorm.position - worm->position;
             int index = 60 + posDiff.x + (posDiff.y*11); //see ascii art at top of this function
             ret.set(index);

@@ -5,7 +5,7 @@
 
 ShootCommand::ShootCommand(ShootCommand::ShootDirection dir)
 {
-    _order = 4;
+    _order = 5; //deviation from their code - but conforms to rules page
     switch (dir)
     {
         case ShootDirection::N:     _shootVector = Position(0,-1); break;

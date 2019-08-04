@@ -737,3 +737,14 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
         }
     }
 }
+
+TEST_CASE( "Reminder that we assume that banana and snowball have the same range", "[banana_snowball_reminder]" ) {
+    REQUIRE(GameConfig::agentWorms.banana.range == GameConfig::technologistWorms.snowball.range);
+    //if this fails, it is a reminder that you need to update BananaSnowballCanReach
+}
+
+TEST_CASE( "Reminder that we use a hardcoded diagRange value", "[diagRange_reminder]" ) {
+    REQUIRE(GameConfig::commandoWorms.weapon.range == 4);
+    REQUIRE(GameConfig::commandoWorms.weapon.diagRange == 3);
+    //if this fails, it is a reminder that you need to update diagrange
+}
