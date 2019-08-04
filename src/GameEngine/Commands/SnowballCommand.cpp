@@ -10,9 +10,11 @@ SnowballCommand::SnowballCommand(Position pos) : _pos{pos}
 
 void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
 
-    //todo
-
+    player->consecutiveDoNothingCount = 0;
+    --worm->snowball_count;
 }
 
 bool SnowballCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const

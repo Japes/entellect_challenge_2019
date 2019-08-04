@@ -127,6 +127,8 @@ void GameStateLoader::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)
     PopulatePosition(worm.position, wormJson["position"]);  
     worm.previous_position = worm.position;
 
+    worm.roundsUntilUnfrozen = wormJson["roundsUntilUnfrozen"].GetInt();
+
     if(wormJson.HasMember("weapon")) {
         PopulateWeapon(worm.weapon, wormJson["weapon"]);
     } //else it will just use the default, i guess
