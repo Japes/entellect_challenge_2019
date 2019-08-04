@@ -1,13 +1,15 @@
-cd dev\entellect_challenge_2019
-python matchAnalysis.py "Matches\Round 2\LOSS willie theron"
-
 TODO
+
+   finish the loading of previous_move into state
+      see [.broken] unit test
+      
+   make unit test to confirm that carry-over state is correct
+      num selects
+      num bananas
+      num snowballs
 
    snowball
       you can select away from the snowballed guy
-
-   find out why/if im doing invalids 
-      use leon's script
 
    use heuristic if all monte carlos are tied
       or off by <numplaythroughs>

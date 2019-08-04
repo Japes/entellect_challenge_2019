@@ -11,6 +11,7 @@ jp9 - added banana mining heuristic
 jp10 - added select heuristic
 jp11 - try to guess if opponent threw banana (this is what was submitted for round 2)
 jp11_short/long - placeholders for various tunings for jp11
+jp12 - put in heuristic to avoid getting lost - THIS WAS NOT TESTED 100%, CANNING IT BECAUSE OF NEW STARTER PACK
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
