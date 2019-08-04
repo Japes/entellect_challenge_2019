@@ -10,6 +10,7 @@ void SetupAgent(std::shared_ptr<GameState> state, GameEngine& eng)
     place_worm(true, 2, {11,11}, state);
 
     //make it agent's turn
+    state->player1.worms[2].SetProffession(Worm::Proffession::AGENT);
     state->player1.worms[0].health = -1;
     state->player1.worms[1].health = -1;
     eng.AdvanceState(TeleportCommand({10,11}), DoNothingCommand());
@@ -27,8 +28,8 @@ TEST_CASE( "Banana validation", "[banana]" ) {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 1, {10,10}, state);
-        place_worm(true, 2, {11,11}, state);
-        place_worm(true, 3, {15,15}, state); //3 is always the agent
+        place_worm(true, 2, {15,15}, state); //2 is always the agent by default
+        place_worm(true, 3, {11,11}, state); 
 
         THEN("bomb's can't be lobbed")
         {
@@ -41,7 +42,7 @@ TEST_CASE( "Banana validation", "[banana]" ) {
         {
             //kill other worms
             state->player1.worms[0].health = -1;
-            state->player1.worms[1].health = -1;
+            state->player1.worms[2].health = -1;
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
             REQUIRE(state->player1.GetCurrentWorm()->proffession == Worm::Proffession::AGENT);
@@ -268,19 +269,19 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
             0   1   2   3   4   5   6   7
         0   .   .   .   .   .   .   .   .
         1   .   .   .   D   .   .   .   .
-        2   .   .   .   D   12  .   .   .
+        2   .   .   .   D   13  .   .   .
         3   .   .   .   D  B21  22  D   .
         4   .   .   .   11  .   .   D   .
         5   .   .   .   .   23  D   D   .
-        6   .   13  .   .   D   D   .   .
+        6   .   12  .   .   D   D   .   .
         7   .   .   .   .   .   .   .   .            
         */
 
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 1, {3,4}, state);
-        place_worm(true, 2, {4,2}, state);
-        place_worm(true, 3, {1,6}, state); //3 is always the agent
+        place_worm(true, 2, {1,6}, state);  //2 is the agent by default
+        place_worm(true, 3, {4,2}, state);
         place_worm(false, 1, {4,3}, state);
         place_worm(false, 2, {5,3}, state);
         place_worm(false, 3, {4,5}, state);
@@ -296,14 +297,11 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
         state->SetCellTypeAt({4, 6}, CellType::DIRT);
 
         //set up 2 kills
-        state->player1.worms[1].health = 1;
+        state->player1.worms[2].health = 1;
         state->player2.worms[2].health = 1;
-
 
         //make it agent's turn
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-
         Worm* currentWorm = state->player1.GetCurrentWorm();
         REQUIRE(currentWorm->proffession == Worm::Proffession::AGENT);
 
@@ -320,7 +318,7 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
                 CHECK(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp - GameConfig::agentWorms.banana.damage);
                 CHECK(!state->player2.worms[0].IsDead());
                 
-                CHECK(state->player2.worms[1].health == GameConfig::commandoWorms.initialHp - 13);
+                CHECK(state->player2.worms[1].health == GameConfig::agentWorms.initialHp - 13);
                 CHECK(!state->player2.worms[1].IsDead());
 
                 CHECK(state->player2.worms[2].health == 1 - 7);
@@ -331,12 +329,12 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
                 CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp - 11);
                 CHECK(!state->player1.worms[0].IsDead());
 
-                CHECK(state->player1.worms[1].health == 1 - 13);
-                CHECK(state->player1.worms[1].IsDead());
-                CHECK(state->Worm_at(state->player1.worms[1].position) == nullptr);
+                CHECK(state->player1.worms[2].health == 1 - 13);
+                CHECK(state->player1.worms[2].IsDead());
+                CHECK(state->Worm_at(state->player1.worms[2].position) == nullptr);
                 
-                CHECK(state->player1.worms[2].health == GameConfig::agentWorms.initialHp);
-                CHECK(!state->player1.worms[2].IsDead());
+                CHECK(state->player1.worms[1].health == GameConfig::technologistWorms.initialHp);
+                CHECK(!state->player1.worms[1].IsDead());
 
                 //dirt
                 CHECK(state->CellType_at({3, 1}) == CellType::DIRT);

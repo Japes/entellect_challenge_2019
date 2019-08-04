@@ -8,6 +8,8 @@ CellType Cell::strToCellType(std::string str)
         return CellType::AIR;
     }else if(str == "DIRT") {
         return CellType::DIRT;
+    }else if(str == "LAVA") {
+        return CellType::LAVA;
     }
     return CellType::AIR;
 }

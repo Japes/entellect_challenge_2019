@@ -8,7 +8,8 @@
 enum class CellType : uint8_t {
     AIR,
     DIRT,
-    DEEP_SPACE
+    DEEP_SPACE,
+    LAVA
 };
 
 

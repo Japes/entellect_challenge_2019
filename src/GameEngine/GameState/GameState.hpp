@@ -28,6 +28,7 @@ class GameState
     void PlacePowerupAt(Position pos);
     void ClearPowerupAt(Position pos);
     void PlaceWormAt(Position pos, Worm* worm);
+    static std::shared_ptr<Command> Str2Cmd(std::string str);
 
     void Move_worm(Worm* worm, Position pos);
 
@@ -45,6 +46,7 @@ class GameState
     //for bitsets [0] is the LSB.  So it is stored x/y flipped with respect to map coords, to make calcs easier.    
     std::bitset<MAP_SIZE*MAP_SIZE> mapDeepSpaces; //TODO no need to store this actually, it is always the same
     std::bitset<MAP_SIZE*MAP_SIZE> mapDirts;
+    std::bitset<MAP_SIZE*MAP_SIZE> mapLavas;
     static std::bitset<MAP_SIZE*MAP_SIZE> bananaBombOverlay;
     static int bananaBombOverlayCentre;
     std::vector<Position> healthPackPos;
@@ -59,6 +61,7 @@ class GameState
     void PopulateWorm(Worm& worm, const rapidjson::Value& wormJson);
     void PopulateWeapon(Weapon& weapon, const rapidjson::Value& weaponJson);
     void PopulateBanana(BananaBomb& banana, const rapidjson::Value& wJson);
+    void PopulateSnowBall(SnowBall& snowball, const rapidjson::Value& wJson);
 
     void PopulateMap(rapidjson::Document& roundJSON);
 
@@ -71,8 +74,14 @@ class GameState
         auto posBit = (MAP_SIZE*pos.y + pos.x);
         if(mapDeepSpaces[posBit]) {
             return CellType::DEEP_SPACE;
-        } else if(mapDirts[posBit]) {
+        } 
+
+        if(mapDirts[posBit]) {
             return CellType::DIRT;
+        } 
+        
+        if(mapLavas[posBit]) {
+            return CellType::LAVA;
         }
             
         return CellType::AIR;

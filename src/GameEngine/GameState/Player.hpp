@@ -2,12 +2,13 @@
 #define PLAYER_H
 
 #include "Worm.hpp"
-
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <memory>
 
 class GameState; //forward declaration
+class Command; //forward declaration
 
 //current state of a player
 struct Player
@@ -20,6 +21,7 @@ struct Player
     int consecutiveDoNothingCount;
     int remainingWormSelections;
     std::vector<Worm> worms;
+    std::shared_ptr<Command> previousCommand;
 
     Player(GameState* _state);
     Player(const Player& other);

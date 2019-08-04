@@ -58,12 +58,12 @@ void check_shot_missed(std::shared_ptr<GameState> state,ShootCommand::ShootDirec
     CHECK(state->player2.health == player2StartingHealth);
 
     CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp);
-    CHECK(state->player1.worms[1].health == GameConfig::commandoWorms.initialHp);
-    CHECK(state->player1.worms[2].health == GameConfig::agentWorms.initialHp);
+    CHECK(state->player1.worms[1].health == GameConfig::agentWorms.initialHp);
+    CHECK(state->player1.worms[2].health == GameConfig::technologistWorms.initialHp);
 
     CHECK(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
-    CHECK(state->player2.worms[1].health == GameConfig::commandoWorms.initialHp);
-    CHECK(state->player2.worms[2].health == GameConfig::agentWorms.initialHp);
+    CHECK(state->player2.worms[1].health == GameConfig::agentWorms.initialHp);
+    CHECK(state->player2.worms[2].health == GameConfig::technologistWorms.initialHp);
 }
 
 //note shoot is always valid

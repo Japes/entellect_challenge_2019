@@ -1,4 +1,5 @@
 #include "GameState.hpp"
+#include "AllCommands.hpp"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include <cmath>
@@ -50,6 +51,7 @@ GameState::GameState(const GameState& other) :
     healthPack{other.healthPack},
     mapDeepSpaces{other.mapDeepSpaces},
     mapDirts{other.mapDirts},
+    mapLavas{other.mapLavas},
     healthPackPos{other.healthPackPos}
 {
     UpdateRefs();
@@ -121,10 +123,40 @@ void GameState::PopulatePlayer(Player& player, const rapidjson::Value& playerJso
     player.RecalculateHealth(); 
 
     player.command_score -= player.GetAverageWormHealth();
+    player.previousCommand = Str2Cmd(playerJson["previousCommand"].GetString());
+}
+
+std::shared_ptr<Command> GameState::Str2Cmd(std::string str)
+{
+
+
+    //TODO
+
+
+
+    if(str.find("move") != std::string::npos){
+        std::size_t secondSpace = str.find(" ", 5); //start from 5th char
+        int x = std::stoi(str.substr(4, secondSpace - 4));
+        int y = std::stoi(str.substr(secondSpace + 1, str.size() - secondSpace + 1));
+        return std::make_shared<TeleportCommand>(Position(x,y));
+    }
+    return nullptr;
 }
 
 void GameState::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)
 {
+    std::string profString = wormJson["profession"].GetString();
+
+    if(profString == "Commando") {
+        worm.SetProffession(Worm::Proffession::COMMANDO);
+    } else if(profString == "Agent") {
+        worm.SetProffession(Worm::Proffession::AGENT);
+    } else if(profString == "Technologist") {
+        worm.SetProffession(Worm::Proffession::TECHNOLOGIST);
+    } else {
+        std::cerr << "(" << __FUNCTION__ << ") worm has no proffession!" << std::endl;
+    }
+
     worm.id = wormJson["id"].GetInt();
     worm.health = wormJson["health"].GetInt();
     worm.movementRange = wormJson["movementRange"].GetInt();
@@ -139,8 +171,12 @@ void GameState::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)
     if(wormJson.HasMember("bananaBombs")) {
         PopulateBanana(worm.banana_bomb, wormJson["bananaBombs"]);
         worm.banana_bomb_count = wormJson["bananaBombs"]["count"].GetInt();
-    } //else it will just use the default, i guess WHICH IS AN ISSUE I NEED TO KEEP TRACK OF ENEMY BANANA BOMBS
-
+    }
+    
+    if(wormJson.HasMember("snowballs")) {
+        PopulateSnowBall(worm.snowball, wormJson["snowballs"]);
+        worm.snowball_count = wormJson["snowballs"]["count"].GetInt();
+    }
 }
 
 void GameState::PopulateWeapon(Weapon& weapon, const rapidjson::Value& wJson)
@@ -165,6 +201,22 @@ void GameState::PopulateBanana(BananaBomb& banana, const rapidjson::Value& wJson
     banana.damage = wJson["damage"].GetInt();
     banana.range = wJson["range"].GetInt();
     banana.damageRadius = wJson["damageRadius"].GetInt();
+}
+
+void GameState::PopulateSnowBall(SnowBall& snowball, const rapidjson::Value& wJson)
+{
+    /*
+    "snowballs": {
+                    "freezeDuration": 5,
+                    "range": 5,
+                    "count": 3,
+                    "freezeRadius": 1
+                },
+                */
+    auto weaponJson = wJson.GetObject();
+    snowball.freezeDuration = wJson["freezeDuration"].GetInt();
+    snowball.range = wJson["range"].GetInt();
+    snowball.freezeRadius = wJson["freezeRadius"].GetInt();
 }
 
 void GameState::PopulatePosition(Position& pos, const rapidjson::Value& posJson)
@@ -213,7 +265,9 @@ Cell GameState::Cell_at(Position pos)
         ret.type = CellType::DEEP_SPACE;
     } else if (mapDirts[pos.y] & (first_bit_set >> pos.x)) {
         ret.type = CellType::DIRT;
-    } else {
+    } else if (mapLavas[pos.y] & (first_bit_set >> pos.x)) {
+        ret.type = CellType::LAVA;
+    }else {
         ret.type = CellType::AIR;
     }
 
@@ -241,14 +295,22 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
         case CellType::AIR:
             mapDeepSpaces.reset(posBit);
             mapDirts.reset(posBit);
+            mapLavas.reset(posBit);
         break;
         case CellType::DEEP_SPACE:
-            mapDeepSpaces.set(posBit);
             mapDirts.reset(posBit);
+            mapLavas.reset(posBit);
+            mapDeepSpaces.set(posBit);
         break;
         case CellType::DIRT:
             mapDeepSpaces.reset(posBit);
+            mapLavas.reset(posBit);
             mapDirts.set(posBit);
+        break;
+        case CellType::LAVA:
+            mapDeepSpaces.reset(posBit);
+            mapDirts.reset(posBit);
+            mapLavas.set(posBit);
         break;
     }
 }
@@ -390,6 +452,7 @@ bool GameState::operator==(const GameState &other) const
 
     return mapDeepSpaces == other.mapDeepSpaces && 
             mapDirts == other.mapDirts && 
+            mapLavas == other.mapLavas && 
             player1 == other.player1 && 
             player2 == other.player2 &&
             healthPackPos == other.healthPackPos &&

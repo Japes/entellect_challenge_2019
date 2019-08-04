@@ -18,6 +18,24 @@ struct BananaBombConfig
     const int damageRadius = 2;
 };
 
+struct SnowballConfig
+{
+    const int freezeDuration = 5;
+    const int range = 5;
+    const int count = 3;
+    const int freezeRadius = 1;
+};
+
+struct TechnologistWorms
+{
+    const int count = 1;
+    const int initialHp = 100;
+    const int movementRange = 1;
+    const int diggingRange = 1;
+    const WeaponConfig weapon;
+    const SnowballConfig snowball;
+};
+
 struct AgentWorms
 {
     const int count = 1;
@@ -30,7 +48,7 @@ struct AgentWorms
 
 struct CommandoWorms
 {
-    const int count = 2;
+    const int count = 1;
     const int initialHp = 150;
     const int movementRange = 1;
     const int diggingRange = 1;
@@ -46,21 +64,25 @@ struct Scores
     const int powerup = 20;
     const int doNothing = 0;
     const int invalidCommand = -4;
+    const int freeze = 17;
 };
-
 
 struct GameConfig
 {
     static const int maxRounds = 400;
     static const int maxDoNothings = 12;
+    static const int lavaDamage = 3;
     static const CommandoWorms commandoWorms;
     static const AgentWorms agentWorms;
+    static const TechnologistWorms technologistWorms;
     static const int pushbackDamage =  20;
     static const int mapSize = MAP_SIZE;
     static const int healthPackHp =  10;
     static const int totalHealthPacks = 2;
     static const int wormSelectTokens = 5;
     static const Scores scores;
+    static const float battleRoyaleStart;
+    static const float battleRoyaleEnd;
 };
 
 #endif

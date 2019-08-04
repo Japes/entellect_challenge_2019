@@ -50,6 +50,8 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
         state->SetCellTypeAt({10, 10}, CellType::DIRT);
 
         //make it the 3rd players turn
+        state->player1.worms[2].SetProffession(Worm::Proffession::AGENT);
+        state->player2.worms[2].SetProffession(Worm::Proffession::AGENT);
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
         state->player1.consecutiveDoNothingCount = 0;
@@ -444,7 +446,7 @@ TEST_CASE( "13 do nothings means disqualified", "[disqualified]" ) {
 
 int ExpectedInitialHealth()
 {
-    return GameConfig::commandoWorms.initialHp*2 + GameConfig::agentWorms.initialHp;
+    return GameConfig::commandoWorms.initialHp + GameConfig::agentWorms.initialHp + GameConfig::technologistWorms.initialHp;
 }
 
 int ExpectedInitialHealthScore()

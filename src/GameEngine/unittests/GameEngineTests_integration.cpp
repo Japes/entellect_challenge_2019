@@ -27,7 +27,7 @@ TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
     unsigned num_seconds = 3;
     auto start_time = Get_ns_since_epoch();
 
-    auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json");
+    auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
     auto original_state = std::make_shared<GameState>(roundJSON);
 
     while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
@@ -90,7 +90,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
     uint64_t num_milliseconds = 3000;
     auto start_time = Get_ns_since_epoch();
 
-    auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json"); //todo need to make sure there are bots in range
+    auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"); //todo need to make sure there are bots in range
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
     auto state1 = std::make_shared<GameState>(roundJSON);
 
@@ -405,7 +405,7 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
 {
     GIVEN("A realistic game state and engine")
     {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json");
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
         auto state = std::make_shared<GameState>(roundJSON);
         GameEngine eng(state);
         
@@ -426,7 +426,7 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
     {
         for(unsigned i = 0; i < 30000; i++)
         {
-            auto roundJSON = Utilities::ReadJsonFile("./Test_files/invalids.json");
+            auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
             auto state1 = std::make_shared<GameState>(roundJSON);
             auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
             GameEngine eng(state);

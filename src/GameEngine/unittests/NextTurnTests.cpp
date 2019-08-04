@@ -228,9 +228,9 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         
-        Worm* worm13 = place_worm(true, 3, {31,15}, state); //agent
+        Worm* worm12 = place_worm(true, 2, {31,15}, state); //agent
         place_worm(true, 1, {30,15}, state); //friendly right next to us
-        place_worm(true, 2, {0,0}, state); //friendly far away
+        place_worm(true, 3, {0,0}, state); //friendly far away
 
         place_worm(false, 1, {31,11}, state); //enemy in range to the north
         place_worm(false, 2, {29,13}, state); //enemy in range NW
@@ -249,7 +249,6 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
         WHEN("It is the agents turn")
         {
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
-            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
             AND_WHEN("He has bananas")
             {
@@ -261,13 +260,13 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
                     REQUIRE(ret.test(16));
                     REQUIRE(ret.test(36));
                     REQUIRE(!ret.test(56)); //returned this when i confused x with y
-                    REQUIRE(NextTurn::GetBanana(worm13, state, 16)->GetCommandString() == "banana 31 11");
-                    REQUIRE(NextTurn::GetBanana(worm13, state, 36)->GetCommandString() == "banana 29 13");            
+                    REQUIRE(NextTurn::GetBanana(worm12, state, 16)->GetCommandString() == "banana 31 11");
+                    REQUIRE(NextTurn::GetBanana(worm12, state, 36)->GetCommandString() == "banana 29 13");            
                 }
             }
             AND_WHEN("He has no bananas")
             {
-                state->player1.worms[2].banana_bomb_count = 0;
+                state->player1.worms[1].banana_bomb_count = 0;
                 THEN("GetValidBananas returns zero")
                 {
                     auto ret = NextTurn::GetValidBananas(true, state, true);
@@ -304,9 +303,8 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
 
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        auto thrower = place_worm(true, 3, {9,6}, state);
+        auto thrower = place_worm(true, 2, {9,6}, state);
         //make it the agent's turn...
-        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
         //big clump to the W

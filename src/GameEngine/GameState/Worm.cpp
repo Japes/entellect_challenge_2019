@@ -1,20 +1,43 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state, bool agent) : state{_state}, id{0}, position{-1,-1}, movedThisRound{0}
+Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, id{0}, position{-1,-1}, movedThisRound{0}
 {
-    if(agent) {
-        proffession = Proffession::AGENT;
-        health = GameConfig::agentWorms.initialHp;
-        diggingRange = GameConfig::agentWorms.diggingRange;
-        movementRange = GameConfig::agentWorms.movementRange;
-        banana_bomb_count = GameConfig::agentWorms.banana.count;
-    } else {
-        proffession = Proffession::COMMANDO;
-        health = GameConfig::commandoWorms.initialHp;
-        diggingRange = GameConfig::commandoWorms.diggingRange;
-        movementRange = GameConfig::commandoWorms.movementRange;
-        banana_bomb_count = 0;
+    SetProffession(_proffession);
+}
+
+void Worm::SetProffession(Worm::Proffession _proffession)
+{
+    proffession = _proffession;
+
+    switch (proffession) {
+        case Proffession::COMMANDO:
+        {
+            health = GameConfig::commandoWorms.initialHp;
+            diggingRange = GameConfig::commandoWorms.diggingRange;
+            movementRange = GameConfig::commandoWorms.movementRange;
+            banana_bomb_count = 0;
+            snowball_count = 0;
+        }
+        break;
+        case Proffession::AGENT:
+        {
+            health = GameConfig::agentWorms.initialHp;
+            diggingRange = GameConfig::agentWorms.diggingRange;
+            movementRange = GameConfig::agentWorms.movementRange;
+            banana_bomb_count = GameConfig::agentWorms.banana.count;
+            snowball_count = 0;
+        }
+        break;
+        case Proffession::TECHNOLOGIST:
+        {
+            health = GameConfig::technologistWorms.initialHp;
+            diggingRange = GameConfig::technologistWorms.diggingRange;
+            movementRange = GameConfig::technologistWorms.movementRange;
+            banana_bomb_count = 0;
+            snowball_count = GameConfig::technologistWorms.snowball.count;
+        }
+        break;
     }
 }
 

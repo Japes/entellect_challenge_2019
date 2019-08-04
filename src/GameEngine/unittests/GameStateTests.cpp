@@ -2,6 +2,7 @@
 #include "../GameState/GameState.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "Utilities.hpp"
+#include "Command.hpp"
 
 TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
     GameState state;
@@ -16,12 +17,12 @@ TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
 TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
     GIVEN("A game state file with a dead worm in it")
     {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/state_dead_worm.json");
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
         GameState state(roundJSON);
 
         THEN("That worm isn't on the map")
         {
-            REQUIRE(state.Worm_at({20,25}) == nullptr);
+            REQUIRE(state.Worm_at({29,15}) == nullptr);
         }
 
         AND_THEN("When we make a copy")
@@ -29,27 +30,103 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
             GameState state2 = state;
             THEN("That worm doesn't appear on the map.")
             {
-                REQUIRE(state2.Worm_at({20,25}) == nullptr);
+                REQUIRE(state2.Worm_at({29,15}) == nullptr);
             }
         }
     }
-    GIVEN("A game state file with a dead worm in it (for player 2)")
+}
+
+TEST_CASE( "Convert string to command", "[str2cmd][.broken]" ) {
+
+    //TODO
+
+    /*
+    GIVEN("A string for a command...")
     {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/invalids.json");
+        std::string move = GENERATE(
+            std::string{"move 5 27"}, 
+            std::string{"dig 22 13"}, 
+            std::string{"shoot NE"}, 
+            std::string{"banana 30 20"}
+            std::string{"snowball 13 14"}
+            );
+
+        WHEN("We convert it to a command")
+        {
+            auto cmd = GameState::Str2Cmd(move);
+            THEN("It converts correctly...")
+            {
+                REQUIRE(cmd != nullptr);
+                REQUIRE(cmd->GetCommandString() == move);
+            }
+        }
+    }
+
+    GIVEN("the format of a do nothing...")
+    {
+        std::string move{"nothing \"Player chose to do nothing\""};
+
+        WHEN("We convert it to a command")
+        {
+            auto cmd = GameState::Str2Cmd(move);
+            THEN("It converts correctly...")
+            {
+                REQUIRE(cmd != nullptr);
+                REQUIRE(cmd->GetCommandString() == "nothing");
+            }
+        }
+    }
+    */
+    //todo handle selects `select 1;move 1 1`
+    //todo handle invalids
+}
+
+TEST_CASE( "GameState load worms from file", "[state_load_worms]" ) {
+    GIVEN("A game state file with different kinds of worms")
+    {
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
         GameState state(roundJSON);
 
-        THEN("That worm isn't on the map")
+        THEN("We create the worms correctly")
         {
-            REQUIRE(state.Worm_at({18,6}) == nullptr);
+            REQUIRE(state.player1.worms[0].id == 1);
+            REQUIRE(state.player1.worms[0].proffession == Worm::Proffession::COMMANDO);
+            REQUIRE(state.player1.worms[1].id == 2);
+            REQUIRE(state.player1.worms[1].proffession == Worm::Proffession::AGENT);
+            REQUIRE(state.player1.worms[2].id == 3);
+            REQUIRE(state.player1.worms[2].proffession == Worm::Proffession::TECHNOLOGIST);
         }
+    }
+}
 
-        AND_THEN("When we make a copy")
+TEST_CASE( "GameState load previous command", "[state_load_previous_cmd][.broken]" ) {
+    GIVEN("A game state file")
+    {
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
+        GameState state(roundJSON);
+
+        THEN("Previous command is read correctly")
         {
-            GameState state2 = state;
-            THEN("That worm doesn't appear on the map.")
-            {
-                REQUIRE(state2.Worm_at({18,6}) == nullptr);
-            }
+            REQUIRE(state.player1.previousCommand != nullptr);
+            REQUIRE(state.player1.previousCommand->GetCommandString() == "move 26 13");
+            REQUIRE(state.player2.previousCommand != nullptr);
+            REQUIRE(state.player2.previousCommand->GetCommandString() == "nothing");
+        }
+    }
+}
+
+TEST_CASE( "GameState load lava", "[state_load_lava]" ) {
+    GIVEN("A game state file")
+    {
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
+        GameState state(roundJSON);
+
+        THEN("Cell types are loaded correctly")
+        {
+            REQUIRE(state.CellType_at({6,0}) == CellType::DEEP_SPACE );
+            REQUIRE(state.CellType_at({11,0}) == CellType::DIRT );
+            REQUIRE(state.CellType_at({15,3}) == CellType::AIR );
+            REQUIRE(state.CellType_at({21,3}) == CellType::LAVA );
         }
     }
 }
@@ -57,7 +134,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
 TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
     WHEN("We make a copy of a state")
     {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/state22.json");
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
         auto original_state = std::make_shared<GameState>(roundJSON);
         auto copied_state = std::make_shared<GameState>(*original_state);
 
@@ -116,6 +193,7 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
             state.SetCellTypeAt({1,2}, CellType::DIRT);
             state.SetCellTypeAt({2,3}, CellType::AIR);
             state.SetCellTypeAt({3,4}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({5,7}, CellType::LAVA);
 
             THEN("The cell is of that type")
             {
@@ -123,6 +201,7 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
                 REQUIRE(state.CellType_at({2,3}) == CellType::AIR);
                 REQUIRE(state.CellType_at({4,5}) == CellType::AIR);
                 REQUIRE(state.CellType_at({3,4}) == CellType::DEEP_SPACE);
+                REQUIRE(state.CellType_at({5,7}) == CellType::LAVA);
             }
         }
 
