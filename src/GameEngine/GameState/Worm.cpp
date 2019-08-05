@@ -46,6 +46,11 @@ bool Worm::IsDead() const
     return (health <= 0);
 }
 
+bool Worm::IsFrozen() const
+{
+    return roundsUntilUnfrozen > 0;
+}
+
 void Worm::TakeDamage(int dmgAmount)
 {
     health -= dmgAmount;

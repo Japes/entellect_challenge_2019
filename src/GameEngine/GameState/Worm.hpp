@@ -41,6 +41,7 @@ struct Worm
     void SetProffession(Worm::Proffession _proffession);
 
     bool IsDead() const;
+    bool IsFrozen() const;
     void TakeDamage(int dmgAmount);
 
     bool operator==(const Worm &other) const;

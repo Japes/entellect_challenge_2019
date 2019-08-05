@@ -199,7 +199,7 @@ TEST_CASE( "Snowball bomb lobbed into deep space", "[snowball][deepspacebanana]"
         //2   S   S   S   S   S   S   .   .
         //3   S   S   S   S   S   S   .   .
         //4   S   S   S   S   S   S   .   .
-        //5   .   D   W2  D   .   W   .   .
+        //5   .   .   W2  .   .   W   .   .
         //6   .   .   .   .   .   .   .   .
         //7   .   .   .   .   .   .   .   .            
 
@@ -213,11 +213,10 @@ TEST_CASE( "Snowball bomb lobbed into deep space", "[snowball][deepspacebanana]"
                 state->SetCellTypeAt({x, y}, CellType::DEEP_SPACE);
             }
         }
-        state->SetCellTypeAt({1, 5}, CellType::DIRT);
         place_worm(false, 1, {2,5}, state);
-        state->SetCellTypeAt({3, 5}, CellType::DIRT);
 
-        REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
+        REQUIRE(!state->player2.worms[0].IsFrozen());
+        auto pointsBefore = state->player1.command_score;
 
         WHEN("We chuck a snowball into deep space")
         {
@@ -231,9 +230,8 @@ TEST_CASE( "Snowball bomb lobbed into deep space", "[snowball][deepspacebanana]"
 
             THEN("It doesn't actually go off")
             {
-                REQUIRE(state->CellType_at({1, 5}) == CellType::DIRT);
-                REQUIRE(state->CellType_at({3, 5}) == CellType::DIRT);
-                REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
+                REQUIRE(!state->player2.worms[0].IsFrozen());
+                REQUIRE(state->player1.command_score == pointsBefore);
             }
         }
     }
@@ -248,8 +246,8 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
     {
         //    0   1   2   3   4   5   6   7
         //0   .   .   .   .   .   .   .   .
-        //1   .   .   .   D   .   .   .   .
-        //2   .   .   .   D   12  .   .   .
+        //1   .   .   .   D   12  .   .   .
+        //2   .   .   .   D   .   PU  .   .
         //3   .   .   .   D  B21  22  D   .
         //4   .   .   .   11  .   .   D   .
         //5   .   .   .   .   23  D   D   .
@@ -259,11 +257,14 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
         place_worm(true, 1, {3,4}, state);
-        place_worm(true, 2, {4,2}, state);
-        place_worm(true, 3, {1,6}, state); //3 is always the agent
+        place_worm(true, 2, {4,1}, state);
+        place_worm(true, 3, {1,6}, state); //3 is technologist by default
         place_worm(false, 1, {4,3}, state);
         place_worm(false, 2, {5,3}, state);
         place_worm(false, 3, {4,5}, state);
+
+        Position powerupPos{5,2};
+        place_powerup(powerupPos, state);
 
         state->SetCellTypeAt({3, 1}, CellType::DIRT);
         state->SetCellTypeAt({3, 2}, CellType::DIRT);
@@ -275,12 +276,7 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         state->SetCellTypeAt({5, 6}, CellType::DIRT);
         state->SetCellTypeAt({4, 6}, CellType::DIRT);
 
-        //set up 2 kills
-        state->player1.worms[1].health = 1;
-        state->player2.worms[2].health = 1;
-
-
-        //make it agent's turn
+        //make it technologist's turn
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
@@ -288,52 +284,62 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         REQUIRE(currentWorm->proffession == Worm::Proffession::TECHNOLOGIST);
 
         auto pointsBefore = state->player1.command_score;
+        REQUIRE(!state->player1.worms[0].IsFrozen());
+        REQUIRE(!state->player1.worms[1].IsFrozen());
+        REQUIRE(!state->player1.worms[2].IsFrozen());
+        REQUIRE(!state->player2.worms[0].IsFrozen());
+        REQUIRE(!state->player2.worms[1].IsFrozen());
+        REQUIRE(!state->player2.worms[2].IsFrozen());
 
-        WHEN("We chuck the banana")
+        REQUIRE(state->PowerUp_at(powerupPos) != nullptr);
+
+        WHEN("We chuck the snowball")
         {
             eng.AdvanceState(SnowballCommand({4,3}), DoNothingCommand());
 
             THEN("Everything is as expected")
             {
-                //damage:
-                //P2
-                CHECK(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp - GameConfig::agentWorms.banana.damage);
-                CHECK(!state->player2.worms[0].IsDead());
-                
-                CHECK(state->player2.worms[1].health == GameConfig::commandoWorms.initialHp - 13);
-                CHECK(!state->player2.worms[1].IsDead());
+                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
 
-                CHECK(state->player2.worms[2].health == 1 - 7);
-                CHECK(state->player2.worms[2].IsDead());
-                CHECK(state->Worm_at(state->player2.worms[2].position) == nullptr);
+                //freeze:
+                //P2
+                CHECK(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
+                CHECK(state->player2.worms[0].IsFrozen());
+                
+                CHECK(state->player2.worms[1].health == GameConfig::agentWorms.initialHp);
+                CHECK(state->player2.worms[1].IsFrozen());
+
+                CHECK(state->player2.worms[2].health == GameConfig::technologistWorms.initialHp);
+                CHECK(!state->player2.worms[2].IsFrozen());
 
                 //P1
-                CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp - 11);
-                CHECK(!state->player1.worms[0].IsDead());
-
-                CHECK(state->player1.worms[1].health == 1 - 13);
-                CHECK(state->player1.worms[1].IsDead());
-                CHECK(state->Worm_at(state->player1.worms[1].position) == nullptr);
+                CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp);
+                CHECK(state->player1.worms[0].IsFrozen());
                 
-                CHECK(state->player1.worms[2].health == GameConfig::agentWorms.initialHp);
-                CHECK(!state->player1.worms[2].IsDead());
+                CHECK(state->player1.worms[1].health == GameConfig::agentWorms.initialHp);
+                CHECK(!state->player1.worms[1].IsFrozen());
+
+                CHECK(state->player1.worms[2].health == GameConfig::technologistWorms.initialHp);
+                CHECK(!state->player1.worms[2].IsFrozen());
 
                 //dirt
                 CHECK(state->CellType_at({3, 1}) == CellType::DIRT);
-                CHECK(state->CellType_at({3, 2}) == CellType::AIR);
-                CHECK(state->CellType_at({3, 3}) == CellType::AIR);
-                CHECK(state->CellType_at({6, 3}) == CellType::AIR);
+                CHECK(state->CellType_at({3, 2}) == CellType::DIRT);
+                CHECK(state->CellType_at({3, 3}) == CellType::DIRT);
+                CHECK(state->CellType_at({6, 3}) == CellType::DIRT);
                 CHECK(state->CellType_at({6, 4}) == CellType::DIRT);
                 CHECK(state->CellType_at({6, 5}) == CellType::DIRT);
                 CHECK(state->CellType_at({5, 5}) == CellType::DIRT);
                 CHECK(state->CellType_at({5, 6}) == CellType::DIRT);
                 CHECK(state->CellType_at({4, 6}) == CellType::DIRT);
 
+                //powerups not destroyed
+                REQUIRE(state->PowerUp_at(powerupPos) != nullptr);
+
                 //points
-                auto expectedEnemyDmgPoints = (GameConfig::agentWorms.banana.damage + 13 + 7 + GameConfig::scores.killShot)*2;
-                auto expectedFriendlyDmgPoints = (11 + 13 + GameConfig::scores.killShot)*-2;
-                auto expectedDigPoints = GameConfig::scores.dig*3;
-                CHECK(state->player1.command_score == pointsBefore + expectedEnemyDmgPoints + expectedFriendlyDmgPoints + expectedDigPoints);
+                auto expectedEnemyPoints = GameConfig::scores.freeze*2;
+                auto expectedFriendlyPoints = -GameConfig::scores.freeze;
+                CHECK(state->player1.command_score == pointsBefore + expectedEnemyPoints + expectedFriendlyPoints);
             }
         }
     }

@@ -11,10 +11,33 @@ SnowballCommand::SnowballCommand(Position pos) : _pos{pos}
 void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = state->GetPlayer(player1);
+    Player* enemyPlayer = state->GetPlayer(!player1);
     Worm* worm = player->GetCurrentWorm();
 
-    player->consecutiveDoNothingCount = 0;
     --worm->snowball_count;
+    player->consecutiveDoNothingCount = 0;
+
+    if(state->CellType_at(_pos) == CellType::DEEP_SPACE) {
+        return; //wasted your bomb...
+    }
+    
+    int points = 0;
+
+    for(auto & thisWorm : enemyPlayer->worms) {
+        if(_pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
+            thisWorm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
+            points += GameConfig::scores.freeze;
+        }
+    }
+
+    for(auto & thisWorm : player->worms) {
+        if(_pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
+            thisWorm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
+            points -= GameConfig::scores.freeze;
+        }
+    }
+
+    player->command_score += points;
 }
 
 bool SnowballCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const

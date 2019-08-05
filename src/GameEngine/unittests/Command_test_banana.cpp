@@ -296,6 +296,9 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
         state->SetCellTypeAt({5, 6}, CellType::DIRT);
         state->SetCellTypeAt({4, 6}, CellType::DIRT);
 
+        Position powerupPos{5,2};
+        place_powerup(powerupPos, state);
+
         //set up 2 kills
         state->player1.worms[2].health = 1;
         state->player2.worms[2].health = 1;
@@ -304,6 +307,8 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
         Worm* currentWorm = state->player1.GetCurrentWorm();
         REQUIRE(currentWorm->proffession == Worm::Proffession::AGENT);
+
+        REQUIRE(state->PowerUp_at(powerupPos) != nullptr);
 
         auto pointsBefore = state->player1.command_score;
 
@@ -346,6 +351,9 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
                 CHECK(state->CellType_at({5, 5}) == CellType::DIRT);
                 CHECK(state->CellType_at({5, 6}) == CellType::DIRT);
                 CHECK(state->CellType_at({4, 6}) == CellType::DIRT);
+
+                //destroy powerups
+                REQUIRE(state->PowerUp_at(powerupPos) == nullptr);
 
                 //points
                 auto expectedEnemyDmgPoints = (GameConfig::agentWorms.banana.damage + 13 + 7 + GameConfig::scores.killShot)*2;
