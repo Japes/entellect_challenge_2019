@@ -349,6 +349,98 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
     //check that they cant do anything
     //the freeze counter goes down
     //once it's zero they can do shit again
+
+    GIVEN("A contrived situation")
+    {
+        //    0   1   2   3   4   5   6
+        //0  11   .   .   .   .   .   .
+        //1  12   .   .   .   .   .   .
+        //2   .   .   .   21  .   .   .
+        //3   .   .   .  B22  .   .   .
+        //4   .   .   .   23  .   .   .
+        //5   .   .   .   .   .   .   .
+        //6   13  .   .   .   .   .   .
+        //7   .   .   .   .   .   .   .            
+
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+
+        bool player1 = GENERATE(true, false);
+
+        place_worm(player1, 1, {0,0}, state);
+        place_worm(player1, 2, {0,1}, state);
+        place_worm(player1, 3, {0,6}, state); //3 is technologist by default
+        place_worm(!player1, 1, {3,2}, state);
+        place_worm(!player1, 2, {3,3}, state);
+        place_worm(!player1, 3, {3,4}, state);
+
+        //make it technologist's turn
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+        Worm* currentWorm = state->player1.GetCurrentWorm();
+        REQUIRE(currentWorm->proffession == Worm::Proffession::TECHNOLOGIST);
+
+        REQUIRE(!state->player1.worms[0].IsFrozen());
+        REQUIRE(!state->player1.worms[1].IsFrozen());
+        REQUIRE(!state->player1.worms[2].IsFrozen());
+        REQUIRE(!state->player2.worms[0].IsFrozen());
+        REQUIRE(!state->player2.worms[1].IsFrozen());
+        REQUIRE(!state->player2.worms[2].IsFrozen());
+
+        Player* myPlayer = player1? &state->player1 : &state->player2;
+        Player* enemyPlayer = player1? &state->player2 : &state->player1;
+
+        WHEN("We chuck the snowball")
+        {
+            eng.AdvanceState(SnowballCommand({3,3}), DoNothingCommand());
+
+            THEN("Enemies are all frozen")
+            {
+                CHECK(enemyPlayer->worms[0].IsFrozen());
+                CHECK(enemyPlayer->worms[1].IsFrozen());
+                CHECK(enemyPlayer->worms[2].IsFrozen());
+            }
+
+            AND_THEN("worms try to move for the next [freezeDuration] turns")
+            {
+                state->player1.consecutiveDoNothingCount = 0;
+                state->player2.consecutiveDoNothingCount = 0;
+
+                for(int i = 0; i < GameConfig::technologistWorms.snowball.freezeDuration; ++i) {
+                    eng.AdvanceState(TeleportCommand(state->player1.GetCurrentWorm()->position + Position(1,0)), 
+                                    TeleportCommand(state->player2.GetCurrentWorm()->position + Position(1,0)) );
+                }
+
+                THEN("They can't")
+                {
+                    REQUIRE(enemyPlayer->consecutiveDoNothingCount == GameConfig::technologistWorms.snowball.freezeDuration);
+                    REQUIRE(enemyPlayer->worms[0].position.x == 3);
+                    REQUIRE(enemyPlayer->worms[1].position.x == 3);
+                    REQUIRE(enemyPlayer->worms[2].position.x == 3);
+                }
+
+                THEN("We can")
+                {
+                    REQUIRE(myPlayer->consecutiveDoNothingCount == 0);
+                    REQUIRE(myPlayer->worms[0].position.x == 2);
+                    REQUIRE(myPlayer->worms[1].position.x == 2);
+                    REQUIRE(myPlayer->worms[2].position.x == 1);
+                }
+
+                AND_THEN("They try to move the turn after that")
+                {
+                    eng.AdvanceState(TeleportCommand(state->player1.GetCurrentWorm()->position + Position(1,0)), 
+                                    TeleportCommand(state->player2.GetCurrentWorm()->position + Position(1,0)) );
+                    THEN("They can")
+                    {
+                        REQUIRE(enemyPlayer->consecutiveDoNothingCount == 0);
+                        REQUIRE(enemyPlayer->worms[2].position.x == 4);
+                    }   
+                }
+            }
+        }
+    }
 }
 
 TEST_CASE( "Get snowball command string", "[snowball]" ) {

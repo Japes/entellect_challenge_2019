@@ -22,8 +22,14 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     }
 
     //validate both guys first
-    bool player1Good = player1_command.IsValid(true, _state);
-    bool player2Good = player2_command.IsValid(false, _state);
+    bool player1Frozen =_state->player1.GetCurrentWorm()->IsFrozen();
+    bool player2Frozen =_state->player2.GetCurrentWorm()->IsFrozen();
+    
+    bool player1Good = player1_command.IsValid(true, _state)  && !player1Frozen;
+    bool player2Good = player2_command.IsValid(false, _state) && !player2Frozen;
+
+    //thaw out worms (important that this happens here, AFTER checking frozen state, and BEFORE executing the next move)
+    _state->ForAllWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
 
     //determine which move should be executed first
     bool player1GoesFirst = player1_command.Order() < player2_command.Order();
@@ -32,7 +38,10 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     movesValid &= DoCommand(!player1GoesFirst?player1_command:player2_command, !player1GoesFirst, !player1GoesFirst?player1Good:player2Good);
 
     if(!movesValid) {
-        std::cerr << "Invalid move found.  Player1 move: " << player1_command.GetCommandString() << " Player2 move: " << player2_command.GetCommandString() << std::endl;
+        std::cerr << "Invalid move found.  Player1 move: " << player1_command.GetCommandString() << " Player2 move: " << player2_command.GetCommandString();
+        if ( player1Frozen ) { std::cerr << " (player1 is frozen)"; }
+        if ( player2Frozen ) { std::cerr << " (player2 is frozen)"; }
+        std::cerr << std::endl;
 #ifdef EXCEPTION_ON_ERROR
         throw std::runtime_error("Invalid move found!");
 #endif
