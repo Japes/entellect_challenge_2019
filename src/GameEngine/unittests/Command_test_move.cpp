@@ -131,15 +131,16 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
         /*
             the situation (worm under test is in the middle):
             [9,9]W2   [10,9] A   [11,9] A
-            [9,10]A   [10,10]W   [11,10]A
+            [9,10]A   [10,10]W   [11,10]L
             [9,11]A   [10,11]A   [11,11]A
         */
 
         Position worm_under_test_pos{10,10};
         Position enemy_worm_pos{9,9};
         Position air_pos1{11,9};
-        Position air_pos2{11,10};
+        Position lava_pos{11,10};
         Position air_pos3{9,10};
+        state->SetCellTypeAt(lava_pos, CellType::LAVA);
 
         Worm* worm_under_test = &state->player1.worms[0];
         worm_under_test->position = worm_under_test->previous_position = worm_under_test_pos;
@@ -162,9 +163,9 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             Check_valid_move(eng, state, worm_under_test_pos, air_pos1);
         }
 
-        THEN("air is valid2")
+        THEN("lava is valid")
         {
-            Check_valid_move(eng, state, worm_under_test_pos, air_pos2);
+            Check_valid_move(eng, state, worm_under_test_pos, lava_pos);
         }
 
         THEN("air is valid3")

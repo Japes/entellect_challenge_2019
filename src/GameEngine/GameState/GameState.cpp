@@ -113,21 +113,16 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
         case CellType::AIR:
             mapDeepSpaces.reset(posBit);
             mapDirts.reset(posBit);
-            mapLavas.reset(posBit);
         break;
         case CellType::DEEP_SPACE:
             mapDirts.reset(posBit);
-            mapLavas.reset(posBit);
             mapDeepSpaces.set(posBit);
         break;
         case CellType::DIRT:
             mapDeepSpaces.reset(posBit);
-            mapLavas.reset(posBit);
             mapDirts.set(posBit);
         break;
         case CellType::LAVA:
-            mapDeepSpaces.reset(posBit);
-            mapDirts.reset(posBit);
             mapLavas.set(posBit);
         break;
     }

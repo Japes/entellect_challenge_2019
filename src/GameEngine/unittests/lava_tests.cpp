@@ -1,0 +1,111 @@
+#include "catch.hpp"
+#include "../GameEngine.hpp"
+#include "../GameConfig.hpp"
+#include "AllCommands.hpp"
+#include "GameEngineTestUtils.hpp"
+
+int NumLavas(std::shared_ptr<GameState> state)
+{
+    int ret = 0;
+    for(int x = 0; x < GameConfig::mapSize; ++x) {
+        for(int y = 0; y < GameConfig::mapSize; ++y) {
+            if(state->CellType_at({x,y}) == CellType::LAVA) {
+                ++ret;
+            }
+        }
+    }
+    return ret;
+}
+
+TEST_CASE( "Lava flow", "[lava]" ) {
+    GIVEN("A game state")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+
+        WHEN("It is earlier than battleRoyaleStart, there is no lave")
+        {
+            while(state->roundNumber < GameConfig::maxRounds * GameConfig::battleRoyaleStart) {
+                eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+                state->player1.consecutiveDoNothingCount = 0;
+                state->player2.consecutiveDoNothingCount = 0;
+                INFO("Round number: " << state->roundNumber);
+                REQUIRE(NumLavas(state) == 0);
+            }
+            std::cerr << "(" << __FUNCTION__ << ") numlavas 1 " << NumLavas(state) << std::endl;
+
+            WHEN("It is between battleRoyaleStart and battleRoyaleEnd, lava grows")
+            {
+                while(state->roundNumber < GameConfig::maxRounds * GameConfig::battleRoyaleEnd) {
+                    int numLavasBefore = NumLavas(state);
+
+                    eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+                    state->player1.consecutiveDoNothingCount = 0;
+                    state->player2.consecutiveDoNothingCount = 0;
+
+                    int numLavasAfter = NumLavas(state);
+
+                    INFO("Round number: " << state->roundNumber);
+                    REQUIRE(numLavasAfter >= numLavasBefore);
+                }
+                std::cerr << "(" << __FUNCTION__ << ") numlavas 2 " << NumLavas(state) << std::endl;
+
+                WHEN("It is after battleRoyaleEnd, lava does not grow")
+                {
+                    int numLavasBefore = NumLavas(state);
+                    while(state->roundNumber < GameConfig::maxRounds) {
+
+                        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+                        state->player1.consecutiveDoNothingCount = 0;
+                        state->player2.consecutiveDoNothingCount = 0;
+
+                        INFO("Round number: " << state->roundNumber);
+                        REQUIRE(NumLavas(state) == numLavasBefore);
+                    }
+                }
+            }
+        }
+
+
+    }
+}
+
+TEST_CASE( "Lava affects", "[lava]" ) {
+    //test effect on health packs
+    //test effects on dirt/deep space
+    //test damage dealt
+    GIVEN("A game state with various things in it")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        auto worm = place_worm(true, 1, {1,1}, state);
+        state->SetCellTypeAt({2, 2}, CellType::DIRT);
+        state->SetCellTypeAt({3, 3}, CellType::DEEP_SPACE);
+        place_powerup({4,4}, state);
+
+        auto wormHealthBefore = worm->health;
+
+        WHEN("We make everything lava and progress game state")
+        {
+            for(int x = 0; x < GameConfig::mapSize; ++x) {
+                for(int y = 0; y < GameConfig::mapSize; ++y) {
+                    state->SetCellTypeAt({x,y}, CellType::LAVA);
+                }
+            }
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+            THEN("Lava affects things as expected")
+            {
+                CHECK(worm->health == wormHealthBefore - 3);
+                CHECK(state->Worm_at({1, 1}) != nullptr);
+                CHECK(state->CellType_at({2, 2}) ==  CellType::DIRT);
+                CHECK(state->CellType_at({3, 3}) ==  CellType::DEEP_SPACE);
+                CHECK(state->PowerUp_at({4, 4}) != nullptr);
+                CHECK(state->CellType_at({5, 5}) ==  CellType::LAVA);
+            }
+        }
+    }
+}
+
+
+//test filling up of dug dirt

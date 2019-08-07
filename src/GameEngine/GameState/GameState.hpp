@@ -58,6 +58,7 @@ class GameState
 
     inline CellType CellType_at(Position pos)
     {
+        //order is important here because a space could be marked e.g. lava & dirt
         auto posBit = (MAP_SIZE*pos.y + pos.x);
         if(mapDeepSpaces[posBit]) {
             return CellType::DEEP_SPACE;

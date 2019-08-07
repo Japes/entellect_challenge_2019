@@ -13,7 +13,8 @@ struct Position
     Position(int x, int y);
     int MaximumDimension(const Position &other) const;
     int MovementDistanceTo(const Position &other) const;
-    int EuclideanDistanceTo(const Position &other) const;
+    float EuclideanDistanceTo(const Position &other) const;
+    int SquareDistanceTo(const Position &other) const;
     bool IsOnMap() const;
     bool BananaSnowballCanReach(const Position &other) const;
     void ClampToMap();

@@ -26,11 +26,18 @@ int Position::MovementDistanceTo(const Position &other) const
 }
 
 //range to target as defined in rules
-int Position::EuclideanDistanceTo(const Position &other) const
+float Position::EuclideanDistanceTo(const Position &other) const
+{
+    float xdist = other.x - x;
+    float ydist = other.y - y;
+    return std::sqrt((xdist*xdist) + (ydist*ydist));
+}
+
+int Position::SquareDistanceTo(const Position &other) const
 {
     auto xdist = other.x - x;
     auto ydist = other.y - y;
-    return static_cast<int>(std::sqrt((xdist*xdist) + (ydist*ydist)));
+    return static_cast<int>((xdist*xdist) + (ydist*ydist));
 }
 
 //adjusts position so that it is on the map

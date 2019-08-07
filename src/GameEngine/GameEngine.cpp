@@ -21,7 +21,10 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
         return; //nothing more to do here
     }
 
-    //validate both guys first
+    //lava
+    SetupLava(_state->roundNumber);
+
+    //validate both guys
     bool player1Frozen =_state->player1.GetCurrentWorm()->IsFrozen();
     bool player2Frozen =_state->player2.GetCurrentWorm()->IsFrozen();
     
@@ -54,12 +57,47 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     _state->player2.UpdateCurrentWorm();
 
     ApplyPowerups();
+    ApplyLava();
 
     ++_state->roundNumber;
 
     UpdateWinCondition();
 
     //at this point we'd ask the players for their next moves
+}
+
+//TODO can make this much faster by precomputing lava for all rounds up front
+void GameEngine::SetupLava(unsigned roundNum)
+{
+    int center = (GameConfig::mapSize - 1) / 2.0;
+    Position mapCenter(center, center);
+
+    float brStartRound = GameConfig::maxRounds * GameConfig::battleRoyaleStart;
+    if (roundNum < brStartRound) {
+        return;
+    }
+
+    float brEndRound = GameConfig::maxRounds * GameConfig::battleRoyaleEnd;
+    float fullPercentageRange = (roundNum - brStartRound) / (brEndRound - brStartRound);
+    //clamp tp [0,1]
+    float currentProgress = fullPercentageRange > 0 ? fullPercentageRange : 0;
+    currentProgress = currentProgress > 1 ? 1 : currentProgress;
+
+    float safeAreaRadius = (GameConfig::mapSize / 2) * (1 - currentProgress);
+
+    unsigned countLavas = 0;
+    for(int x = 0; x < GameConfig::mapSize; ++x) {
+        for(int y = 0; y < GameConfig::mapSize; ++y) {
+            Position pos(x,y);
+            if(mapCenter.EuclideanDistanceTo(pos) > (safeAreaRadius + 1) && _state->CellType_at(pos) == CellType::AIR) {
+                _state->SetCellTypeAt(pos, CellType::LAVA);
+                ++countLavas;
+            }
+        }
+    }
+
+    //std::cerr << "(" << __FUNCTION__ << ") roundNum: " << roundNum << " currentProgress: " << currentProgress 
+    //            << " safeAreaRadius: " << safeAreaRadius << " countLavas: " << countLavas << std::endl;
 }
 
 //returns false if move is invalid
@@ -90,10 +128,23 @@ void GameEngine::ApplyPowerups()
         if(powerupHere != nullptr) {
             powerupHere->ApplyTo(&worm);
             _state->ClearPowerupAt(worm.position);
-            _state->player1.RecalculateHealth();
-            _state->player2.RecalculateHealth();
         }
     });
+
+    _state->player1.RecalculateHealth();
+    _state->player2.RecalculateHealth();
+}
+
+void GameEngine::ApplyLava()
+{
+    _state->ForAllWorms([&](Worm& worm) {
+        if( worm.position.IsOnMap() && _state->CellType_at(worm.position) == CellType::LAVA) {
+            worm.health -= GameConfig::lavaDamage;
+        }
+    });
+
+    _state->player1.RecalculateHealth();
+    _state->player2.RecalculateHealth();
 }
 
 //do a random playthrough to the end and return:

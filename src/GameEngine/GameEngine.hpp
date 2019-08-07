@@ -42,7 +42,9 @@ class GameEngine
     private:
     bool DoCommand(const Command& command, bool player1, bool valid);
     void ApplyPowerups();
+    void ApplyLava();
     void UpdateWinCondition();
+    void SetupLava(unsigned roundNum);
 
     std::shared_ptr<GameState> _state;
     GameResult _currentResult;

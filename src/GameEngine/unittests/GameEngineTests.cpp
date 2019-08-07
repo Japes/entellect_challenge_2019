@@ -614,6 +614,9 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
         place_worm(false, 2, {21,10}, state);
         place_worm(false, 3, {22,20}, state);
 
+        state->player1.worms[0].health = 999999; //so lava doesn't kill him
+        state->player2.worms[0].health = 999999; //so lava doesn't kill him
+
         TeleportCommand player1move({0,0});
         TeleportCommand player2move({0,0});
 
@@ -627,11 +630,11 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
             for(unsigned i = 1; i < GameConfig::maxRounds; i++) {
                 //make sure moves are valid
                 if(flipflop) {
-                    player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{1,1});
-                    player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{1,1});
+                    player1move = TeleportCommand( (state->player1.GetCurrentWorm()->position + Position{1,1}) );
+                    player2move = TeleportCommand( (state->player2.GetCurrentWorm()->position + Position{1,1}) );
                 } else {
-                    player1move = TeleportCommand(state->player1.GetCurrentWorm()->position + Position{-1,-1});
-                    player2move = TeleportCommand(state->player2.GetCurrentWorm()->position + Position{-1,-1});
+                    player1move = TeleportCommand( (state->player1.GetCurrentWorm()->position + Position{-1,-1}) );
+                    player2move = TeleportCommand( (state->player2.GetCurrentWorm()->position + Position{-1,-1}) );
                 }
                 eng.AdvanceState(player1move, player2move);
                 flipflop = !flipflop;
