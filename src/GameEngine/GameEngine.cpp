@@ -41,13 +41,12 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     movesValid &= DoCommand(!player1GoesFirst?player1_command:player2_command, !player1GoesFirst, !player1GoesFirst?player1Good:player2Good);
 
     if(!movesValid) {
-        std::cerr << "Invalid move found.  Player1 move: " << player1_command.GetCommandString() << " Player2 move: " << player2_command.GetCommandString();
-        if ( player1Frozen ) { std::cerr << " (player1 is frozen)"; }
-        if ( player2Frozen ) { std::cerr << " (player2 is frozen)"; }
-        std::cerr << std::endl;
-#ifdef EXCEPTION_ON_ERROR
-        throw std::runtime_error("Invalid move found!");
-#endif
+        if(!player1Good && !player1Frozen) {
+            std::cerr << "Invalid move by worm 1" << _state->player1.GetCurrentWorm()->id << ": " << player1_command.GetCommandString() << std::endl;
+        }
+        if(!player2Good && !player2Frozen) {
+            std::cerr << "Invalid move by worm 2" << _state->player2.GetCurrentWorm()->id << ": " << player2_command.GetCommandString() << std::endl;
+        }
     }
 
     _state->player1.GetCurrentWorm()->movedThisRound = false;

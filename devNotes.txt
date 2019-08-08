@@ -1,5 +1,8 @@
 TODO
 
+   run compare over LOTS of matches
+      fix engine bugs
+
    finish the loading of previous_move into state
       see [.broken] unit test
       
@@ -7,15 +10,6 @@ TODO
       num selects
       num bananas
       num snowballs
-
-   snowball
-      you can select away from the snowballed guy
-
-   use heuristic if all monte carlos are tied
-      or off by <numplaythroughs>
-
-   runMatches script takes long because it wipes the copy of starter-pack, which could have loads of matches in it.
-      maybe should dump all the matches in one place
       
    handle monte carlo ties
       make wins/losses comparable as well - will reduce ties
@@ -44,8 +38,7 @@ TODO
          C value
          playthrough weights
 
-   run compare over LOTS of matches
-      fix engine bugs
+
 
 
    optimization
@@ -107,8 +100,6 @@ sort out deployment---------------
         known issue: incorrect case in header includes
 
 
-
-
 MISC NOTES--------------------
 to scan match logs for No Commands:
    find . -wholename "*JP3/PlayerCommand*" -exec grep -A 1 "No Command" {} +
@@ -118,6 +109,12 @@ to count number of moves of a certain type (note this isn't a true count, but it
    find . -wholename "*UltraSnob/PlayerCommand*" -exec grep -A 1 "Command: move" {} + | wc -l
 
 BRAINSTORMING---------------------------------------------------------------------------------------
+
+   snowball
+      you can select away from the snowballed guy
+
+   use heuristic if all monte carlos are tied
+      or off by <numplaythroughs>
 
     try
        playthroughs considering only nearby worms
