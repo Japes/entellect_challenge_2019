@@ -127,7 +127,7 @@ std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, std::sh
     Position bestMoveTarget(-100,-100);
     for(auto const & space : _surroundingWormSpaces) {
         Position potentialTarget = worm->position + space;
-        if(!potentialTarget.IsOnMap() || state->Worm_at(potentialTarget) != nullptr || state->CellType_at(potentialTarget) != CellType::AIR) {
+        if(!potentialTarget.IsOnMap() || state->Worm_at(potentialTarget) != nullptr || IsBlocking(state->CellType_at(potentialTarget))) {
             continue;
         }
         if(potentialTarget.MovementDistanceTo(closestDirt) < bestMoveTarget.MovementDistanceTo(closestDirt)) {
@@ -254,7 +254,7 @@ std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, std::shared_ptr<Ga
 
     if(state->Worm_at(targetPos) == nullptr) {
         CellType t = state->CellType_at(targetPos);
-        if(t == CellType::AIR) {
+        if(!IsBlocking(t)) {
             return std::make_shared<TeleportCommand>(targetPos);
         } else if(t == CellType::DIRT) {
             return std::make_shared<DigCommand>(targetPos);

@@ -83,7 +83,8 @@ Worm* ShootCommand::WormOnTarget(const Worm* worm, const std::shared_ptr<GameSta
             return nullptr;
         }
 
-        if (state->CellType_at(pos) != CellType::AIR) {
+        //check dirt/deep space
+        if (IsBlocking(state->CellType_at(pos))) {
             //std::cerr << "HIT DIRT (or deep space)!" << std::endl;
             return nullptr;
         }

@@ -139,7 +139,7 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
             0   1   2
         0   D   .   D
         1   S   11  12
-        2   .   .   22
+        2   L   .   22
         */
 
         auto state = std::make_shared<GameState>();
@@ -149,6 +149,7 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         state->SetCellTypeAt({0, 0}, CellType::DIRT);
         state->SetCellTypeAt({2, 0}, CellType::DIRT);
         state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
+        state->SetCellTypeAt({0, 2}, CellType::LAVA);
 
         auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
         REQUIRE(moves == 0b01100111);
@@ -158,7 +159,7 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         REQUIRE(NextTurn::GetTeleportDig(worm11, state, 2)->GetCommandString() == "dig 2 0");
         REQUIRE(NextTurn::GetTeleportDig(worm11, state, 3)->GetCommandString() == "nothing"); //error case...
         REQUIRE(NextTurn::GetTeleportDig(worm11, state, 4)->GetCommandString() == "nothing"); //error case...
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 5)->GetCommandString() == "move 0 2"); //error case...
+        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 5)->GetCommandString() == "move 0 2");
         REQUIRE(NextTurn::GetTeleportDig(worm11, state, 6)->GetCommandString() == "move 1 2");
         REQUIRE(NextTurn::GetTeleportDig(worm11, state, 7)->GetCommandString() == "nothing"); //error case...
     }
@@ -602,7 +603,7 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
         {
             //    0   1   2   3   4 
             //0   S   S   .   .   D
-            //1   11  .   .   .   .
+            //1   11     .   .   .
             //2   .   .   .   .   .
             //3   .   .   .   .   .
             //4   .   .   .   .   .
@@ -749,6 +750,59 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
                 auto cmdStr = cmd->GetCommandString();
                 INFO(cmdStr)
                 REQUIRE( ( (cmdStr == "move 2 5") ) ) ;
+            }
+        }
+
+        WHEN("We put lava in the way")
+        {
+            //    0   1   2   3   4 
+            //0   S   S   .   .   D
+            //1   11  L   .   .   .
+            //2   L   L   .   .   .
+            //3   .   .   .   .   .
+            //4   .   .   .   .   .
+            //5   .   .   .   .   .
+
+            place_worm(player1, wormIndex, {0,1}, state);
+            state->SetCellTypeAt({4,0}, CellType::DIRT);
+            state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({1,1}, CellType::LAVA);
+            state->SetCellTypeAt({1,2}, CellType::LAVA);
+            state->SetCellTypeAt({0,2}, CellType::LAVA);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("It doesn't care")
+            {
+                REQUIRE(cmd->GetCommandString() != "move 1 0");
+                REQUIRE(cmd->GetCommandString() == "move 1 1");
+            }
+        }
+
+        WHEN("The dude is complete surrounded")
+        {
+            //    0   1   2   3   4 
+            //0   S   S   .   .   D
+            //1   11  D   .   .   .
+            //2   W   D   .   .   .
+            //3   .   .   .   .   .
+            //4   .   .   .   .   .
+            //5   .   .   .   .   .
+
+            place_worm(player1, wormIndex, {0,1}, state);
+            state->SetCellTypeAt({4,0}, CellType::DIRT);
+            state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
+            state->SetCellTypeAt({1,1}, CellType::DIRT);
+            state->SetCellTypeAt({1,2}, CellType::DIRT);
+            place_worm(!player1, wormIndex, {0,2}, state);
+
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+
+            THEN("He gives up")
+            {
+                    REQUIRE(cmd == nullptr);
             }
         }
     }

@@ -12,6 +12,10 @@ enum class CellType : uint8_t {
     LAVA
 };
 
+inline bool IsBlocking(CellType t)
+{
+    return t == CellType::DIRT || t == CellType::DEEP_SPACE;
+}
 
 struct Cell
 {

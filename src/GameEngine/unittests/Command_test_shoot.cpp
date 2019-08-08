@@ -400,6 +400,71 @@ TEST_CASE( "Shoot command obstacles : dirt", "[Shoot_command][Shot_missed]" ) {
     }
 }
 
+TEST_CASE( "Shoot command NON obstacle : lava", "[Shoot_command][Shot_missed]" ) {
+
+    GIVEN("A game state and a shoot command")
+    {
+        auto state = std::make_shared<GameState>();
+
+        Position worm_under_test_pos{15,15};
+        place_worm(true, 1, worm_under_test_pos, state);
+
+        //surround the dude in lava
+        state->SetCellTypeAt(worm_under_test_pos + Position(-1,-1), CellType::LAVA);
+        state->SetCellTypeAt(worm_under_test_pos + Position(0,-1), CellType::LAVA); 
+        state->SetCellTypeAt(worm_under_test_pos + Position(1,-1), CellType::LAVA); 
+
+        state->SetCellTypeAt(worm_under_test_pos + Position(-1,1), CellType::LAVA);
+        state->SetCellTypeAt(worm_under_test_pos + Position(0,1), CellType::LAVA);
+        state->SetCellTypeAt(worm_under_test_pos + Position(1,1), CellType::LAVA);
+
+        state->SetCellTypeAt(worm_under_test_pos + Position(-1,0), CellType::LAVA);
+        state->SetCellTypeAt(worm_under_test_pos + Position(1,0), CellType::LAVA);
+
+        auto range = GameConfig::commandoWorms.weapon.range;
+        auto diagRange = GameConfig::commandoWorms.weapon.diagRange;
+
+        THEN("Shooting hits worms far away N")
+        {
+            Position enemy_worm_pos1{worm_under_test_pos.x - diagRange, worm_under_test_pos.y - diagRange};
+            place_worm(false, 1, enemy_worm_pos1, state);
+            Position enemy_worm_pos2{worm_under_test_pos.x + 1, worm_under_test_pos.y - range};
+            place_worm(false, 2, enemy_worm_pos2, state);
+            Position enemy_worm_pos3{worm_under_test_pos.x + diagRange - 1, worm_under_test_pos.y - diagRange};
+            place_worm(false, 3, enemy_worm_pos3, state);
+
+            check_shot_hit(state, 1, ShootCommand::ShootDirection::NW);
+            check_shot_hit(state, 2, ShootCommand::ShootDirection::N);
+            check_shot_hit(state, 3, ShootCommand::ShootDirection::NE);
+        }
+
+        THEN("Shooting hits worms far away S")
+        {
+            Position enemy_worm_pos1{worm_under_test_pos.x - diagRange, worm_under_test_pos.y + diagRange};
+            place_worm(false, 1, enemy_worm_pos1, state);
+            Position enemy_worm_pos2{worm_under_test_pos.x + 1, worm_under_test_pos.y + range};
+            place_worm(false, 2, enemy_worm_pos2, state);
+            Position enemy_worm_pos3{worm_under_test_pos.x + diagRange - 1, worm_under_test_pos.y + diagRange};
+            place_worm(false, 3, enemy_worm_pos3, state);
+
+            check_shot_hit(state, 1, ShootCommand::ShootDirection::SW);
+            check_shot_hit(state, 2, ShootCommand::ShootDirection::S);
+            check_shot_hit(state, 3, ShootCommand::ShootDirection::SE);
+        }
+
+        THEN("Shooting hits worms far away EW")
+        {
+            Position enemy_worm_pos1{worm_under_test_pos.x - range, worm_under_test_pos.y};
+            place_worm(false, 1, enemy_worm_pos1, state);
+            Position enemy_worm_pos2{worm_under_test_pos.x + range, worm_under_test_pos.y};
+            place_worm(false, 2, enemy_worm_pos2, state);
+
+            check_shot_hit(state, 1, ShootCommand::ShootDirection::W);
+            check_shot_hit(state, 2, ShootCommand::ShootDirection::E);
+        }
+    }
+}
+
 TEST_CASE( "Shoot command obstacles : other worms", "[Shoot_command][Shot_missed]" ) {
 
     GIVEN("A game state and a shoot command")
