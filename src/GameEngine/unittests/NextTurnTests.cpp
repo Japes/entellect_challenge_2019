@@ -149,7 +149,7 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         state->SetCellTypeAt({0, 0}, CellType::DIRT);
         state->SetCellTypeAt({2, 0}, CellType::DIRT);
         state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({0, 2}, CellType::LAVA);
+        state->AddLavaAt({0, 2});
 
         auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
         REQUIRE(moves == 0b01100111);
@@ -767,9 +767,9 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             state->SetCellTypeAt({4,0}, CellType::DIRT);
             state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
             state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({1,1}, CellType::LAVA);
-            state->SetCellTypeAt({1,2}, CellType::LAVA);
-            state->SetCellTypeAt({0,2}, CellType::LAVA);
+            state->AddLavaAt({1,1});
+            state->AddLavaAt({1,2});
+            state->AddLavaAt({0,2});
 
             auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
 

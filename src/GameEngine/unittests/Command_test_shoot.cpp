@@ -410,16 +410,14 @@ TEST_CASE( "Shoot command NON obstacle : lava", "[Shoot_command][Shot_missed]" )
         place_worm(true, 1, worm_under_test_pos, state);
 
         //surround the dude in lava
-        state->SetCellTypeAt(worm_under_test_pos + Position(-1,-1), CellType::LAVA);
-        state->SetCellTypeAt(worm_under_test_pos + Position(0,-1), CellType::LAVA); 
-        state->SetCellTypeAt(worm_under_test_pos + Position(1,-1), CellType::LAVA); 
-
-        state->SetCellTypeAt(worm_under_test_pos + Position(-1,1), CellType::LAVA);
-        state->SetCellTypeAt(worm_under_test_pos + Position(0,1), CellType::LAVA);
-        state->SetCellTypeAt(worm_under_test_pos + Position(1,1), CellType::LAVA);
-
-        state->SetCellTypeAt(worm_under_test_pos + Position(-1,0), CellType::LAVA);
-        state->SetCellTypeAt(worm_under_test_pos + Position(1,0), CellType::LAVA);
+        state->AddLavaAt(worm_under_test_pos + Position(-1,-1));
+        state->AddLavaAt(worm_under_test_pos + Position(0,-1));
+        state->AddLavaAt(worm_under_test_pos + Position(1,-1));
+        state->AddLavaAt(worm_under_test_pos + Position(-1,1));
+        state->AddLavaAt(worm_under_test_pos + Position(0,1));
+        state->AddLavaAt(worm_under_test_pos + Position(1,1));
+        state->AddLavaAt(worm_under_test_pos + Position(-1,0));
+        state->AddLavaAt(worm_under_test_pos + Position(1,0));
 
         auto range = GameConfig::commandoWorms.weapon.range;
         auto diagRange = GameConfig::commandoWorms.weapon.diagRange;

@@ -89,8 +89,8 @@ void GameEngine::SetupLava(unsigned roundNum)
     for(int x = 0; x < GameConfig::mapSize; ++x) {
         for(int y = 0; y < GameConfig::mapSize; ++y) {
             Position pos(x,y);
-            if(mapCenter.EuclideanDistanceTo(pos) > (safeAreaRadius + 1) && _state->CellType_at(pos) == CellType::AIR) {
-                _state->SetCellTypeAt(pos, CellType::LAVA);
+            if(mapCenter.EuclideanDistanceTo(pos) > (safeAreaRadius + 1)) {
+                _state->AddLavaAt(pos);
                 ++countLavas;
             }
         }
@@ -138,7 +138,7 @@ void GameEngine::ApplyPowerups()
 void GameEngine::ApplyLava()
 {
     _state->ForAllWorms([&](Worm& worm) {
-        if( worm.position.IsOnMap() && _state->CellType_at(worm.position) == CellType::LAVA) {
+        if( worm.position.IsOnMap() && _state->LavaAt(worm.position)) {
             worm.health -= GameConfig::lavaDamage;
         }
     });

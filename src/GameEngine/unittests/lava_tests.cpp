@@ -9,7 +9,7 @@ int NumLavas(std::shared_ptr<GameState> state)
     int ret = 0;
     for(int x = 0; x < GameConfig::mapSize; ++x) {
         for(int y = 0; y < GameConfig::mapSize; ++y) {
-            if(state->CellType_at({x,y}) == CellType::LAVA) {
+            if(state->LavaAt({x,y})) {
                 ++ret;
             }
         }
@@ -89,7 +89,7 @@ TEST_CASE( "Lava affects", "[lava]" ) {
         {
             for(int x = 0; x < GameConfig::mapSize; ++x) {
                 for(int y = 0; y < GameConfig::mapSize; ++y) {
-                    state->SetCellTypeAt({x,y}, CellType::LAVA);
+                    state->AddLavaAt({x,y});
                 }
             }
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
@@ -101,7 +101,7 @@ TEST_CASE( "Lava affects", "[lava]" ) {
                 CHECK(state->CellType_at({2, 2}) ==  CellType::DIRT);
                 CHECK(state->CellType_at({3, 3}) ==  CellType::DEEP_SPACE);
                 CHECK(state->PowerUp_at({4, 4}) != nullptr);
-                CHECK(state->CellType_at({5, 5}) ==  CellType::LAVA);
+                CHECK(state->LavaAt({5, 5}));
             }
         }
     }

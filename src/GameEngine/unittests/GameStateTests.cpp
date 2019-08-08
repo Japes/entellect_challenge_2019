@@ -4,6 +4,7 @@
 #include "GameEngineTestUtils.hpp"
 #include "Utilities.hpp"
 #include "Command.hpp"
+#include "GameEngine.hpp"
 
 TEST_CASE( "I can make a state instance", "[sanity_state]" ) {
     GameState state;
@@ -163,7 +164,7 @@ TEST_CASE( "GameState load lava", "[state_load_lava]" ) {
             REQUIRE(state.CellType_at({6,0}) == CellType::DEEP_SPACE );
             REQUIRE(state.CellType_at({11,0}) == CellType::DIRT );
             REQUIRE(state.CellType_at({15,3}) == CellType::AIR );
-            REQUIRE(state.CellType_at({21,3}) == CellType::LAVA );
+            REQUIRE(state.LavaAt({21,3}));
         }
     }
 }
@@ -185,21 +186,22 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
             for(int i = 0; i < GameConfig::mapSize; ++i) {
                 for(int j = 0; j < GameConfig::mapSize; ++j) {
                     INFO("position " << i << ", " << j);
-                    auto copied_cell = copied_state->Cell_at({i,j});
-                    auto original_cell = original_state->Cell_at({i,j});
-                    REQUIRE(copied_cell.type == original_cell.type);
+                    Position pos(i,j);
+                    REQUIRE(copied_state->CellType_at(pos) == original_state->CellType_at(pos));
 
-                    if(copied_cell.powerup == nullptr) {
-                        REQUIRE(copied_cell.powerup == original_cell.powerup);
+                    if(copied_state->PowerUp_at(pos) == nullptr) {
+                        REQUIRE(copied_state->PowerUp_at(pos) == original_state->PowerUp_at(pos));
                     } else {
-                        REQUIRE(original_cell.powerup != nullptr);
+                        REQUIRE(original_state->PowerUp_at(pos) != nullptr);
                     }
 
-                    if(copied_cell.worm == nullptr) {
-                        REQUIRE(copied_cell.worm == original_cell.worm);
+                    if(copied_state->Worm_at(pos) == nullptr) {
+                        REQUIRE(copied_state->Worm_at(pos) == original_state->Worm_at(pos));
                     } else {
-                        REQUIRE(copied_cell.worm != original_cell.worm);
+                        REQUIRE(copied_state->Worm_at(pos) != original_state->Worm_at(pos));
                     }
+
+                    REQUIRE(copied_state->LavaAt(pos) == original_state->LavaAt(pos));
                 }
             }
 
@@ -230,7 +232,7 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
             state.SetCellTypeAt({1,2}, CellType::DIRT);
             state.SetCellTypeAt({2,3}, CellType::AIR);
             state.SetCellTypeAt({3,4}, CellType::DEEP_SPACE);
-            state.SetCellTypeAt({5,7}, CellType::LAVA);
+            state.AddLavaAt({5,7});
 
             THEN("The cell is of that type")
             {
@@ -238,7 +240,41 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
                 REQUIRE(state.CellType_at({2,3}) == CellType::AIR);
                 REQUIRE(state.CellType_at({4,5}) == CellType::AIR);
                 REQUIRE(state.CellType_at({3,4}) == CellType::DEEP_SPACE);
-                REQUIRE(state.CellType_at({5,7}) == CellType::LAVA);
+                REQUIRE(state.LavaAt({5,7}));
+            }
+        }
+
+        WHEN("A cell has lava under dirt")
+        {
+            Position testPos(9,9);
+            state.AddLavaAt(testPos);
+            state.SetCellTypeAt(testPos, CellType::DIRT);
+
+            AND_THEN("It gets dug")
+            {
+                auto ptr = std::make_shared<GameState>(state);
+                GameEngine eng(ptr);
+                place_worm(true, 1, testPos + Position(1,0), ptr);
+                eng.AdvanceState(DigCommand(testPos), DoNothingCommand());
+                THEN("It is air, but has lava")
+                {
+                    REQUIRE(ptr->CellType_at(testPos) == CellType::AIR);
+                    REQUIRE(ptr->LavaAt(testPos));
+                }
+            }
+
+            AND_THEN("It gets banana'd")
+            {
+                auto ptr = std::make_shared<GameState>(state);
+                GameEngine eng(ptr);
+                place_worm(true, 1, testPos + Position(1,0), ptr);
+                ptr->player1.worms[0].SetProffession(Worm::Proffession::AGENT);
+                eng.AdvanceState(BananaCommand(testPos), DoNothingCommand());
+                THEN("It is air, but has lava")
+                {
+                    REQUIRE(ptr->CellType_at(testPos) == CellType::AIR);
+                    REQUIRE(ptr->LavaAt(testPos));
+                }
             }
         }
 

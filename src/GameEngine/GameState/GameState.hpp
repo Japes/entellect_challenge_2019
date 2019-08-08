@@ -23,8 +23,8 @@ class GameState
     GameState(const GameState& p);
     GameState(rapidjson::Document& roundJSON);
 
-    Cell Cell_at(Position pos);
     void SetCellTypeAt(Position pos, CellType type);
+    void AddLavaAt(Position pos);
     void PlacePowerupAt(Position pos);
     void ClearPowerupAt(Position pos);
     void PlaceWormAt(Position pos, Worm* worm);
@@ -58,7 +58,6 @@ class GameState
 
     inline CellType CellType_at(Position pos)
     {
-        //order is important here because a space could be marked e.g. lava & dirt
         auto posBit = (MAP_SIZE*pos.y + pos.x);
         if(mapDeepSpaces[posBit]) {
             return CellType::DEEP_SPACE;
@@ -67,12 +66,14 @@ class GameState
         if(mapDirts[posBit]) {
             return CellType::DIRT;
         } 
-        
-        if(mapLavas[posBit]) {
-            return CellType::LAVA;
-        }
             
         return CellType::AIR;
+    }
+
+    inline bool LavaAt(Position pos)
+    {
+        auto posBit = (MAP_SIZE*pos.y + pos.x);
+        return mapLavas[posBit];
     }
 
     inline PowerUp* PowerUp_at(Position pos)

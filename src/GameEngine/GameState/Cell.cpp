@@ -4,12 +4,10 @@ CellType Cell::strToCellType(std::string str)
 {
     if(str == "DEEP_SPACE") {
         return CellType::DEEP_SPACE;
-    } else if(str == "AIR") {
+    } else if(str == "AIR" || str == "LAVA") {
         return CellType::AIR;
     }else if(str == "DIRT") {
         return CellType::DIRT;
-    }else if(str == "LAVA") {
-        return CellType::LAVA;
     }
     return CellType::AIR;
 }

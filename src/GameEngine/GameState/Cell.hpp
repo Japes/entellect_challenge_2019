@@ -8,8 +8,7 @@
 enum class CellType : uint8_t {
     AIR,
     DIRT,
-    DEEP_SPACE,
-    LAVA
+    DEEP_SPACE
 };
 
 inline bool IsBlocking(CellType t)

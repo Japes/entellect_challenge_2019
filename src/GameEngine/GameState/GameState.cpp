@@ -76,35 +76,6 @@ void GameState::UpdateRefs(Player& player)
     }
 }
 
-Cell GameState::Cell_at(Position pos)
-{
-    Cell ret;
-    if(mapDeepSpaces[pos.y] & (first_bit_set >> pos.x) ) {
-        ret.type = CellType::DEEP_SPACE;
-    } else if (mapDirts[pos.y] & (first_bit_set >> pos.x)) {
-        ret.type = CellType::DIRT;
-    } else if (mapLavas[pos.y] & (first_bit_set >> pos.x)) {
-        ret.type = CellType::LAVA;
-    }else {
-        ret.type = CellType::AIR;
-    }
-
-    ForAllWorms([&] (Worm& w) {
-        if(w.position == pos && !w.IsDead()) {
-            ret.worm = &w;
-        }
-    });
-
-    for(auto const& hpPos : healthPackPos) {
-        if(hpPos == pos) {
-            ret.powerup = &healthPack;
-            break;
-        } 
-    }
-
-    return ret;
-}
-
 void GameState::SetCellTypeAt(Position pos, CellType type)
 {
     auto posBit = (MAP_SIZE*pos.y + pos.x);
@@ -122,10 +93,13 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
             mapDeepSpaces.reset(posBit);
             mapDirts.set(posBit);
         break;
-        case CellType::LAVA:
-            mapLavas.set(posBit);
-        break;
     }
+}
+
+void GameState::AddLavaAt(Position pos)
+{
+    auto posBit = (MAP_SIZE*pos.y + pos.x);
+    mapLavas.set(posBit);
 }
 
 void GameState::PlacePowerupAt(Position pos)

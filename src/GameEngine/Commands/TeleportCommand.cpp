@@ -62,7 +62,7 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
         return false;
     }
 
-    if(state->CellType_at(_pos) == CellType::DIRT || state->CellType_at(_pos) == CellType::DEEP_SPACE) {
+    if(IsBlocking(state->CellType_at(_pos))) {
         std::cerr << latestBot << "------Cant move through dirt or deep-space..." << _pos << std::endl;
         return false;
     }

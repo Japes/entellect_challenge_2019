@@ -140,7 +140,8 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
         Position air_pos1{11,9};
         Position lava_pos{11,10};
         Position air_pos3{9,10};
-        state->SetCellTypeAt(lava_pos, CellType::LAVA);
+
+        state->AddLavaAt(lava_pos);
 
         Worm* worm_under_test = &state->player1.worms[0];
         worm_under_test->position = worm_under_test->previous_position = worm_under_test_pos;

@@ -204,9 +204,13 @@ void GameStateLoader::PopulateMap(GameState& state, rapidjson::Document& roundJS
             int x = (*colItr)["x"].GetInt();
             int y = (*colItr)["y"].GetInt();
             Position pos(x,y);
-            CellType type =  Cell::strToCellType((*colItr)["type"].GetString());
-
+            std::string cellType = (*colItr)["type"].GetString();
+            CellType type =  Cell::strToCellType(cellType);
             state.SetCellTypeAt(pos, type);
+            if(cellType == "LAVA") {
+                state.AddLavaAt(pos);
+            }
+
             state.ClearPowerupAt(pos);
 
             if((*colItr).HasMember("occupier")) {
