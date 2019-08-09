@@ -133,67 +133,6 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
     //700000 moves per second, with just donothings, 2.5M per second
 }
 
-//expects strings of form:
-//`No Command`
-//`move 25 27`
-//`select 1;move 25 27`
-std::shared_ptr<Command> GetCommandFromString(std::string cmd)
-{
-    const std::size_t firstSpace = cmd.find(" ");
-    const std::size_t endLine = cmd.find("\n");
-    const std::string moveType = cmd.substr(0, firstSpace);
-
-    if(moveType == "move") {
-        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
-        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
-        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
-        return std::make_shared<TeleportCommand>(Position(x,y));
-    } else if (moveType == "dig") {
-        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
-        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
-        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
-        return std::make_shared<DigCommand>(Position(x,y));
-    } else if (moveType == "shoot") {
-        std::string dirString = cmd.substr(firstSpace + 1, (endLine - firstSpace));
-        ShootCommand::ShootDirection dir;
-
-        if(dirString == "N") { dir = ShootCommand::ShootDirection::N;}
-        else if(dirString == "NE") { dir = ShootCommand::ShootDirection::NE;}
-        else if(dirString == "E") { dir = ShootCommand::ShootDirection::E;}
-        else if(dirString == "SE") { dir = ShootCommand::ShootDirection::SE;}
-        else if(dirString == "S") { dir = ShootCommand::ShootDirection::S;}
-        else if(dirString == "SW") { dir = ShootCommand::ShootDirection::SW;}
-        else if(dirString == "W") { dir = ShootCommand::ShootDirection::W;}
-        else if(dirString == "NW") { dir = ShootCommand::ShootDirection::NW;}
-        else {throw std::runtime_error("don't understand this shoot string");}
-
-        auto ret = std::make_shared<ShootCommand>(dir);
-        return ret;
-    } else if (moveType == "banana") {
-        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
-        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
-        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
-        return std::make_shared<BananaCommand>(Position(x,y));
-    } else if (moveType == "nothing") {
-        return std::make_shared<DoNothingCommand>();
-    } else if (moveType == "No") { //"No Command" - invalid
-        return std::make_shared<TeleportCommand>(Position(-10,-10)); //always invalid
-    } else if (moveType == "select") {
-        std::string indexStr = cmd.substr(firstSpace + 1, 1); 
-        int index = std::stoi(indexStr); //will always be 1 digit
-
-        size_t startOfSelected = firstSpace + 3;
-        std::string selectedCmdstr = cmd.substr(startOfSelected, cmd.length() - startOfSelected );
-        std::shared_ptr<Command> selectedCmd = GetCommandFromString(selectedCmdstr);
-
-        return std::make_shared<SelectCommand>(index, selectedCmd);
-    } else {
-        std::stringstream msg;
-        msg << "dont understand this move type: " << moveType;
-        throw std::runtime_error(msg.str());
-    }
-}
-
 void GetEndGameState(std::string path, std::string& winningPlayer, int& playerAScore, int& playerAHealth, int& playerBScore, int& playerBHealth)
 {
     std::string fileContents = Utilities::ReadFile(path);
@@ -251,7 +190,7 @@ std::shared_ptr<Command> GetCommandFromFile(std::string path)
 
     UNSCOPED_INFO("cmdString: " << cmdString );
 
-    return GetCommandFromString(cmdString);
+    return GameStateLoader::GetCommandFromString(cmdString);
 }
 
 std::string GetRoundFolder(unsigned round)

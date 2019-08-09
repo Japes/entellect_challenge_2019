@@ -59,7 +59,7 @@ void GameStateLoader::PopulatePlayer(Player& player, const rapidjson::Value& pla
     player.RecalculateHealth(); 
 
     player.command_score -= player.GetAverageWormHealth();
-    player.previousCommand = Str2Cmd(playerJson["previousCommand"].GetString());
+    player.previousCommand = GetCommandFromString(playerJson["previousCommand"].GetString());
 }
 
 //gets the x/y part of commands that use it
@@ -74,42 +74,66 @@ Position GameStateLoader::GetCommandPosition(std::string str)
     return {x,y};
 }
 
-std::shared_ptr<Command> GameStateLoader::Str2Cmd(std::string str)
+//expects strings of form:
+//`No Command`
+//`move 25 27`
+//`select 1;move 25 27`
+std::shared_ptr<Command> GameStateLoader::GetCommandFromString(std::string cmd)
 {
-    if(str.find("select") != std::string::npos){
-        str = str.substr(9, str.length() - 9); //ignore the select bit
-    }
+    const std::size_t firstSpace = cmd.find(" ");
+    const std::size_t endLine = cmd.find("\n");
+    const std::string moveType = cmd.substr(0, firstSpace);
 
-    if(str.find("move") != std::string::npos){
-        return std::make_shared<TeleportCommand>(GetCommandPosition(str));
-    }
-    if(str.find("dig") != std::string::npos){
-        return std::make_shared<DigCommand>(GetCommandPosition(str));
-    }
-    if(str.find("banana") != std::string::npos){
-        return std::make_shared<BananaCommand>(GetCommandPosition(str));
-    }
-    if(str.find("shoot") != std::string::npos){
-        std::string dirStr = str.substr(6, str.size() - 6);
+    if(moveType == "move") {
+        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
+        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
+        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
+        return std::make_shared<TeleportCommand>(Position(x,y));
+
+    } else if (moveType == "dig") {
+        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
+        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
+        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
+        return std::make_shared<DigCommand>(Position(x,y));
+
+    } else if (moveType == "shoot") {
+        std::string dirString = cmd.substr(firstSpace + 1, (endLine - firstSpace));
         ShootCommand::ShootDirection dir;
-        if(dirStr == "N") { dir = ShootCommand::ShootDirection::N; }
-        if(dirStr == "NE") { dir = ShootCommand::ShootDirection::NE; }
-        if(dirStr == "E") { dir = ShootCommand::ShootDirection::E; }
-        if(dirStr == "SE") { dir = ShootCommand::ShootDirection::SE; }
-        if(dirStr == "S") { dir = ShootCommand::ShootDirection::S; }
-        if(dirStr == "SW") { dir = ShootCommand::ShootDirection::SW; }
-        if(dirStr == "W") { dir = ShootCommand::ShootDirection::W; }
-        if(dirStr == "NW") { dir = ShootCommand::ShootDirection::NW; }
-        return std::make_shared<ShootCommand>(dir);
-    }
-    if(str.find("nothing") != std::string::npos || str.find("invalid") != std::string::npos){
-        return std::make_shared<DoNothingCommand>();
-    }
-    if(str.find("snowball") != std::string::npos){
-        return std::make_shared<SnowballCommand>(GetCommandPosition(str));
-    }
 
-    return nullptr;
+        if(dirString == "N") { dir = ShootCommand::ShootDirection::N;}
+        else if(dirString == "NE") { dir = ShootCommand::ShootDirection::NE;}
+        else if(dirString == "E") { dir = ShootCommand::ShootDirection::E;}
+        else if(dirString == "SE") { dir = ShootCommand::ShootDirection::SE;}
+        else if(dirString == "S") { dir = ShootCommand::ShootDirection::S;}
+        else if(dirString == "SW") { dir = ShootCommand::ShootDirection::SW;}
+        else if(dirString == "W") { dir = ShootCommand::ShootDirection::W;}
+        else if(dirString == "NW") { dir = ShootCommand::ShootDirection::NW;}
+        else {return nullptr;}
+
+        auto ret = std::make_shared<ShootCommand>(dir);
+        return ret;
+
+    } else if (moveType == "banana") {
+        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
+        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
+        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
+        return std::make_shared<BananaCommand>(Position(x,y));
+
+    } else if (moveType == "nothing") {
+        return std::make_shared<DoNothingCommand>();
+
+    } else if (moveType == "select") {
+        std::string indexStr = cmd.substr(firstSpace + 1, 1); 
+        int index = std::stoi(indexStr); //will always be 1 digit
+
+        size_t startOfSelected = firstSpace + 3;
+        std::string selectedCmdstr = cmd.substr(startOfSelected, cmd.length() - startOfSelected );
+        std::shared_ptr<Command> selectedCmd = GetCommandFromString(selectedCmdstr);
+
+        return std::make_shared<SelectCommand>(index, selectedCmd);
+    } 
+
+    return std::make_shared<TeleportCommand>(Position(-10,-10)); //it was invalid for some reason (timeout, invalid command, etc)
 }
 
 void GameStateLoader::PopulateWorm(Worm& worm, const rapidjson::Value& wormJson)

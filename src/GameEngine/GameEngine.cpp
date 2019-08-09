@@ -50,7 +50,9 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     }
 
     _state->player1.GetCurrentWorm()->movedThisRound = false;
+    _state->player1.GetCurrentWorm()->diedByLavaThisRound = false;
     _state->player2.GetCurrentWorm()->movedThisRound = false;
+    _state->player2.GetCurrentWorm()->diedByLavaThisRound = false;
 
     ApplyPowerups();
 
@@ -104,6 +106,9 @@ void GameEngine::ApplyLava()
     _state->ForAllWorms([&](Worm& worm) {
         if( !worm.IsDead() && worm.position.IsOnMap() && _state->LavaAt(worm.position)) {
             worm.health -= GameConfig::lavaDamage;
+            if(worm.IsDead()) {
+                worm.diedByLavaThisRound = true;
+            }
         }
     });
 

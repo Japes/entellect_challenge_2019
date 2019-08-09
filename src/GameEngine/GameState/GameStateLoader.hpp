@@ -16,7 +16,7 @@ class GameStateLoader
     static std::shared_ptr<GameState> LoadGameStatePtr(rapidjson::Document& roundJSON);
     static GameState LoadGameState(rapidjson::Document& roundJSON);
 
-    static std::shared_ptr<Command> Str2Cmd(std::string str);
+    static std::shared_ptr<Command> GetCommandFromString(std::string cmd);
 
     private:
 

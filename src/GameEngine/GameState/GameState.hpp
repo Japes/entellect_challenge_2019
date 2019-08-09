@@ -94,12 +94,12 @@ class GameState
 
         //not using ForAllWorms here for performance reasons
         for(auto & w : player1.worms) {
-            if(w.position == pos && !w.IsDead()) {
+            if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
                 ret = &w;
             }
         }
         for(auto & w : player2.worms) {
-            if(w.position == pos && !w.IsDead()) {
+            if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
                 ret = &w;
             }
         }

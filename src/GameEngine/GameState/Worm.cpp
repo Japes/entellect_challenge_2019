@@ -1,7 +1,7 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, id{0}, position{-1,-1}, movedThisRound{0}, roundsUntilUnfrozen{0}
+Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, id{0}, position{-1,-1}, movedThisRound{false}, diedByLavaThisRound{false}, roundsUntilUnfrozen{0}
 {
     SetProffession(_proffession);
 }
@@ -60,17 +60,19 @@ void Worm::TakeDamage(int dmgAmount)
 
 bool Worm::operator==(const Worm &other) const
 {
-    //std::cerr << "(" << __FUNCTION__ << ") " 
-    //" id: " << (id == other.id) << "(" << id << ", " << other.id << ")" <<
-    //" health: " << (health == other.health) << "( " << health << ", " << other.health << ")" <<
-    //" position: " << (position == other.position) <<
-    //" previous_position: " << (previous_position == other.previous_position) <<
-    //" weapon: " << (weapon == other.weapon) <<
-    //" banana_bomb: " << (banana_bomb == other.banana_bomb) <<
-    //" banana_bomb_count: " << (banana_bomb_count == other.banana_bomb_count) <<
-    //" diggingRange: " << (diggingRange == other.diggingRange) <<
-    //" movementRange: " << (movementRange == other.movementRange) <<
-    //std::endl;
+    /*
+    std::cerr << "(" << __FUNCTION__ << ") " 
+    " id: " << (id == other.id) << "(" << id << ", " << other.id << ")" <<
+    " health: " << (health == other.health) << "( " << health << ", " << other.health << ")" <<
+    " position: " << (position == other.position) <<
+    " previous_position: " << (previous_position == other.previous_position) <<
+    " weapon: " << (weapon == other.weapon) <<
+    " banana_bomb: " << (banana_bomb == other.banana_bomb) <<
+    " banana_bomb_count: " << (banana_bomb_count == other.banana_bomb_count) <<
+    " diggingRange: " << (diggingRange == other.diggingRange) <<
+    " movementRange: " << (movementRange == other.movementRange) <<
+    std::endl;
+    */
 
     return (id == other.id &&
             proffession == other.proffession &&

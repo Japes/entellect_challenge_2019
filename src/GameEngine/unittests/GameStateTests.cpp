@@ -38,7 +38,7 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
     }
 }
 
-TEST_CASE( "Convert string to command", "[str2cmd]" ) {
+TEST_CASE( "Convert string to command", "[GetCommandFromString]" ) {
 
     GIVEN("A string for a command...")
     {
@@ -52,7 +52,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
         WHEN("We convert it to a command")
         {
-            auto cmd = GameStateLoader::Str2Cmd(move);
+            auto cmd = GameStateLoader::GetCommandFromString(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -68,7 +68,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
         WHEN("We convert it to a command")
         {
-            auto cmd = GameStateLoader::Str2Cmd(move);
+            auto cmd = GameStateLoader::GetCommandFromString(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -84,7 +84,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
 
         WHEN("We convert it to a command")
         {
-            auto cmd = GameStateLoader::Str2Cmd(move);
+            auto cmd = GameStateLoader::GetCommandFromString(move);
             THEN("It converts correctly...")
             {
                 INFO(move);
@@ -105,7 +105,7 @@ TEST_CASE( "Convert string to command", "[str2cmd]" ) {
             );
         WHEN("We ignore the select part and just convert the move") //not sure how we'll use this info, can update in future
         {
-            auto cmd = GameStateLoader::Str2Cmd(move);
+            auto cmd = GameStateLoader::GetCommandFromString(move);
             THEN("It converts correctly...")
             {
                 INFO(move);

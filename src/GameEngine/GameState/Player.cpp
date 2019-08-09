@@ -99,14 +99,16 @@ bool Player::operator==(const Player &other) const
         wormsGood &= worms[i] == other.worms[i];
     }
 
-    //std::cerr << "(" << __FUNCTION__ << ") " <<
-    //" wormsGood : " << wormsGood <<
-    //" id : " << (id == other.id) <<
-    //" command_score : " << (command_score == other.command_score) << " " << command_score << " " << other.command_score <<
-    //" health : " << (health == other.health) << " " << health << " " << other.health <<
-    //" currentWormId : " << (currentWormId == other.currentWormId) << " " << currentWormId << " " << other.currentWormId <<
-    //" consecutiveDoNothingCount : " << (consecutiveDoNothingCount == other.consecutiveDoNothingCount) <<
-    //std::endl;
+/*
+    std::cerr << "(" << __FUNCTION__ << ") " <<
+    " wormsGood : " << wormsGood <<
+    " id : " << (id == other.id) <<
+    " command_score : " << (command_score == other.command_score) << " " << command_score << " " << other.command_score <<
+    " health : " << (health == other.health) << " " << health << " " << other.health <<
+    " currentWormId : " << (currentWormId == other.currentWormId) << " " << currentWormId << " " << other.currentWormId <<
+    " consecutiveDoNothingCount : " << (consecutiveDoNothingCount == other.consecutiveDoNothingCount) <<
+    std::endl;
+    */
 
     return wormsGood &&
             id == other.id &&
