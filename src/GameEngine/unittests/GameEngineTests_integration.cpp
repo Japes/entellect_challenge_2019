@@ -133,11 +133,15 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
     //700000 moves per second, with just donothings, 2.5M per second
 }
 
+//expects strings of form:
+//`No Command`
+//`move 25 27`
+//`select 1;move 25 27`
 std::shared_ptr<Command> GetCommandFromString(std::string cmd)
 {
-    std::size_t firstSpace = cmd.find(" ");
-    std::size_t endLine = cmd.find("\n");
-    std::string moveType = cmd.substr(0, firstSpace);
+    const std::size_t firstSpace = cmd.find(" ");
+    const std::size_t endLine = cmd.find("\n");
+    const std::string moveType = cmd.substr(0, firstSpace);
 
     if(moveType == "move") {
         std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
@@ -174,7 +178,15 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
         return std::make_shared<DoNothingCommand>();
     } else if (moveType == "No") { //"No Command" - invalid
         return std::make_shared<TeleportCommand>(Position(-10,-10)); //always invalid
-    //} else if (moveType == "select") {
+    } else if (moveType == "select") {
+        std::string indexStr = cmd.substr(firstSpace + 1, 1); 
+        int index = std::stoi(indexStr); //will always be 1 digit
+
+        size_t startOfSelected = firstSpace + 3;
+        std::string selectedCmdstr = cmd.substr(startOfSelected, cmd.length() - startOfSelected );
+        std::shared_ptr<Command> selectedCmd = GetCommandFromString(selectedCmdstr);
+
+        return std::make_shared<SelectCommand>(index, selectedCmd);
     } else {
         std::stringstream msg;
         msg << "dont understand this move type: " << moveType;
