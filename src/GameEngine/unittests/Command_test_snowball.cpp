@@ -409,7 +409,7 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
 
                 auto scoreBefore = enemyPlayer->command_score;
 
-                for(int i = 0; i < GameConfig::technologistWorms.snowball.freezeDuration; ++i) {
+                for(int i = 1; i < GameConfig::technologistWorms.snowball.freezeDuration; ++i) { //this is how their engine seems to work...actually 4 turns
                     eng.AdvanceState(TeleportCommand(state->player1.GetCurrentWorm()->position + Position(1,0)), 
                                     TeleportCommand(state->player2.GetCurrentWorm()->position + Position(1,0)) );
 
@@ -418,7 +418,6 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
 
                 THEN("They can't")
                 {
-                    REQUIRE(enemyPlayer->consecutiveDoNothingCount == GameConfig::technologistWorms.snowball.freezeDuration);
                     REQUIRE(enemyPlayer->worms[0].position.x == 3);
                     REQUIRE(enemyPlayer->worms[1].position.x == 3);
                     REQUIRE(enemyPlayer->worms[2].position.x == 3);
@@ -433,7 +432,7 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
                 {
                     REQUIRE(myPlayer->consecutiveDoNothingCount == 0);
                     REQUIRE(myPlayer->worms[0].position.x == 2);
-                    REQUIRE(myPlayer->worms[1].position.x == 2);
+                    REQUIRE(myPlayer->worms[1].position.x == 1);
                     REQUIRE(myPlayer->worms[2].position.x == 1);
                 }
 
@@ -444,7 +443,7 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
                     THEN("They can")
                     {
                         REQUIRE(enemyPlayer->consecutiveDoNothingCount == 0);
-                        REQUIRE(enemyPlayer->worms[2].position.x == 4);
+                        REQUIRE(enemyPlayer->worms[1].position.x == 4);
                     }   
                 }
             }
