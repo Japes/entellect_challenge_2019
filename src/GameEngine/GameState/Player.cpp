@@ -53,24 +53,37 @@ Worm* Player::GetWormById(int id)
     return &worms[id - 1];
 }
 
+//have to do this a slightly weird way to be exactly the same as entellect
+/*
+    fun selectNextWorm() {
+        //Assign living worms to a local variable since it is a computed property
+        val livingWorms = this.livingWorms
+        if (livingWorms.isNotEmpty()) {
+            val nextIndex = (livingWorms.indexOf(currentWorm) + 1) % livingWorms.size //indexOf returns -1 if element not in list
+            updateCurrentWorm(livingWorms[nextIndex])
+        }
+    }
+*/
+
 void Player::UpdateCurrentWorm()
 {
-    if(std::none_of(worms.begin(), worms.end(), [](Worm& w){return !w.IsDead();})) {
+    int livingIndexOfCurrentWorm = -1;
+    std::vector<Worm*> livingWorms;
+    for(auto &worm : worms) {
+        if(!worm.IsDead()) {
+            if(worm.id == static_cast<unsigned>(currentWormId)) {
+                livingIndexOfCurrentWorm = livingWorms.size();
+            }
+            livingWorms.push_back(&worm);
+        }
+    }
+
+    if(livingWorms.empty()) {
         return;
     }
 
-    ++currentWormId;
-
-    if(currentWormId > static_cast<int>(worms.size())) {
-        currentWormId = 1;
-    }
-
-    while(worms[currentWormId-1].IsDead()) {
-        ++currentWormId;
-        if(currentWormId > static_cast<int>(worms.size())) {
-            currentWormId = 1;
-        }
-    }
+    int nextIndex = (livingIndexOfCurrentWorm + 1) % livingWorms.size();
+    currentWormId = livingWorms[nextIndex]->id;
 }
 
 void Player::RecalculateHealth()
