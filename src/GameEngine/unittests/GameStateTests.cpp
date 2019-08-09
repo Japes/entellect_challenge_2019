@@ -173,7 +173,7 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
     WHEN("We make a copy of a state")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        auto original_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
+        auto original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
         auto copied_state = std::make_shared<GameState>(*original_state);
 
         THEN("A true deep copy happens")

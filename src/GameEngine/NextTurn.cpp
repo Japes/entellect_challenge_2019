@@ -5,7 +5,7 @@
 std::shared_ptr<pcg32> NextTurn::_rng;
 std::vector<std::shared_ptr<Command>> NextTurn::_playerShoots;
 std::vector<Position> NextTurn::_surroundingWormSpaces;
-std::vector<Position> NextTurn::_relativeBananaTargets;
+std::vector<Position> NextTurn::_relativeBombTargets;
 
 void NextTurn::Initialise()
 {
@@ -38,11 +38,11 @@ void NextTurn::Initialise()
         _surroundingWormSpaces.push_back(Position(1, 1));
     }
 
-    if(_relativeBananaTargets.empty()) {
+    if(_relativeBombTargets.empty()) {
         //the order of these guys is important (see GetValidBananas)
         for(int y = (GameConfig::agentWorms.banana.range)*-1; y <= GameConfig::agentWorms.banana.range; ++y) {
             for(int x = (GameConfig::agentWorms.banana.range)*-1; x <= GameConfig::agentWorms.banana.range; ++x) {
-                _relativeBananaTargets.push_back(Position(x, y));
+                _relativeBombTargets.push_back(Position(x, y));
             }
         }
     }
@@ -202,7 +202,7 @@ std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, std::shared_ptr<Ga
     return ret;
 }
 
-//returns a bitfield representing the valid targets to lob a banana
+//returns a bitfield representing the valid targets to lob a banana/snowball
 //bits are set as follows (LSB is bit[0]):
 
 // 0   1   2   3   4   5   6   7   8   9   10
@@ -218,14 +218,11 @@ std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, std::shared_ptr<Ga
 // 110 111 112 113 114 115 116 117 118 119 120
 
 //there are 3 bits in each corner that are out of range - they will always be 0
-std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+//NB ASSUMES SAME RANGE FOR BANANA AND SNOWBALL
+std::bitset<121> NextTurn::GetValidBombThrow(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
-
-    if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0) {
-        return std::bitset<121>(0);
-    }
 
     if (!trimStupidMoves) {
         std::bitset<121> ret; //TODO not strictly correct - includes corners
@@ -248,6 +245,30 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
     return ret;
 }
 
+std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+{
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
+
+    if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0) {
+        return std::bitset<121>(0);
+    }
+
+    return GetValidBombThrow(player1, state, trimStupidMoves);
+}
+
+std::bitset<121> NextTurn::GetValidSnowballs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+{
+    Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
+
+    if(worm->proffession != Worm::Proffession::TECHNOLOGIST || worm->snowball_count <= 0) {
+        return std::bitset<121>(0);
+    }
+
+    return GetValidBombThrow(player1, state, trimStupidMoves);
+}
+
 std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
 {
     Position targetPos{worm->position + _surroundingWormSpaces[index]};
@@ -267,9 +288,16 @@ std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, std::shared_ptr<Ga
 
 std::shared_ptr<Command> NextTurn::GetBanana(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
 {
-    Position targetPos{worm->position + _relativeBananaTargets[index]};
+    Position targetPos{worm->position + _relativeBombTargets[index]};
 
     return std::make_shared<BananaCommand>(targetPos);
+}
+
+std::shared_ptr<Command> NextTurn::GetSnowball(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
+{
+    Position targetPos{worm->position + _relativeBombTargets[index]};
+
+    return std::make_shared<SnowballCommand>(targetPos);
 }
 
 std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
@@ -280,9 +308,11 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std
     std::bitset<8> moves = std::bitset<8>(GetValidTeleportDigs (worm, state, trimStupidMoves));
     std::bitset<8> shoots = std::bitset<8>(GetValidShoots(player1, state, trimStupidMoves));
     std::bitset<121> bananas = std::bitset<121>(GetValidBananas(player1, state, trimStupidMoves));
+    std::bitset<121> snowballs = std::bitset<121>(GetValidSnowballs(player1, state, trimStupidMoves));
+
 
     //choose random one
-    int totalNumMoves = moves.count() + shoots.count() + bananas.count();
+    int totalNumMoves = moves.count() + shoots.count() + bananas.count() + snowballs.count();
 
     if(totalNumMoves == 0) {
         return std::make_shared<DoNothingCommand>();
@@ -291,18 +321,24 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std
     std::uniform_int_distribution<int> uniform_dist(0, totalNumMoves-1);
     int mean = uniform_dist(*_rng.get());
 
-    if(mean < static_cast<int>(moves.count())) {
+    if ( mean < static_cast<int>(moves.count()) ) {
         unsigned index = IndexOfIthSetBit(moves, mean);
         return GetTeleportDig(worm, state, index);
-    } else if (mean < static_cast<int>(moves.count() + shoots.count())) {
+    } else if ( mean < static_cast<int>(moves.count() + shoots.count()) ) {
         mean -= moves.count();
         unsigned index = IndexOfIthSetBit(shoots, mean);
         return _playerShoots[index];
-    } else {
+    } else if ( mean < static_cast<int>(moves.count() + shoots.count() + bananas.count()) ) {
         mean -= moves.count();
         mean -= shoots.count();
         unsigned index = IndexOfIthSetBit(bananas, mean);
         return GetBanana(worm, state, index);
+    } else {
+        mean -= moves.count();
+        mean -= shoots.count();
+        mean -= bananas.count();
+        unsigned index = IndexOfIthSetBit(snowballs, mean);
+        return GetSnowball(worm, state, index);
     }
 }
 
@@ -329,6 +365,13 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
     for(unsigned i = 0; i < bananas.size(); ++i ) {
         if(bananas[i]) {
             ret.push_back(NextTurn::GetBanana(worm, state, i));
+        }
+    }
+
+    std::bitset<121> snowballs = std::bitset<121>(GetValidSnowballs(player1, state, trimStupidMoves));
+    for(unsigned i = 0; i < snowballs.size(); ++i ) {
+        if(snowballs[i]) {
+            ret.push_back(NextTurn::GetSnowball(worm, state, i));
         }
     }
 

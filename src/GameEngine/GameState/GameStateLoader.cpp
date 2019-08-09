@@ -4,13 +4,19 @@
 #include "rapidjson/stringbuffer.h"
 #include <cmath>
 
+std::shared_ptr<GameState> GameStateLoader::LoadGameStatePtr(rapidjson::Document& roundJSON)
+{
+    auto ret = std::make_shared<GameState>();
+    ret->roundNumber = roundJSON["currentRound"].GetInt();
+    PopulatePlayers(*ret, roundJSON);
+    PopulateMap(*ret, roundJSON);
+    return ret;
+}
+
 GameState GameStateLoader::LoadGameState(rapidjson::Document& roundJSON)
 {
-    GameState ret;
-    ret.roundNumber = roundJSON["currentRound"].GetInt();
-    PopulatePlayers(ret, roundJSON);
-    PopulateMap(ret, roundJSON);
-    return ret;
+    std::shared_ptr<GameState> ret = LoadGameStatePtr(roundJSON);
+    return *ret;
 }
 
 void GameStateLoader::PrintJson(const rapidjson::Value& json)

@@ -29,7 +29,7 @@ TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
     auto start_time = Get_ns_since_epoch();
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-    auto original_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
+    auto original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
 
     while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
     //while(true) {
@@ -93,7 +93,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"); //todo need to make sure there are bots in range
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
+    auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
 
     NextTurn::Initialise();
 
@@ -320,10 +320,7 @@ unsigned GetNumRounds(std::string roundFolder)
 
 TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
 
-    std::vector<std::string> matches = GetFoldersInFolder("../../starter-pack/match-logs");
-    matches.push_back("Test_files/matches/2019.06.15.13.50.08/"); //this one is not from the latest engine
-    matches.push_back("Test_files/matches/2019.06.22.15.52.10/");
-    matches.push_back("Test_files/matches/2019.06.22.15.46.18/");
+    std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     //std::vector<std::string> matches;
     //matches.push_back("../../starter-pack/match-logs/2019.07.15.04.04.01/");
@@ -332,6 +329,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
         match = match + std::string("/");
 
         INFO(match);
+        std::cerr << "(" << __FUNCTION__ << ") match: " << match << std::endl;
 
         std::string botAFolder, botBFolder;
         GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
@@ -341,7 +339,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
 
         unsigned round = 1;
         auto roundJSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-        auto original_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
+        auto original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
         GameEngine eng(original_state);
 
         while(round <= numRounds) {
@@ -359,7 +357,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
             if(round != numRounds) {
                 ++round;
                 auto round2JSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-                auto next_state = std::make_shared<GameState>(GameStateLoader::LoadGameState(round2JSON));
+                auto next_state = GameStateLoader::LoadGameStatePtr(round2JSON);
 
                 REQUIRE(original_state->player1 == next_state->player1);
                 REQUIRE(original_state->player2 == next_state->player2);
@@ -398,8 +396,50 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
             }
         }
     }
-    
+}
 
+
+TEST_CASE( "Comparison with java engine for lava", "[lava[[.comparison]" ) {
+
+    std::string match = "Test_files/matches/2019.08.07.21.43.02/"; //todo use a match that goes to BattleRoyaleEnd
+    INFO(match);
+    std::cerr << "(" << __FUNCTION__ << ") match: " << match << std::endl;
+
+    std::string botAFolder, botBFolder;
+    GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
+    INFO("botAFolder: " << botAFolder << " botBFolder: " << botBFolder);
+    unsigned numRounds = GetNumRounds(match);
+    INFO("numRounds: " << numRounds );
+
+    unsigned round = 1;
+    auto roundJSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
+    auto original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
+    GameEngine eng(original_state);
+
+    while(round <= numRounds) {
+        INFO("progressing from round " << round << " to " << round + 1);
+        std::shared_ptr<Command> p1Command = GetCommandFromFile(match + GetRoundFolder(round) + botAFolder + "PlayerCommand.txt");
+        std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
+        eng.AdvanceState(*p1Command, *p2Command);
+
+        if(round != numRounds) {
+            ++round;
+            auto round2JSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
+            auto next_state = GameStateLoader::LoadGameStatePtr(round2JSON);
+
+            //cant just compare lavas, coz in my engine things can be lava and something else at the same time
+            for(int x = 0; x < GameConfig::mapSize; ++x) {
+                for(int y = 0; y < GameConfig::mapSize; ++y) {
+                    Position pos(x,y);
+                    if(original_state->LavaAt(pos)) {
+                        INFO(pos << " next_state->LavaAt(pos): " << next_state->LavaAt(pos) << " CellType_at(pos): " << (int)next_state->CellType_at(pos));
+                        bool couldBeALava = next_state->LavaAt(pos) || next_state->CellType_at(pos) == CellType::DIRT || next_state->CellType_at(pos) == CellType::DEEP_SPACE;
+                        REQUIRE(couldBeALava);
+                    }
+                }
+            }
+        }
+    }
 }
 
 TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
@@ -407,7 +447,7 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
     GIVEN("A realistic game state and engine")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        auto state = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
+        auto state = GameStateLoader::LoadGameStatePtr(roundJSON);
         GameEngine eng(state);
         
         WHEN("We do a playthrough to a depth -1")
@@ -428,7 +468,7 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
         for(unsigned i = 0; i < 30000; i++)
         {
             auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-            auto state1 = std::make_shared<GameState>(GameStateLoader::LoadGameState(roundJSON));
+            auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
             auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
             GameEngine eng(state);
 

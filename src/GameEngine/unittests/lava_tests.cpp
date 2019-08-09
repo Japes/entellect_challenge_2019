@@ -17,7 +17,7 @@ int NumLavas(std::shared_ptr<GameState> state)
     return ret;
 }
 
-TEST_CASE( "Lava flow", "[lava]" ) {
+TEST_CASE( "Lava flow sanity", "[lava]" ) {
     GIVEN("A game state")
     {
         auto state = std::make_shared<GameState>();
@@ -65,8 +65,6 @@ TEST_CASE( "Lava flow", "[lava]" ) {
                 }
             }
         }
-
-
     }
 }
 

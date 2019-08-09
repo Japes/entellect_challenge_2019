@@ -2,6 +2,7 @@
 #include "Utilities.hpp"
 #include "NextTurn.hpp"
 #include "GameEngine.hpp"
+#include "GameStateLoader.hpp"
 #include "EvaluationFunctions.hpp"
 #include <thread>
 
@@ -23,7 +24,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     uint64_t start_time = Utilities::Get_ns_since_epoch();
 
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = std::make_shared<GameState>(roundJSON);
+    auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
 
     AdjustOpponentBananaCount(ImPlayer1, state1);
     _last_round_state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
@@ -82,7 +83,7 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_p
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int numplies{0};
-            auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, distToConsider, playthroughDepth, numplies);
+            auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::HealthComparison, distToConsider, playthroughDepth, numplies);
 
             _mtx.lock();
 
