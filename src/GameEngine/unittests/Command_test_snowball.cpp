@@ -249,8 +249,8 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         //1   .   .   .   D   12  .   .   .
         //2   .   .   .   D   .   PU  .   .
         //3   .   .   .   D  B21  22  D   .
-        //4   .   .   .   11  .   .   D   .
-        //5   .   .   .   .   23  D   D   .
+        //4   .   .   .   11 (23) .   D   .
+        //5   .   .   .   .   .   D   D   .
         //6   .   13  .   .   D   D   .   .
         //7   .   .   .   .   .   .   .   .            
 
@@ -261,7 +261,8 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         place_worm(true, 3, {1,6}, state); //3 is technologist by default
         place_worm(false, 1, {4,3}, state);
         place_worm(false, 2, {5,3}, state);
-        place_worm(false, 3, {4,5}, state);
+        auto dedWorm = place_worm(false, 3, {4,4}, state);
+        dedWorm->health = -1;
 
         Position powerupPos{5,2};
         place_powerup(powerupPos, state);
@@ -309,7 +310,7 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
                 CHECK(state->player2.worms[1].health == GameConfig::agentWorms.initialHp);
                 CHECK(state->player2.worms[1].IsFrozen());
 
-                CHECK(state->player2.worms[2].health == GameConfig::technologistWorms.initialHp);
+                CHECK(state->player2.worms[2].IsDead());
                 CHECK(!state->player2.worms[2].IsFrozen());
 
                 //P1
@@ -337,7 +338,7 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
                 REQUIRE(state->PowerUp_at(powerupPos) != nullptr);
 
                 //points
-                auto expectedEnemyPoints = GameConfig::scores.freeze*2;
+                auto expectedEnemyPoints = GameConfig::scores.freeze*2; //no points for ded guy
                 auto expectedFriendlyPoints = -GameConfig::scores.freeze;
                 CHECK(state->player1.command_score == pointsBefore + expectedEnemyPoints + expectedFriendlyPoints);
             }
