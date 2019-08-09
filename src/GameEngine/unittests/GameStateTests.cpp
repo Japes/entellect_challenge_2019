@@ -256,10 +256,10 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
                 GameEngine eng(ptr);
                 place_worm(true, 1, testPos + Position(1,0), ptr);
                 eng.AdvanceState(DigCommand(testPos), DoNothingCommand());
-                THEN("It is air, but has lava")
+                THEN("It is air for one round")
                 {
                     REQUIRE(ptr->CellType_at(testPos) == CellType::AIR);
-                    REQUIRE(ptr->LavaAt(testPos));
+                    REQUIRE(!ptr->LavaAt(testPos));
                 }
             }
 
@@ -270,10 +270,10 @@ TEST_CASE( "Get/sets", "[Gamestate_get_set]" ) {
                 place_worm(true, 1, testPos + Position(1,0), ptr);
                 ptr->player1.worms[0].SetProffession(Worm::Proffession::AGENT);
                 eng.AdvanceState(BananaCommand(testPos), DoNothingCommand());
-                THEN("It is air, but has lava")
+                THEN("It is air for one round")
                 {
                     REQUIRE(ptr->CellType_at(testPos) == CellType::AIR);
-                    REQUIRE(ptr->LavaAt(testPos));
+                    REQUIRE(!ptr->LavaAt(testPos));
                 }
             }
         }

@@ -32,7 +32,6 @@ TEST_CASE( "Lava flow sanity", "[lava]" ) {
                 INFO("Round number: " << state->roundNumber);
                 REQUIRE(NumLavas(state) == 0);
             }
-            std::cerr << "(" << __FUNCTION__ << ") numlavas 1 " << NumLavas(state) << std::endl;
 
             WHEN("It is between battleRoyaleStart and battleRoyaleEnd, lava grows")
             {
@@ -48,7 +47,6 @@ TEST_CASE( "Lava flow sanity", "[lava]" ) {
                     INFO("Round number: " << state->roundNumber);
                     REQUIRE(numLavasAfter >= numLavasBefore);
                 }
-                std::cerr << "(" << __FUNCTION__ << ") numlavas 2 " << NumLavas(state) << std::endl;
 
                 WHEN("It is after battleRoyaleEnd, lava does not grow")
                 {
@@ -76,12 +74,15 @@ TEST_CASE( "Lava affects", "[lava]" ) {
     {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        auto worm = place_worm(true, 1, {1,1}, state);
+        auto liveWorm = place_worm(true, 1, {1,1}, state);
+        auto deadWorm = place_worm(true, 2, {2,1}, state);
+        deadWorm->health = -2;
         state->SetCellTypeAt({2, 2}, CellType::DIRT);
         state->SetCellTypeAt({3, 3}, CellType::DEEP_SPACE);
         place_powerup({4,4}, state);
 
-        auto wormHealthBefore = worm->health;
+        auto liveWormHealthBefore = liveWorm->health;
+        auto deadWormHealthBefore = deadWorm->health;
 
         WHEN("We make everything lava and progress game state")
         {
@@ -94,7 +95,8 @@ TEST_CASE( "Lava affects", "[lava]" ) {
 
             THEN("Lava affects things as expected")
             {
-                CHECK(worm->health == wormHealthBefore - 3);
+                CHECK(liveWorm->health == liveWormHealthBefore - 3);
+                CHECK(deadWorm->health == deadWormHealthBefore);
                 CHECK(state->Worm_at({1, 1}) != nullptr);
                 CHECK(state->CellType_at({2, 2}) ==  CellType::DIRT);
                 CHECK(state->CellType_at({3, 3}) ==  CellType::DEEP_SPACE);

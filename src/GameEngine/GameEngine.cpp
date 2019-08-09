@@ -21,7 +21,8 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
         return; //nothing more to do here
     }
 
-    SetupLava(_state->roundNumber - 1);
+    SetupLava(_state->roundNumber);
+    ApplyLava();
 
     //validate both guys
     bool player1Frozen =_state->player1.GetCurrentWorm()->IsFrozen();
@@ -51,13 +52,11 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     _state->player1.GetCurrentWorm()->movedThisRound = false;
     _state->player2.GetCurrentWorm()->movedThisRound = false;
 
+    ApplyPowerups();
+
     _state->player1.UpdateCurrentWorm();
     _state->player2.UpdateCurrentWorm();
 
-
-    ApplyPowerups();
-
-    ApplyLava();
 
     ++_state->roundNumber;
 
@@ -103,7 +102,7 @@ void GameEngine::SetupLava(unsigned roundNum)
 void GameEngine::ApplyLava()
 {
     _state->ForAllWorms([&](Worm& worm) {
-        if( worm.position.IsOnMap() && _state->LavaAt(worm.position)) {
+        if( !worm.IsDead() && worm.position.IsOnMap() && _state->LavaAt(worm.position)) {
             worm.health -= GameConfig::lavaDamage;
         }
     });

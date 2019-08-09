@@ -24,6 +24,7 @@ class GameState
     GameState(rapidjson::Document& roundJSON);
 
     void SetCellTypeAt(Position pos, CellType type);
+    void RemoveLavaAt(Position pos);
     void AddLavaAt(Position pos);
     void PlacePowerupAt(Position pos);
     void ClearPowerupAt(Position pos);

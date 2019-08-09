@@ -96,6 +96,12 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
     }
 }
 
+void GameState::RemoveLavaAt(Position pos)
+{
+    auto posBit = (MAP_SIZE*pos.y + pos.x);
+    mapLavas.reset(posBit);
+}
+
 void GameState::AddLavaAt(Position pos)
 {
     auto posBit = (MAP_SIZE*pos.y + pos.x);
@@ -231,15 +237,18 @@ std::vector<Worm*> GameState::WormsWithinDistance(Position pos, int dist)
 
 bool GameState::operator==(const GameState &other) const
 {
-    //std::cerr << "(" << __FUNCTION__ << ") deepSpacesGood: " << deepSpacesGood <<
-    //" dirtsGood: " << dirtsGood << 
-    //" healthPackPos == other.healthPackPos: " << (healthPackPos == other.healthPackPos) <<
-    //" roundNumber == other.roundNumber: " << (roundNumber == other.roundNumber) <<
-    //std::endl;
+    /*
+    std::cerr << "(" << __FUNCTION__ << ") deepSpacesGood: " << (mapDeepSpaces == other.mapDeepSpaces) <<
+    " dirtsGood: " << (mapDirts == other.mapDirts) << 
+    " lavasGood: " << (mapLavas == other.mapLavas) << 
+    " healthPackPos == other.healthPackPos: " << (healthPackPos == other.healthPackPos) <<
+    " roundNumber == other.roundNumber: " << (roundNumber == other.roundNumber) <<
+    std::endl;
+    */
 
     return mapDeepSpaces == other.mapDeepSpaces && 
             mapDirts == other.mapDirts && 
-            mapLavas == other.mapLavas && 
+            //mapLavas == other.mapLavas &&  //we store lavas in 2 different ways
             player1 == other.player1 && 
             player2 == other.player2 &&
             healthPackPos == other.healthPackPos &&

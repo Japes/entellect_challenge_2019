@@ -174,6 +174,7 @@ std::shared_ptr<Command> GetCommandFromString(std::string cmd)
         return std::make_shared<DoNothingCommand>();
     } else if (moveType == "No") { //"No Command" - invalid
         return std::make_shared<TeleportCommand>(Position(-10,-10)); //always invalid
+    //} else if (moveType == "select") {
     } else {
         std::stringstream msg;
         msg << "dont understand this move type: " << moveType;
@@ -343,7 +344,9 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
         GameEngine eng(original_state);
 
         while(round <= numRounds) {
-            INFO("round " << round);
+            INFO("progressing from round " << round << " to " << round + 1 
+            << ". Current worms are 1" << original_state->player1.GetCurrentWorm()->id
+            << " and 2" << original_state->player2.GetCurrentWorm()->id );
 
             //todo compare freshly loaded each round as well?
 
@@ -362,6 +365,18 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
                 REQUIRE(original_state->player1 == next_state->player1);
                 REQUIRE(original_state->player2 == next_state->player2);
                 REQUIRE(*original_state == *next_state);
+
+                //cant just compare lavas directly, coz in my engine things can be lava and something else at the same time
+                for(int x = 0; x < GameConfig::mapSize; ++x) {
+                    for(int y = 0; y < GameConfig::mapSize; ++y) {
+                        Position pos(x,y);
+                        if(original_state->LavaAt(pos)) {
+                            INFO(pos << " next_state->LavaAt(pos): " << next_state->LavaAt(pos) << " CellType_at(pos): " << (int)next_state->CellType_at(pos));
+                            bool couldBeALava = next_state->LavaAt(pos) || next_state->CellType_at(pos) == CellType::DIRT || next_state->CellType_at(pos) == CellType::DEEP_SPACE;
+                            REQUIRE(couldBeALava);
+                        }
+                    }
+                }
                 
             } else {
                 //check end state
@@ -393,50 +408,6 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
                 REQUIRE(playerBHealth == original_state->player2.health);
 
                 ++round;
-            }
-        }
-    }
-}
-
-
-TEST_CASE( "Comparison with java engine for lava", "[lava[[.comparison]" ) {
-
-    std::string match = "Test_files/matches/2019.08.07.21.43.02/"; //todo use a match that goes to BattleRoyaleEnd
-    INFO(match);
-    std::cerr << "(" << __FUNCTION__ << ") match: " << match << std::endl;
-
-    std::string botAFolder, botBFolder;
-    GetBotFolders(match + GetRoundFolder(1), botAFolder, botBFolder);
-    INFO("botAFolder: " << botAFolder << " botBFolder: " << botBFolder);
-    unsigned numRounds = GetNumRounds(match);
-    INFO("numRounds: " << numRounds );
-
-    unsigned round = 1;
-    auto roundJSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-    auto original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
-    GameEngine eng(original_state);
-
-    while(round <= numRounds) {
-        INFO("progressing from round " << round << " to " << round + 1);
-        std::shared_ptr<Command> p1Command = GetCommandFromFile(match + GetRoundFolder(round) + botAFolder + "PlayerCommand.txt");
-        std::shared_ptr<Command> p2Command = GetCommandFromFile(match + GetRoundFolder(round) + botBFolder + "PlayerCommand.txt");
-        eng.AdvanceState(*p1Command, *p2Command);
-
-        if(round != numRounds) {
-            ++round;
-            auto round2JSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
-            auto next_state = GameStateLoader::LoadGameStatePtr(round2JSON);
-
-            //cant just compare lavas, coz in my engine things can be lava and something else at the same time
-            for(int x = 0; x < GameConfig::mapSize; ++x) {
-                for(int y = 0; y < GameConfig::mapSize; ++y) {
-                    Position pos(x,y);
-                    if(original_state->LavaAt(pos)) {
-                        INFO(pos << " next_state->LavaAt(pos): " << next_state->LavaAt(pos) << " CellType_at(pos): " << (int)next_state->CellType_at(pos));
-                        bool couldBeALava = next_state->LavaAt(pos) || next_state->CellType_at(pos) == CellType::DIRT || next_state->CellType_at(pos) == CellType::DEEP_SPACE;
-                        REQUIRE(couldBeALava);
-                    }
-                }
             }
         }
     }
