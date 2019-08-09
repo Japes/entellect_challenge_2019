@@ -353,10 +353,12 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
                     REQUIRE(result.result == GameEngine::ResultType::FINISHED_POINTS);
                 }
 
-                REQUIRE(playerAScore == original_state->player1.GetScore());
-                REQUIRE(playerBScore == original_state->player2.GetScore());
-                REQUIRE(playerAHealth == original_state->player1.health);
-                REQUIRE(playerBHealth == original_state->player2.health);
+                INFO(" original_state->player1.GetScore() " << original_state->player1.GetScore() << " playerAScore: " << playerAScore); 
+                CHECK(original_state->player1.GetScore() == playerAScore);
+                INFO(" original_state->player2.GetScore() " << original_state->player2.GetScore() << " playerBScore: " << playerBScore); 
+                CHECK(original_state->player2.GetScore() == playerBScore );
+                CHECK( original_state->player1.health == playerAHealth);
+                CHECK( original_state->player2.health == playerBHealth);
 
                 ++round;
             }

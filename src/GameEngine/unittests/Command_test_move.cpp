@@ -196,8 +196,8 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 
             CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
             CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
-            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
-            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
+            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move); //no points deducted for knockback
+            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move); //no points deducted for knockback
         }
 
         THEN("Worm collision works - swap")
@@ -215,8 +215,8 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 
             CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
             CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
-            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
-            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move - GameConfig::pushbackDamage*2);
+            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move); //no points deducted for knockback
+            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move); //no points deducted for knockback
         }
 
 

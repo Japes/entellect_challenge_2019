@@ -41,9 +41,7 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
         worm->TakeDamage(GameConfig::pushbackDamage);
         worm_there->TakeDamage(GameConfig::pushbackDamage);
 
-        //both lost points for taking damage
-        state->player1.command_score -= GameConfig::pushbackDamage*2;
-        state->player2.command_score -= GameConfig::pushbackDamage*2;
+        //no points lost for taking knockback damage
 
     }
 
