@@ -85,16 +85,10 @@ std::shared_ptr<Command> GameStateLoader::GetCommandFromString(std::string cmd)
     const std::string moveType = cmd.substr(0, firstSpace);
 
     if(moveType == "move") {
-        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
-        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
-        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
-        return std::make_shared<TeleportCommand>(Position(x,y));
+        return std::make_shared<TeleportCommand>(GetCommandPosition(cmd));
 
     } else if (moveType == "dig") {
-        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
-        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
-        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
-        return std::make_shared<DigCommand>(Position(x,y));
+        return std::make_shared<DigCommand>(GetCommandPosition(cmd));
 
     } else if (moveType == "shoot") {
         std::string dirString = cmd.substr(firstSpace + 1, (endLine - firstSpace));
@@ -114,10 +108,10 @@ std::shared_ptr<Command> GameStateLoader::GetCommandFromString(std::string cmd)
         return ret;
 
     } else if (moveType == "banana") {
-        std::size_t secondSpace = cmd.find(" ", firstSpace + 1);
-        int x = std::stoi(cmd.substr(firstSpace, secondSpace - firstSpace));
-        int y = std::stoi(cmd.substr(secondSpace, cmd.length() - secondSpace));
-        return std::make_shared<BananaCommand>(Position(x,y));
+        return std::make_shared<BananaCommand>(GetCommandPosition(cmd));
+
+    } else if (moveType == "snowball") {
+        return std::make_shared<SnowballCommand>(GetCommandPosition(cmd));
 
     } else if (moveType == "nothing") {
         return std::make_shared<DoNothingCommand>();
