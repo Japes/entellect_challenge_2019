@@ -24,7 +24,7 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     SetupLava(_state->roundNumber);
     ApplyLava();
 
-    //thaw out worms (important that this happens here, AFTER checking frozen state, and BEFORE executing the next move)
+    //thaw out worms
     _state->ForAllWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
 
     bool player1Good = player1_command.IsValid(true, _state);
@@ -118,16 +118,17 @@ bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
 {
     Player* player = _state->GetPlayer(player1);
 
+    if(player->GetCurrentWorm()->IsFrozen()) {
+        return true;
+    }
+
     if(!valid) {
         player->command_score += GameConfig::scores.invalidCommand;
         ++player->consecutiveDoNothingCount;
         return false;
     }
 
-    if(!player->GetCurrentWorm()->IsFrozen()) {
-        command.Execute(player1, _state);
-    }
-
+    command.Execute(player1, _state);
     return true;
 }
 
