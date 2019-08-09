@@ -407,9 +407,13 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
                 state->player1.consecutiveDoNothingCount = 0;
                 state->player2.consecutiveDoNothingCount = 0;
 
+                auto scoreBefore = enemyPlayer->command_score;
+
                 for(int i = 0; i < GameConfig::technologistWorms.snowball.freezeDuration; ++i) {
                     eng.AdvanceState(TeleportCommand(state->player1.GetCurrentWorm()->position + Position(1,0)), 
                                     TeleportCommand(state->player2.GetCurrentWorm()->position + Position(1,0)) );
+
+                    REQUIRE(enemyPlayer->consecutiveDoNothingCount == 0); //snowballs aren't invalid
                 }
 
                 THEN("They can't")
@@ -418,6 +422,11 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
                     REQUIRE(enemyPlayer->worms[0].position.x == 3);
                     REQUIRE(enemyPlayer->worms[1].position.x == 3);
                     REQUIRE(enemyPlayer->worms[2].position.x == 3);
+                }
+
+                THEN("It doesn't count as an invalid move")
+                {
+                    REQUIRE(enemyPlayer->command_score == scoreBefore);
                 }
 
                 THEN("We can")

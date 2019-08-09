@@ -47,7 +47,12 @@ TEST_CASE( "Convert string to command", "[GetCommandFromString]" ) {
             std::string{"dig 22 13"}, 
             std::string{"shoot NE"}, 
             std::string{"banana 30 20"},
-            std::string{"snowball 13 14"}
+            std::string{"snowball 13 14"},
+            std::string{"select 1;move 5 27"}, 
+            std::string{"select 2;dig 22 13"}, 
+            std::string{"select 3;shoot NE"}, 
+            std::string{"select 1;banana 30 20"},
+            std::string{"select 2;snowball 13 14"}
             );
 
         WHEN("We convert it to a command")
@@ -89,28 +94,7 @@ TEST_CASE( "Convert string to command", "[GetCommandFromString]" ) {
             {
                 INFO(move);
                 REQUIRE(cmd != nullptr);
-                REQUIRE(cmd->GetCommandString() == "nothing");
-            }
-        }
-    }
-
-    GIVEN("a select...")
-    {
-        std::string move = GENERATE(
-            std::string{"select 1;move 5 27"}, 
-            std::string{"select 2;dig 22 13"}, 
-            std::string{"select 3;shoot NE"}, 
-            std::string{"select 1;banana 30 20"},
-            std::string{"select 2;snowball 13 14"}
-            );
-        WHEN("We ignore the select part and just convert the move") //not sure how we'll use this info, can update in future
-        {
-            auto cmd = GameStateLoader::GetCommandFromString(move);
-            THEN("It converts correctly...")
-            {
-                INFO(move);
-                REQUIRE(cmd != nullptr);
-                REQUIRE(cmd->GetCommandString() == move.substr(9, move.length() - 9));
+                REQUIRE(!cmd->IsValid(true, std::make_shared<GameState>()));
             }
         }
     }

@@ -24,15 +24,12 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     SetupLava(_state->roundNumber);
     ApplyLava();
 
-    //validate both guys
-    bool player1Frozen =_state->player1.GetCurrentWorm()->IsFrozen();
-    bool player2Frozen =_state->player2.GetCurrentWorm()->IsFrozen();
-    
-    bool player1Good = player1_command.IsValid(true, _state)  && !player1Frozen;
-    bool player2Good = player2_command.IsValid(false, _state) && !player2Frozen;
-
     //thaw out worms (important that this happens here, AFTER checking frozen state, and BEFORE executing the next move)
     _state->ForAllWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
+
+    bool player1Good = player1_command.IsValid(true, _state);
+    bool player2Good = player2_command.IsValid(false, _state);
+
 
     //determine which move should be executed first
     bool player1GoesFirst = player1_command.Order() < player2_command.Order();
@@ -41,10 +38,10 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     movesValid &= DoCommand(!player1GoesFirst?player1_command:player2_command, !player1GoesFirst, !player1GoesFirst?player1Good:player2Good);
 
     if(!movesValid) {
-        if(!player1Good && !player1Frozen) {
+        if(!player1Good) {
             std::cerr << "Invalid move by worm 1" << _state->player1.GetCurrentWorm()->id << ": " << player1_command.GetCommandString() << std::endl;
         }
-        if(!player2Good && !player2Frozen) {
+        if(!player2Good) {
             std::cerr << "Invalid move by worm 2" << _state->player2.GetCurrentWorm()->id << ": " << player2_command.GetCommandString() << std::endl;
         }
     }
@@ -127,7 +124,9 @@ bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
         return false;
     }
 
-    command.Execute(player1, _state);
+    if(!player->GetCurrentWorm()->IsFrozen()) {
+        command.Execute(player1, _state);
+    }
 
     return true;
 }
