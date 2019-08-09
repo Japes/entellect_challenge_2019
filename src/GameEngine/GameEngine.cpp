@@ -223,7 +223,14 @@ float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     //std::cerr << "(" << __FUNCTION__ << ") ret: " << ret << std::endl;
     //return ret;
 
-    return (((evaluationAfter - evaluationBefore) / (static_cast<float>(numPlies) * 16)) / 4) + 0.5f;
+    //return (((evaluationAfter - evaluationBefore) / (bestPossible)) / 4) + 0.5f; //this was for score
+
+    float bestPossible = GameConfig::commandoWorms.initialHp + 
+                            GameConfig::agentWorms.initialHp + 
+                            GameConfig::technologistWorms.initialHp + 
+                            GameConfig::healthPackHp*2;
+
+    return (((evaluationAfter - evaluationBefore) / bestPossible ) / 4) + 0.5f; //this was for score
 }
 
 GameEngine::GameResult GameEngine::GetResult()

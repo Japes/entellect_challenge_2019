@@ -35,17 +35,17 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1);
 
     //banana mine
-    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
-    if(bananaMove != nullptr) {
-        return selectPrefix + bananaMove->GetCommandString();
-    }
+    //auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
+    //if(bananaMove != nullptr) {
+    //    return selectPrefix + bananaMove->GetCommandString();
+    //}
 
-    //heuristic to avoid getting lost
-    auto nearestDirtMove = NextTurn::GetNearestDirtHeuristic(ImPlayer1, state1, _distanceForLost);
-    if(nearestDirtMove != nullptr) {
-        std::cerr << "(" << __FUNCTION__ << ") USING HEURISTIC TO PREVENT GETTING LOST" << std::endl;
-        return selectPrefix + nearestDirtMove->GetCommandString();
-    }
+    ////heuristic to avoid getting lost
+    //auto nearestDirtMove = NextTurn::GetNearestDirtHeuristic(ImPlayer1, state1, _distanceForLost);
+    //if(nearestDirtMove != nullptr) {
+    //    std::cerr << "(" << __FUNCTION__ << ") USING HEURISTIC TO PREVENT GETTING LOST" << std::endl;
+    //    return selectPrefix + nearestDirtMove->GetCommandString();
+    //}
 
     //begin monte carlo----------------------------------------------------------------
     auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), _mc_c);

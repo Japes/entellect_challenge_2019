@@ -12,6 +12,9 @@ jp10 - added select heuristic
 jp11 - try to guess if opponent threw banana (this is what was submitted for round 2)
 jp11_short/long - placeholders for various tunings for jp11
 jp12 - put in heuristic to avoid getting lost - THIS WAS NOT TESTED 100%, CANNING IT BECAUSE OF NEW STARTER PACK
+      - updated engine for new rules
+      - change MC to optimise for health diff instead of score
+      - remove banana and nearestDirt heuristic
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -225,3 +228,7 @@ Engine version: 2019.2.2 -- 2019_August_02__04_53_41 -- ParallelID: 1
 (wins/draws/losses):     digduck2.0               jp12                     
 digduck2.0:              0/0/0                    58/0/23                   (32/0/8)
 
+//NEW JP12, new engine rules----------------------------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.3.0 -- 2019_August_09__05_02_08 -- ParallelID: 
+(wins/draws/losses):     jp12                     reference-bot            
+jp12:                    0/0/0                    14/0/0                    (14/0/0)
