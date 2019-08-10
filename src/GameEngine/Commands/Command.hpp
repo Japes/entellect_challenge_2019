@@ -8,6 +8,18 @@
 class Command
 {
 	public:
+    enum class CommandType : uint8_t
+    {
+        NOTHING = 0,
+        SELECT = 1,
+        TELEPORT = 2,
+        DIG = 3,
+        BANANA = 4,
+        //order of these two deviates from the rules but agrees with their code/behaviour
+        SHOOT = 5,
+        SNOWBALL = 6
+    };
+
     Command() {}
 
     int Order() const

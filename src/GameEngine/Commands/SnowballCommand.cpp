@@ -5,7 +5,7 @@
 
 SnowballCommand::SnowballCommand(Position pos) : _pos{pos}
 {
-    _order = 4;  //deviation from their code - but conforms to rules page
+    _order = static_cast<int>(CommandType::SNOWBALL);
 }
 
 void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) const

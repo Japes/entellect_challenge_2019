@@ -5,7 +5,7 @@
 
 ShootCommand::ShootCommand(ShootCommand::ShootDirection dir)
 {
-    _order = 5; //deviation from their code - but conforms to rules page
+    _order = static_cast<int>(CommandType::SHOOT);
     switch (dir)
     {
         case ShootDirection::N:     _shootVector = Position(0,-1); break;
@@ -21,7 +21,7 @@ ShootCommand::ShootCommand(ShootCommand::ShootDirection dir)
 
 ShootCommand::ShootCommand(Position dir)
 {
-    _order = 3;
+    _order = static_cast<int>(CommandType::SHOOT);
 
     //normalise
     if(dir.x > 0) {

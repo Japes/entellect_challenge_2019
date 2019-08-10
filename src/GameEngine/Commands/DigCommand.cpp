@@ -4,7 +4,7 @@
 
 DigCommand::DigCommand(Position pos) : _pos{pos}
 {
-    _order = 2;
+    _order = static_cast<int>(CommandType::DIG);
 }
 
 //NOTE this assumes move is valid

@@ -7,7 +7,7 @@ std::vector<std::vector<int>> BananaCommand::_splashDamageLookup;
 
 BananaCommand::BananaCommand(Position pos) : _pos{pos}
 {
-    _order = 3;
+    _order = static_cast<int>(CommandType::BANANA);
 
     if(_splashDamageLookup.empty()) {
         std::vector<int> row1 {0,0,7,0,0};

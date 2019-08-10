@@ -6,7 +6,7 @@ SelectCommand::SelectCommand(int wormIndex, std::shared_ptr<Command> selectedCmd
     _wormIndex{wormIndex},
     _selectedCmd{selectedCmd}
 {
-    _order = 1;
+    _order = static_cast<int>(CommandType::SELECT);
 }
 
 //note: assumes move is valid.

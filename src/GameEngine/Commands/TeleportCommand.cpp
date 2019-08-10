@@ -8,7 +8,7 @@ TeleportCommand::TeleportCommand(Position pos, bool* forceRandom) :
     _pos{pos},
     _forceRandom{forceRandom}
 {
-    _order = 1;
+    _order = static_cast<int>(CommandType::TELEPORT);
 }
 
 //note: assumes move is valid.
