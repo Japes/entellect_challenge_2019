@@ -232,3 +232,8 @@ digduck2.0:              0/0/0                    58/0/23                   (32/
 Engine version: 2019.3.0 -- 2019_August_09__05_02_08 -- ParallelID: 
 (wins/draws/losses):     jp12                     reference-bot            
 jp12:                    0/0/0                    14/0/0                    (14/0/0)
+
+JP13 has various engine bugfixes ------------------------------------------------------------------------------------------------------------------------------------------
+Engine version: 2019.3.0 -- 2019_August_10__12_43_11 -- ParallelID: 1
+(wins/draws/losses):     jp12                     jp13                     
+jp12:                    0/0/0                    24/0/19                  (11/0/11)

@@ -11,21 +11,24 @@ import numpy as np
 class PlayerData :
     def __init__(self):
         self.name = ""
+        self.healths = []
         self.scores = []
         self.moves = []
         self.moveTimes = []
 
     def AppendData(self, data):
+        self.healths.append(data["health"])
         self.scores.append(data["score"])
         self.moves.append(data["move"])
         self.moveTimes.append(data["executionTime"])
 
         self.selects = [i for i, m in enumerate(self.moves) if m == "sel"]
         self.bananas = [i for i, m in enumerate(self.moves) if m == "ban"]
+        self.snowballs = [i for i, m in enumerate(self.moves) if m == "sno"]
         self.teleports = [i for i, m in enumerate(self.moves) if m == "mov"]
         self.digs = [i for i, m in enumerate(self.moves) if m == "dig"]
         self.shoots = [i for i, m in enumerate(self.moves) if m == "sho"]
-        self.invalid_moves = [i for i, m in enumerate(self.moves) if m != "sel" and m != "ban" and m != "mov" and m != "dig" and m != "sho" ]
+        self.invalid_moves = [i for i, m in enumerate(self.moves) if m != "sel" and m != "ban" and m != "mov" and m != "dig" and m != "sho" and m != "sno" ]
 
     def PlotData(self, axes, xValues, playerA):
         global _matchFolder
@@ -40,8 +43,11 @@ class PlayerData :
             selectIndicator = "<"
 
         axes.plot(xValues, self.scores, selectIndicator, ls='-', label=self.name + " selects", color=color, markevery=self.selects)
-        axes.plot(xValues, self.scores, "o", ls='-', label=self.name + " bananas", color=color, markevery=self.bananas)
         axes.plot(xValues, self.scores, "x", ls='-', label=self.name + " invalid/no moves", color=color, markevery=self.invalid_moves)
+
+        axes.plot(xValues, self.healths, "o", ls='-', label=self.name + " bananas", color=color, markevery=self.bananas)
+        axes.plot(xValues, self.healths, "d", ls='-', label=self.name + " snowballs", color=color, markevery=self.snowballs)
+
         axes.plot(xValues, self.moveTimes, ls='-', label=self.name + " execution time", color=timeColor)
 
         axes.set(title='Player scores ' + _matchFolder )
@@ -49,8 +55,8 @@ class PlayerData :
         axes.legend()
 
     def PlotMovesPie(self, axes, playerA):
-        pieData = [len(self.selects), len(self.bananas), len(self.teleports), len(self.digs), len(self.shoots), len(self.invalid_moves)]
-        pieLabels = ['selects', 'bananas', 'moves', 'digs', 'shoots', 'OTHER(' + str(len(self.invalid_moves)) + ')']
+        pieData = [len(self.selects), len(self.bananas), len(self.snowballs), len(self.teleports), len(self.digs), len(self.shoots), len(self.invalid_moves)]
+        pieLabels = ['selects', 'bananas', 'snowballs', 'moves', 'digs', 'shoots', 'OTHER(' + str(len(self.invalid_moves)) + ')']
 
         axes.pie(pieData, labels=pieLabels, autopct='%1.1f%%', shadow=True, startangle=90)
 
@@ -91,6 +97,7 @@ def getJsonMapData(JsonMapFilePath) :
     ret = {}
     json_map = json.load(open(JsonMapFilePath, 'r'))
     ret["score"] = json_map["myPlayer"]["score"]
+    ret["health"] = json_map["myPlayer"]["health"]
     return ret
 
 def getPlayerData(playerFolder) :

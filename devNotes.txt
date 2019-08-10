@@ -1,7 +1,14 @@
 TODO
 
+   dont snowball yourself
+
    run compare over LOTS of matches
       fix engine bugs
+
+   optimization
+      lava progression! precompute
+      simple optimizations: don't use shared ptr
+      do more than 1 playthrough for each tip
 
    finish the loading of previous_move into state
       see [.broken] unit test
@@ -10,6 +17,9 @@ TODO
       num selects
       num bananas
       num snowballs
+
+   heavier playthroughs (biases)
+      bias towards shooting (for opponent)
       
    handle monte carlo ties
       make wins/losses comparable as well - will reduce ties
@@ -22,10 +32,9 @@ TODO
 
    store MC results of first level
 
-   need to try to get more into the monta carlos.  off-by-one banana hits aren't considered...
-
-   heavier playthroughs (biases)
-      bias towards shooting (for opponent)
+   need to try to get more into the monta carlos.  
+      off-by-one banana hits aren't considered...
+      shooting where opponent could be
 
    Tuning
       make bot tunable via config file
@@ -39,14 +48,6 @@ TODO
          playthrough weights
 
 
-
-
-   optimization
-      simple optimizations: don't use shared ptr
-      do more than 1 playthrough for each tip
-
-   don't expect worm3 to be agent...
-
    update reference bot so it's more usefull...
       use bananas
       use select
@@ -56,29 +57,10 @@ TODO
          cant see till the end of the game, points wise makes sense to rather dodge
       my (not last) worm about to die - why not evade?
 
-
-   Need to avoid getting lost
-      try using seed/jippo'd game state to reproduce this
-      one solution - bias towards moving in a direction
-      another solution - low confidence, go for heuristic 
-         aim for big clump of dirt if health looking bad
-         go for enemies if health looking good
-         run away if at a points advantage
-   
    explicit exclude of potential game ending move
       explicit exclude of all chances for opponent to shoot?
          add unit tests for this
 
-   UPGRADE SCRIPT
-      make tourneys 50/50 p1/p2
-
-   spreadsheet profile of opponents
-      run grep on match logs
-       scrape logs to find their output
-
-   why do my bots not use the whole cpu?
-      they use about 1/8th: 12.5%
-   
 sort out deployment---------------
         copy bot folder
         remove bin/rounds
