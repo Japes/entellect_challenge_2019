@@ -15,9 +15,8 @@ class Command
         TELEPORT = 2,
         DIG = 3,
         BANANA = 4,
-        //order of these two deviates from the rules but agrees with their code/behaviour
-        SHOOT = 5,
-        SNOWBALL = 6
+        SNOWBALL = 5,
+        SHOOT = 6
     };
 
     Command() {}

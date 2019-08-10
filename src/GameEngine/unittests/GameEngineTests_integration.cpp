@@ -275,7 +275,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     //std::vector<std::string> matches;
-    //matches.push_back("../../starter-pack/match-logs/2019.07.15.04.04.01/");
+    //matches.push_back("Test_files/matches/2019.08.08.22.47.07/");
 
     for(auto & match: matches) {
         match = match + std::string("/");
@@ -307,6 +307,21 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
             INFO("(" << __FUNCTION__ << ") round: " << round << " p1Command: " << p1Command->GetCommandString() << " p2Command: " << p2Command->GetCommandString() << 
                 " p1 score: " << original_state->player1.command_score  << " p2 score: " << original_state->player2.command_score);
             eng.AdvanceState(*p1Command, *p2Command);
+
+            if(p1Command->Order() == static_cast<int>(Command::CommandType::TELEPORT) && 
+                p2Command->Order() == static_cast<int>(Command::CommandType::TELEPORT) && 
+                p1Command->GetCommandString() == p2Command->GetCommandString()) {
+
+                std::cerr << "(" << __FUNCTION__ << ") COLLISION DETECTED, SKIPPING VALIDATION OF ROUND " << round << std::endl;
+
+                ++round;
+                if(round <= numRounds) {
+                    roundJSON = Utilities::ReadJsonFile(match + GetRoundFolder(round) + botBFolder + "JsonMap.json");
+                    original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
+                    eng = GameEngine(original_state);
+                }
+                continue; //collisions are non-deterministic, can't test
+            }
 
             if(round != numRounds) {
                 ++round;
