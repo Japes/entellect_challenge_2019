@@ -143,16 +143,6 @@ Player* GameState::GetPlayer(bool player1)
     return player1 ? &this->player1 : &player2;
 }
 
-void GameState::ForAllWorms(std::function<void(Worm&)> wormFn)
-{
-    for(auto & worm : player1.worms) {
-        wormFn(worm);
-    }
-    for(auto & worm : player2.worms) {
-        wormFn(worm);
-    }
-}
-
 //returns closest dirt in terms of move distance
 //returns {-1, -1} if no dirts
 Position GameState::Closest_dirt(const Position& fromPos) 
@@ -208,6 +198,7 @@ int GameState::Dist_to_closest_enemy(bool player1)
     //now calc
     Player * enemy = GetPlayer(!player1);
     int closestDist = 9999;
+    
     for(auto const & worm : enemy->worms) {
         if(worm.IsDead() || !worm.position.IsOnMap()) {
             continue;
@@ -226,8 +217,8 @@ std::vector<Worm*> GameState::WormsWithinDistance(Position pos, int dist)
 {
     std::vector<Worm*> ret;
 
-    ForAllWorms([&](Worm& worm) {
-        if(dist < 0 || (!worm.IsDead() && pos.EuclideanDistanceTo(worm.position) <= dist)) {
+    ForAllLiveWorms([&](Worm& worm) {
+        if(dist < 0 || pos.EuclideanDistanceTo(worm.position) <= dist) {
             ret.push_back(&worm);
         }
     });

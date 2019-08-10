@@ -222,6 +222,64 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
     }
 }
 
+TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
+{
+    GIVEN("A semi realistic game state and engine")
+    {
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        
+        Worm* worm12 = place_worm(true, 3, {31,15}, state); //technologist
+        place_worm(true, 1, {30,15}, state); //friendly right next to us
+        place_worm(true, 2, {0,0}, state); //friendly far away
+
+        place_worm(false, 1, {31,11}, state); //enemy in range to the north
+        auto dedguy = place_worm(false, 2, {29,13}, state); //enemy in range NW
+        dedguy->health = -1;
+        place_worm(false, 3, {15,31}, state); //enemy out of range
+
+        WHEN("It's not the techies turn")
+        {
+            THEN("GetValidSnowballs is always 0")
+            {
+                auto ret = NextTurn::GetValidSnowballs(true, state, true);
+                INFO("shoots: " << ret)
+                REQUIRE(ret.count() == 0);
+            }
+        }
+
+        WHEN("It is the techies turn")
+        {
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+            eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+            AND_WHEN("He has snowballs")
+            {
+                THEN("GetValidSnowballs returns correct")
+                {
+                    auto ret = NextTurn::GetValidSnowballs(true, state, true);
+                    INFO("shoots: " << ret)
+                    CHECK(ret.count() == 1);
+                    CHECK(ret.test(16));
+                    CHECK(!ret.test(36)); //dedguy
+                    CHECK(!ret.test(56)); //returned this when i confused x with y
+                    CHECK(NextTurn::GetSnowball(worm12, state, 16)->GetCommandString() == "snowball 31 11");          
+                }
+            }
+            AND_WHEN("He has no snowballs")
+            {
+                state->player1.worms[2].snowball_count = 0;
+                THEN("GetValidSnowballs returns zero")
+                {
+                    auto ret = NextTurn::GetValidSnowballs(true, state, true);
+                    INFO("shoots: " << ret)
+                    REQUIRE(ret.count() == 0);
+                }
+            }
+        }
+    }
+}
+
 TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
 {
     GIVEN("A semi realistic game state and engine")
@@ -234,7 +292,8 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
         place_worm(true, 3, {0,0}, state); //friendly far away
 
         place_worm(false, 1, {31,11}, state); //enemy in range to the north
-        place_worm(false, 2, {29,13}, state); //enemy in range NW
+        auto dedguy = place_worm(false, 2, {29,13}, state); //enemy in range NW
+        dedguy->health = -1;
         place_worm(false, 3, {15,31}, state); //enemy out of range
 
         WHEN("It's not the agent's turn")
@@ -257,12 +316,11 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
                 {
                     auto ret = NextTurn::GetValidBananas(true, state, true);
                     INFO("shoots: " << ret)
-                    REQUIRE(ret.count() == 2);
+                    REQUIRE(ret.count() == 1);
                     REQUIRE(ret.test(16));
-                    REQUIRE(ret.test(36));
+                    REQUIRE(!ret.test(36)); //dedguy
                     REQUIRE(!ret.test(56)); //returned this when i confused x with y
-                    REQUIRE(NextTurn::GetBanana(worm12, state, 16)->GetCommandString() == "banana 31 11");
-                    REQUIRE(NextTurn::GetBanana(worm12, state, 36)->GetCommandString() == "banana 29 13");            
+                    REQUIRE(NextTurn::GetBanana(worm12, state, 16)->GetCommandString() == "banana 31 11");          
                 }
             }
             AND_WHEN("He has no bananas")

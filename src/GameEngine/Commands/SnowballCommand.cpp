@@ -11,7 +11,6 @@ SnowballCommand::SnowballCommand(Position pos) : _pos{pos}
 void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = state->GetPlayer(player1);
-    Player* enemyPlayer = state->GetPlayer(!player1);
     Worm* worm = player->GetCurrentWorm();
 
     --worm->snowball_count;
@@ -23,21 +22,21 @@ void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     
     int points = 0;
 
-    for(auto & thisWorm : enemyPlayer->worms) {
-        if(!thisWorm.IsDead() && _pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
+    state->ForAllLiveWorms(!player1, [&](Worm& thisWorm) {
+        if(_pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
             //std::cerr << "(" << __FUNCTION__ << ") froze an enemy at " << thisWorm.position << std::endl;
             thisWorm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
             points += GameConfig::scores.freeze;
         }
-    }
+    });
 
-    for(auto & thisWorm : player->worms) {
-        if(!thisWorm.IsDead() && _pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
+    state->ForAllLiveWorms(player1, [&](Worm& thisWorm) {
+        if(_pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
             //std::cerr << "(" << __FUNCTION__ << ") froze a friendly at " << thisWorm.position << std::endl;
             thisWorm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
             points -= GameConfig::scores.freeze;
         }
-    }
+    });
 
     player->command_score += points;
 }

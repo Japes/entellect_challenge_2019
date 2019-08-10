@@ -34,7 +34,43 @@ class GameState
     void Move_worm(Worm* worm, Position pos);
 
     Player* GetPlayer(bool player1);
-    void ForAllWorms(std::function<void(Worm&)> wormFn);
+
+    inline void ForAllWorms(std::function<void(Worm&)> wormFn)
+    {
+        for(auto & worm : player1.worms) { wormFn(worm); }
+        for(auto & worm : player2.worms) { wormFn(worm); }
+    }
+
+    inline void ForAllLiveWorms(std::function<void(Worm&)> wormFn)
+    {
+        for(auto & worm : player1.worms) {
+            if(!worm.IsDead()) {
+                wormFn(worm);
+            }
+        }
+        for(auto & worm : player2.worms) {
+            if(!worm.IsDead()) {
+                wormFn(worm);
+            }
+        }
+    }
+
+    inline void ForAllLiveWorms(bool _player1, std::function<void(Worm&)> wormFn)
+    {
+        if(_player1) {
+            for(auto & worm : player1.worms) {
+                if(!worm.IsDead()) {
+                    wormFn(worm);
+                }
+            }
+        } else {
+            for(auto & worm : player2.worms) {
+                if(!worm.IsDead()) {
+                    wormFn(worm);
+                }
+            }
+        }
+    }
 
     std::vector<Worm*> WormsWithinDistance(Position pos, int dist);
     Position Closest_dirt(const Position& fromPos);
@@ -92,17 +128,11 @@ class GameState
     {
         Worm* ret = nullptr;
 
-        //not using ForAllWorms here for performance reasons
-        for(auto & w : player1.worms) {
+        ForAllWorms([&](Worm& w) {
             if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
                 ret = &w;
             }
-        }
-        for(auto & w : player2.worms) {
-            if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
-                ret = &w;
-            }
-        }
+        });
 
         return ret;
     }

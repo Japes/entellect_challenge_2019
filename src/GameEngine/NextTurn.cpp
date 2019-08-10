@@ -84,10 +84,8 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
-    auto enemyWorms = player1? &(state->player2.worms) : &(state->player1.worms);
-
     Position noShot{0,0};
-    for(auto const & enemyWorm : (*enemyWorms)) {
+    state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
         Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state);
         if(shootVec != noShot) {
             auto it = std::find(_surroundingWormSpaces.begin(), _surroundingWormSpaces.end(), shootVec);
@@ -97,7 +95,7 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
             }
 
         }
-    }
+    });
 
     return ret;
 }
@@ -232,15 +230,13 @@ std::bitset<121> NextTurn::GetValidBombThrow(bool player1, std::shared_ptr<GameS
 
     std::bitset<121> ret(0);
 
-    auto enemyWorms = player1? &(state->player2.worms) : &(state->player1.worms);
-
-    for(auto const & enemyWorm : (*enemyWorms)) {
+    state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
         if(worm->position.BananaSnowballCanReach(enemyWorm.position)) {
             Position posDiff = enemyWorm.position - worm->position;
             int index = 60 + posDiff.x + (posDiff.y*11); //see ascii art at top of this function
             ret.set(index);
         }
-    }
+    });
 
     return ret;
 }

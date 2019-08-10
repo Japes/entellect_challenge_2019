@@ -25,7 +25,7 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     ApplyLava();
 
     //thaw out worms
-    _state->ForAllWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
+    _state->ForAllLiveWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
 
     bool player1Good = player1_command.IsValid(true, _state);
     bool player2Good = player2_command.IsValid(false, _state);
@@ -100,8 +100,8 @@ void GameEngine::SetupLava(unsigned roundNum)
 
 void GameEngine::ApplyLava()
 {
-    _state->ForAllWorms([&](Worm& worm) {
-        if( !worm.IsDead() && worm.position.IsOnMap() && _state->LavaAt(worm.position)) {
+    _state->ForAllLiveWorms([&](Worm& worm) {
+        if( worm.position.IsOnMap() && _state->LavaAt(worm.position)) {
             worm.health -= GameConfig::lavaDamage;
             if(worm.IsDead()) {
                 worm.diedByLavaThisRound = true;

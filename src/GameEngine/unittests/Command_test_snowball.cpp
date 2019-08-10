@@ -256,13 +256,17 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
 
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        place_worm(true, 1, {3,4}, state);
-        place_worm(true, 2, {4,1}, state);
-        place_worm(true, 3, {1,6}, state); //3 is technologist by default
-        place_worm(false, 1, {4,3}, state);
-        place_worm(false, 2, {5,3}, state);
-        auto dedWorm = place_worm(false, 3, {4,4}, state);
+        bool player1 = GENERATE(true, false);
+        place_worm(player1, 1, {3,4}, state);
+        place_worm(player1, 2, {4,1}, state);
+        place_worm(player1, 3, {1,6}, state); //3 is technologist by default
+        place_worm(!player1, 1, {4,3}, state);
+        place_worm(!player1, 2, {5,3}, state);
+        auto dedWorm = place_worm(!player1, 3, {4,4}, state);
         dedWorm->health = -1;
+
+        Player* throwingPlayer = player1? &state->player1 : &state->player2;
+        Player* enemyPlayer = player1? &state->player2 : &state->player1;
 
         Position powerupPos{5,2};
         place_powerup(powerupPos, state);
@@ -281,47 +285,51 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
-        Worm* currentWorm = state->player1.GetCurrentWorm();
+        Worm* currentWorm = throwingPlayer->GetCurrentWorm();
         REQUIRE(currentWorm->proffession == Worm::Proffession::TECHNOLOGIST);
 
-        auto pointsBefore = state->player1.command_score;
-        REQUIRE(!state->player1.worms[0].IsFrozen());
-        REQUIRE(!state->player1.worms[1].IsFrozen());
-        REQUIRE(!state->player1.worms[2].IsFrozen());
-        REQUIRE(!state->player2.worms[0].IsFrozen());
-        REQUIRE(!state->player2.worms[1].IsFrozen());
-        REQUIRE(!state->player2.worms[2].IsFrozen());
+        auto pointsBefore = throwingPlayer->command_score;
+        REQUIRE(!throwingPlayer->worms[0].IsFrozen());
+        REQUIRE(!throwingPlayer->worms[1].IsFrozen());
+        REQUIRE(!throwingPlayer->worms[2].IsFrozen());
+        REQUIRE(!enemyPlayer->worms[0].IsFrozen());
+        REQUIRE(!enemyPlayer->worms[1].IsFrozen());
+        REQUIRE(!enemyPlayer->worms[2].IsFrozen());
 
         REQUIRE(state->PowerUp_at(powerupPos) != nullptr);
 
         WHEN("We chuck the snowball")
         {
-            eng.AdvanceState(SnowballCommand({4,3}), DoNothingCommand());
+            if(player1) {
+                eng.AdvanceState(SnowballCommand({4,3}), DoNothingCommand());
+            } else {
+                eng.AdvanceState(DoNothingCommand(), SnowballCommand({4,3}));
+            }
 
             THEN("Everything is as expected")
             {
-                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                REQUIRE(throwingPlayer->consecutiveDoNothingCount == 0);
 
                 //freeze:
                 //P2
-                CHECK(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
-                CHECK(state->player2.worms[0].IsFrozen());
+                CHECK(enemyPlayer->worms[0].health == GameConfig::commandoWorms.initialHp);
+                CHECK(enemyPlayer->worms[0].IsFrozen());
                 
-                CHECK(state->player2.worms[1].health == GameConfig::agentWorms.initialHp);
-                CHECK(state->player2.worms[1].IsFrozen());
+                CHECK(enemyPlayer->worms[1].health == GameConfig::agentWorms.initialHp);
+                CHECK(enemyPlayer->worms[1].IsFrozen());
 
-                CHECK(state->player2.worms[2].IsDead());
-                CHECK(!state->player2.worms[2].IsFrozen());
+                CHECK(enemyPlayer->worms[2].IsDead());
+                CHECK(!enemyPlayer->worms[2].IsFrozen());
 
                 //P1
-                CHECK(state->player1.worms[0].health == GameConfig::commandoWorms.initialHp);
-                CHECK(state->player1.worms[0].IsFrozen());
+                CHECK(throwingPlayer->worms[0].health == GameConfig::commandoWorms.initialHp);
+                CHECK(throwingPlayer->worms[0].IsFrozen());
                 
-                CHECK(state->player1.worms[1].health == GameConfig::agentWorms.initialHp);
-                CHECK(!state->player1.worms[1].IsFrozen());
+                CHECK(throwingPlayer->worms[1].health == GameConfig::agentWorms.initialHp);
+                CHECK(!throwingPlayer->worms[1].IsFrozen());
 
-                CHECK(state->player1.worms[2].health == GameConfig::technologistWorms.initialHp);
-                CHECK(!state->player1.worms[2].IsFrozen());
+                CHECK(throwingPlayer->worms[2].health == GameConfig::technologistWorms.initialHp);
+                CHECK(!throwingPlayer->worms[2].IsFrozen());
 
                 //dirt
                 CHECK(state->CellType_at({3, 1}) == CellType::DIRT);
@@ -340,7 +348,7 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
                 //points
                 auto expectedEnemyPoints = GameConfig::scores.freeze*2; //no points for ded guy
                 auto expectedFriendlyPoints = -GameConfig::scores.freeze;
-                CHECK(state->player1.command_score == pointsBefore + expectedEnemyPoints + expectedFriendlyPoints);
+                CHECK(throwingPlayer->command_score == pointsBefore + expectedEnemyPoints + expectedFriendlyPoints);
             }
         }
     }
