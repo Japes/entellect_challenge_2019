@@ -41,6 +41,11 @@ bool SelectCommand::operator==(const SelectCommand& other)
     _selectedCmd == other._selectedCmd;
 }
 
+int SelectCommand::GetWormIndex() const
+{
+    return _wormIndex;
+}
+
 std::string SelectCommand::GetCommandString() const
 {
     std::stringstream ret;

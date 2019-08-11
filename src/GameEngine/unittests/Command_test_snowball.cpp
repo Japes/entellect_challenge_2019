@@ -458,6 +458,63 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
             }
         }
     }
+
+     GIVEN("A contrived situation")
+    {
+        //    0   1   2   3   4   5   6
+        //0   .   .   .   .   .   .   .
+        //1   .   .   23  .   .   .   .
+        //2   .   .   .   .   .   .   .
+        //3   13  .   .   .   .   .   .
+        //4   .   .   .   .   .   .   .
+        //5   .   .   .   .   .   .   .
+        //6   .   .   .   .   .   .   .
+        //7   .   .   .   .   .   .   .            
+
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+
+        bool player1 = GENERATE(true, false);
+
+        place_worm(player1, 3, {0,3}, state); //3 is technologist by default
+        Position target_worm_pos(2,1);
+        auto target_worm = place_worm(!player1, 3, target_worm_pos, state);
+
+        place_worm(player1, 1, {10,10}, state);
+        place_worm(player1, 2, {11,10}, state);
+        place_worm(!player1, 1, {12,10}, state);
+        place_worm(!player1, 2, {13,10}, state);
+
+
+        //make it technologist's turn
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+        Worm* currentWorm = state->player1.GetCurrentWorm();
+        REQUIRE(currentWorm->proffession == Worm::Proffession::TECHNOLOGIST);
+
+        WHEN("A worm is frozen") {
+            if(player1) {
+                eng.AdvanceState(SnowballCommand({2,1}), DoNothingCommand());
+            } else {
+                eng.AdvanceState(DoNothingCommand(), SnowballCommand({2,1}));
+            }
+
+            AND_THEN("they try to do stuff after being selected")
+            {
+                auto selectCmd = SelectCommand(3, std::make_shared<TeleportCommand>(Position(3,1)));
+                if(player1) {
+                    eng.AdvanceState(DoNothingCommand(), selectCmd );
+                } else {
+                    eng.AdvanceState(selectCmd, DoNothingCommand());
+                }
+
+                THEN("They can't")
+                {
+                    REQUIRE(target_worm->position == target_worm_pos);
+                }
+            }
+        }
+    }
 }
 
 TEST_CASE( "Get snowball command string", "[snowball]" ) {

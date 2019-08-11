@@ -14,6 +14,8 @@ class SelectCommand : public Command
 
     bool operator==(const SelectCommand& other);
 
+    int GetWormIndex() const;
+
     private:
     int _wormIndex;
     std::shared_ptr<Command> _selectedCmd;
