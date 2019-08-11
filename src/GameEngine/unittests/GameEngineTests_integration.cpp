@@ -275,7 +275,10 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     //std::vector<std::string> matches;
-    //matches.push_back("Test_files/matches/2019.08.08.22.47.07/");
+    //matches.push_back("Test_files/matches/2019.08.09.16.35.29/");
+    //matches.push_back("Test_files/matches/2019.08.10.09.34.19/");
+    //matches.push_back("Test_files/matches/2019.08.10.09.52.21/");
+    //matches.push_back("Test_files/matches/2019.08.10.09.52.25/");
 
     for(auto & match: matches) {
         match = match + std::string("/");
@@ -362,7 +365,8 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
                     REQUIRE(result.losingPlayer == &original_state->player2);
                 }
 
-                if(playerAHealth == 0 || playerBHealth == 0) {
+                if ( (playerAHealth <= 0 && playerBHealth > 0) ||
+                    (playerBHealth <= 0 && playerAHealth > 0) ) {
                     REQUIRE(result.result == GameEngine::ResultType::FINISHED_KO);
                 } else {
                     REQUIRE(result.result == GameEngine::ResultType::FINISHED_POINTS);
