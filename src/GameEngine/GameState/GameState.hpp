@@ -76,6 +76,10 @@ class GameState
     Position Closest_dirt(const Position& fromPos);
     int Dist_to_closest_enemy(bool player1);
 
+    void MarkDirtDugThisRound(Position pos);
+    bool DirtWasDugThisRound(Position pos);
+    void ClearDirtsDugThisRound();
+
     bool operator==(const GameState &other) const;
 
     private:
@@ -87,6 +91,7 @@ class GameState
     static std::bitset<MAP_SIZE*MAP_SIZE> bananaBombOverlay;
     static int bananaBombOverlayCentre;
     std::vector<Position> healthPackPos;
+    std::vector<Position> dirtsDugThisRound;
 
     void UpdateRefs();
     void UpdateRefs(Player& player);

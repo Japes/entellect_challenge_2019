@@ -63,9 +63,10 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
             }
 
             //clear dirt
-            if(state->CellType_at(mapPos) == CellType::DIRT) {
+            if(state->CellType_at(mapPos) == CellType::DIRT || state->DirtWasDugThisRound(mapPos)) {
                 state->SetCellTypeAt(mapPos, CellType::AIR);
                 state->RemoveLavaAt(mapPos);
+                state->MarkDirtDugThisRound(mapPos);
                 points += GameConfig::scores.dig;
             } 
 

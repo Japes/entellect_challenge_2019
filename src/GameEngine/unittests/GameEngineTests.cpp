@@ -89,26 +89,6 @@ TEST_CASE( "Commands are resolved in the right order", "[command_order]" ) {
             }
         }
 
-        //Dig happens before banana----------------
-        WHEN("A player digs and a player bananas")
-        {
-            DigCommand player1move({10,10});
-            BananaCommand player2move({8,10});
-
-            auto p1ScoreBefore = state->player1.GetScore();
-            auto p2ScoreBefore = state->player2.GetScore();
-
-            REQUIRE(state->player1.GetCurrentWorm() == &state->player1.worms[2]);
-            eng.AdvanceState(player1move, player2move);
-
-            THEN("The dig happens first")
-            {
-                REQUIRE(state->CellType_at({10, 10}) == CellType::AIR);
-                REQUIRE(state->player1.GetScore() == p1ScoreBefore + GameConfig::scores.dig);
-                REQUIRE(state->player2.GetScore() == p2ScoreBefore);
-            }
-        }
-
         //banana happens before shoot----------------
         WHEN("A player shoots and a player bananas")
         {

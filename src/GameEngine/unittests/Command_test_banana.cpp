@@ -365,6 +365,53 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
     }
 }
 
+TEST_CASE( "Both players clearing dirt with banana", "[banana]" ) {
+    GIVEN("A situation where both dudes will clear the same dirt") {
+        /*
+            0   1   2   3   4   5   6   7
+        0   .   .   .   .   .   .   .   .
+        1   .   .   .   .   .   22  .   .
+        2   .   .   .   D   .   .   .   .
+        3   .   .   .   D   .   .   .   .
+        4   .   .   .   D   .   .   .   .
+        5   .   12  .   .   .   .   .   .
+        6   .   .   .   .   .   .   .   .
+        7   .   .   .   .   .   .   .   .
+        */
+
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+        bool player1 = GENERATE(true, false);
+        place_worm(player1, 2, {1,5}, state);  //2 is the agent by default
+        place_worm(!player1, 2, {5,1}, state);
+
+        place_worm(player1, 1, {20,20}, state);
+        place_worm(!player1, 1, {20,22}, state);
+        place_worm(player1, 3, {20,21}, state);
+        place_worm(!player1, 3, {20,23}, state);
+
+        state->SetCellTypeAt({3, 2}, CellType::DIRT);
+        state->SetCellTypeAt({3, 3}, CellType::DIRT);
+        state->SetCellTypeAt({3, 4}, CellType::DIRT);
+
+        int p1PointsBefore = state->player1.command_score;
+        int p2PointsBefore = state->player2.command_score;
+
+        //make it the agents turn
+        eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
+
+        WHEN("They lob at the dirt")
+        {
+            eng.AdvanceState(BananaCommand({3,3}), BananaCommand({3,3}));
+            THEN("They both get the points for it")
+            {
+                REQUIRE(state->player1.command_score == p1PointsBefore + GameConfig::scores.dig*3);
+                REQUIRE(state->player2.command_score == p2PointsBefore + GameConfig::scores.dig*3);
+            }
+        }
+    }
+}
+
 TEST_CASE( "Get command string", "[banana]" ) {
     BananaCommand move(Position(5,6));
     REQUIRE(move.GetCommandString() == "banana 5 6");

@@ -47,6 +47,8 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
         }
     }
 
+    _state->ClearDirtsDugThisRound();
+
     _state->ForAllLiveWorms([&](Worm& worm) { 
         if(worm.frozenThisRound) {
             worm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;

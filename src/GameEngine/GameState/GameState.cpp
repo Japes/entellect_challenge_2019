@@ -226,6 +226,22 @@ std::vector<Worm*> GameState::WormsWithinDistance(Position pos, int dist)
     return ret;
 }
 
+bool GameState::DirtWasDugThisRound(Position pos)
+{
+    return std::find(std::begin(dirtsDugThisRound), std::end(dirtsDugThisRound), pos) != std::end(dirtsDugThisRound);
+}
+
+void GameState::MarkDirtDugThisRound(Position pos)
+{
+    dirtsDugThisRound.push_back(pos);
+}
+
+void GameState::ClearDirtsDugThisRound()
+{
+    dirtsDugThisRound.clear();
+}
+
+
 bool GameState::operator==(const GameState &other) const
 {
     /*

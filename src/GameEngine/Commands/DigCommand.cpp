@@ -20,6 +20,8 @@ void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     state->SetCellTypeAt(_pos, CellType::AIR);
     state->RemoveLavaAt(_pos);
+    state->MarkDirtDugThisRound(_pos);
+
     player->command_score += GameConfig::scores.dig;
 }
 
@@ -37,7 +39,7 @@ bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
         return false;
     }
 
-    if(state->CellType_at(_pos) != CellType::DIRT) {
+    if(state->CellType_at(_pos) != CellType::DIRT && !state->DirtWasDugThisRound(_pos)) {
         std::cerr << latestBot << " Cant dig air..." << _pos << " (round " << state->roundNumber << " worm " << player->id << worm->id <<  ")" << std::endl;
         return false;
     }
