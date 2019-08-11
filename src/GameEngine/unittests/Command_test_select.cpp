@@ -30,6 +30,34 @@ TEST_CASE( "Select command", "[Select_command]" ) {
     }
 }
 
+TEST_CASE( "Get select move order", "[Select_string]" ) {
+    //couldn't get GENERATE working here for some reason
+    GIVEN("A select command") {
+        std::shared_ptr<Command> cmd = std::make_shared<TeleportCommand>(Position(11,11));
+        SelectCommand sel(2, cmd);
+
+        THEN("It's order is the order of it's selected move") {
+            REQUIRE(sel.Order() == cmd->Order());
+        }
+    }
+    GIVEN("A select command") {
+        std::shared_ptr<Command> cmd = std::make_shared<DigCommand>(Position(11,11));
+        SelectCommand sel(2, cmd);
+
+        THEN("It's order is the order of it's selected move") {
+            REQUIRE(sel.Order() == cmd->Order());
+        }
+    }
+    GIVEN("A select command") {
+        std::shared_ptr<Command> cmd = std::make_shared<BananaCommand>(Position(11,11));
+        SelectCommand sel(2, cmd);
+
+        THEN("It's order is the order of it's selected move") {
+            REQUIRE(sel.Order() == cmd->Order());
+        }
+    }
+}
+
 TEST_CASE( "Get select string", "[Select_string]" ) {
     auto state = std::make_shared<GameState>();
 
