@@ -34,6 +34,7 @@ struct Worm
     Proffession proffession;
     bool movedThisRound;
     bool diedByLavaThisRound;
+    bool frozenThisRound;
     int roundsUntilUnfrozen;
 
 

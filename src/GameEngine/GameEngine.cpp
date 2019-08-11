@@ -30,38 +30,49 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     bool player1Good = player1_command.IsValid(true, _state);
     bool player2Good = player2_command.IsValid(false, _state);
 
-
     //determine which move should be executed first
-    bool player1GoesFirst = player1_command.Order() < player2_command.Order();
+    bool player1GoesFirst = player1_command.Order() <= player2_command.Order(); //they seem to favour player 1...
     bool movesValid = true;
     movesValid &= DoCommand(player1GoesFirst?player1_command:player2_command, player1GoesFirst, player1GoesFirst?player1Good:player2Good);
     movesValid &= DoCommand(!player1GoesFirst?player1_command:player2_command, !player1GoesFirst, !player1GoesFirst?player1Good:player2Good);
 
+    Worm* p1worm = _state->player1.GetCurrentWorm();
+    Worm* p2worm = _state->player2.GetCurrentWorm();
     if(!movesValid) {
         if(!player1Good) {
-            std::cerr << "Invalid move by worm 1" << _state->player1.GetCurrentWorm()->id << ": " << player1_command.GetCommandString() << std::endl;
+            std::cerr << "Invalid move by worm 1" << p1worm->id << ": " << player1_command.GetCommandString() << std::endl;
         }
         if(!player2Good) {
-            std::cerr << "Invalid move by worm 2" << _state->player2.GetCurrentWorm()->id << ": " << player2_command.GetCommandString() << std::endl;
+            std::cerr << "Invalid move by worm 2" << p2worm->id << ": " << player2_command.GetCommandString() << std::endl;
         }
     }
 
-    _state->player1.GetCurrentWorm()->movedThisRound = false;
-    _state->player1.GetCurrentWorm()->diedByLavaThisRound = false;
-    _state->player2.GetCurrentWorm()->movedThisRound = false;
-    _state->player2.GetCurrentWorm()->diedByLavaThisRound = false;
+    _state->ForAllLiveWorms([&](Worm& worm) { 
+        if(worm.frozenThisRound) {
+            worm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
+            worm.frozenThisRound = false;
+        }
+     });
+
+    ProcessWormFlags(p1worm);
+    ProcessWormFlags(p2worm);
 
     ApplyPowerups();
 
     _state->player1.UpdateCurrentWorm();
     _state->player2.UpdateCurrentWorm();
 
-
     ++_state->roundNumber;
 
     UpdateWinCondition();
 
     //at this point we'd ask the players for their next moves
+}
+
+void GameEngine::ProcessWormFlags(Worm* worm)
+{
+    worm->movedThisRound = false;
+    worm->diedByLavaThisRound = false;
 }
 
 //TODO can make this much faster by precomputing lava for all rounds up front

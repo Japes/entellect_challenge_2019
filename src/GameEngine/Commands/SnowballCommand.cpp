@@ -28,7 +28,12 @@ void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     state->ForAllLiveWorms(!player1, [&](Worm& thisWorm) {
         if(_pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
             //std::cerr << "(" << __FUNCTION__ << ") froze an enemy at " << thisWorm.position << std::endl;
+
+            //TODO they do it this way - player 1 will freeze first if both players are snowballing.
             thisWorm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
+            //I think it should rather be done this way:
+            //thisWorm.frozenThisRound = true;
+
             points += GameConfig::scores.freeze;
         }
     });
@@ -36,7 +41,12 @@ void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     state->ForAllLiveWorms(player1, [&](Worm& thisWorm) {
         if(_pos.MaximumDimension(thisWorm.position) <= GameConfig::technologistWorms.snowball.freezeRadius) {
             //std::cerr << "(" << __FUNCTION__ << ") froze a friendly at " << thisWorm.position << std::endl;
+            
+            //TODO they do it this way - player 1 will freeze first if both players are snowballing.
             thisWorm.roundsUntilUnfrozen = GameConfig::technologistWorms.snowball.freezeDuration;
+            //I think it should rather be done this way:
+            //thisWorm.frozenThisRound = true;
+            
             points -= GameConfig::scores.freeze;
         }
     });

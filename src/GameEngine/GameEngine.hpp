@@ -41,6 +41,7 @@ class GameEngine
 
     private:
     bool DoCommand(const Command& command, bool player1, bool valid);
+    void ProcessWormFlags(Worm* worm);
     void ApplyPowerups();
     void ApplyLava();
     void UpdateWinCondition();
