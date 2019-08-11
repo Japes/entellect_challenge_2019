@@ -378,7 +378,9 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
 //if so, progresses gamestate until it's that worm's turn, and returns a non-empty string with the "select" command that should be applied.
 std::string NextTurn::TryApplySelect(bool player1, std::shared_ptr<GameState> state)
 {
-    if(GetValidShoots(player1, state, true).any()) {
+    Player* original_state_player = state->GetPlayer(player1);
+
+    if(!original_state_player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, state, true).any()) {
         return "";
     }
 
@@ -396,7 +398,7 @@ std::string NextTurn::TryApplySelect(bool player1, std::shared_ptr<GameState> st
 
     while(player->GetCurrentWorm() != worm) {
 
-        if(GetValidShoots(player1, myState, true).any()) {
+        if(!player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, myState, true).any()) {
             //cool we have a candidate.  project the given state forward so the caller can use it
             GameEngine eng(state);
             for(int i = 0; i < numAdvancesApplied; ++i) {

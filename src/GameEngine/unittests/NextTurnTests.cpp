@@ -931,6 +931,16 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
             }
         }
 
+        WHEN("The dude is frozen")
+        {
+            state->player1.worms[1].roundsUntilUnfrozen = 5;
+            state->player1.worms[2].roundsUntilUnfrozen = 5;
+            THEN("Heuristic should not kick in")
+            {
+                REQUIRE(NextTurn::TryApplySelect(true, state) == "");
+            }
+        }
+
         WHEN("our heuristic SHOULDN'T kick in")
         {
             GameEngine eng(state);
