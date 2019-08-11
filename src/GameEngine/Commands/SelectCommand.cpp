@@ -13,6 +13,11 @@ SelectCommand::SelectCommand(int wormIndex, std::shared_ptr<Command> selectedCmd
 void SelectCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return;
+    }
+
     player->currentWormId = _wormIndex;
     --player->remainingWormSelections;
     _selectedCmd->Execute(player1, state);
