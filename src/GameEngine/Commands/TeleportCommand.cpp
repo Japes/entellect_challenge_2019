@@ -16,6 +16,9 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return;
+    }
 
     player->consecutiveDoNothingCount = 0;
     
@@ -53,6 +56,9 @@ bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return true;
+    }
 
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {

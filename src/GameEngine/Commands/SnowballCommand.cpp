@@ -12,6 +12,9 @@ void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return;
+    }
 
     --worm->snowball_count;
     player->consecutiveDoNothingCount = 0;
@@ -45,6 +48,9 @@ bool SnowballCommand::IsValid(bool player1, std::shared_ptr<GameState> state) co
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return true;
+    }
 
     if(!_pos.IsOnMap()) {
         std::cerr << latestBot << " (" << __FUNCTION__ << ") snowball target not on map: " << _pos << std::endl;

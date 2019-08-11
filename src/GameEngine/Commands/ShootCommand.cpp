@@ -43,6 +43,9 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return;
+    }
 
     player->consecutiveDoNothingCount = 0;
 

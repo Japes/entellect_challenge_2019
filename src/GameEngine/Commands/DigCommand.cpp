@@ -11,6 +11,10 @@ DigCommand::DigCommand(Position pos) : _pos{pos}
 void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = state->GetPlayer(player1);
+    Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return;
+    }
 
     player->consecutiveDoNothingCount = 0;
 
@@ -23,6 +27,9 @@ bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return true;
+    }
 
     if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
         _pos.x < 0 || _pos.y < 0 ) {

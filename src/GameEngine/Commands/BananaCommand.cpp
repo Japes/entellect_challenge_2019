@@ -37,6 +37,9 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
 
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return;
+    }
 
     player->consecutiveDoNothingCount = 0;
     --worm->banana_bomb_count;
@@ -97,6 +100,9 @@ bool BananaCommand::IsValid(bool player1, std::shared_ptr<GameState> state) cons
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    if(worm->IsFrozen()) {
+        return true;
+    }
 
     if(!_pos.IsOnMap()) {
         std::cerr << latestBot << " (" << __FUNCTION__ << ") banana target not on map: " << _pos << std::endl;

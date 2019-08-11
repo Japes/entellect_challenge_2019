@@ -501,6 +501,9 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
 
             AND_THEN("they try to do stuff after being selected")
             {
+                Player* selectingPlayer = player1? &state->player2 : &state->player1;
+                int numSelectsAtStart = selectingPlayer->remainingWormSelections;
+
                 auto selectCmd = SelectCommand(3, std::make_shared<TeleportCommand>(Position(3,1)));
                 if(player1) {
                     eng.AdvanceState(DoNothingCommand(), selectCmd );
@@ -511,6 +514,12 @@ TEST_CASE( "Freeze behaviour", "[snowball]" ) {
                 THEN("They can't")
                 {
                     REQUIRE(target_worm->position == target_worm_pos);
+                }
+
+                THEN("The select gets applied")
+                {
+                    CHECK(selectingPlayer->remainingWormSelections == numSelectsAtStart - 1);
+                    CHECK(selectingPlayer->GetCurrentWorm()->id == 1);
                 }
             }
         }

@@ -118,18 +118,6 @@ bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
 {
     Player* player = _state->GetPlayer(player1);
 
-    Worm* executingWorm = player->GetCurrentWorm();
-    //unfortunate complication here for select...
-    if(command.Order() == static_cast<int>(Command::CommandType::SELECT) ) {
-        auto selCmd = dynamic_cast<const SelectCommand*>(&command);
-        int wormIndex = selCmd->GetWormIndex();
-        executingWorm = &player->worms[wormIndex - 1];
-    }
-
-    if ( executingWorm->IsFrozen() ) {
-        return true;
-    }
-
     if(!valid) {
         player->command_score += GameConfig::scores.invalidCommand;
         ++player->consecutiveDoNothingCount;
