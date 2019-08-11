@@ -14,8 +14,8 @@ class Command
         SELECT = 1,
         TELEPORT = 2,
         DIG = 3,
-        BANANA = 4,
-        SNOWBALL = 5,
+        SNOWBALL = 4, //temporary, apparently snowball will become last
+        BANANA = 5,
         SHOOT = 6
     };
 
