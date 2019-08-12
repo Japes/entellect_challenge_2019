@@ -20,7 +20,6 @@ void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 
     state->SetCellTypeAt(_pos, CellType::AIR);
     state->RemoveLavaAt(_pos);
-    state->MarkDirtDugThisRound(_pos);
 
     player->command_score += GameConfig::scores.dig;
 }
