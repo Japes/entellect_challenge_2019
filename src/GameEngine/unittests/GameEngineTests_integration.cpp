@@ -279,6 +279,10 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     //matches.push_back("Test_files/matches/2019.08.10.09.34.19/");
     //matches.push_back("Test_files/matches/2019.08.10.09.52.21/");
     //matches.push_back("Test_files/matches/2019.08.10.09.52.25/");
+    //matches.push_back("Test_files/matches/2019.08.10.10.19.24/");
+    //matches.push_back("Test_files/matches/2019.08.10.12.07.57/"); //snowball before banana pls
+    //matches.push_back("Test_files/matches/2019.08.11.06.06.54/"); //dig points for simultaneous dig/banana
+    //matches.push_back("Test_files/matches/2019.08.10.11.41.52/");
 
     for(auto & match: matches) {
         match = match + std::string("/");

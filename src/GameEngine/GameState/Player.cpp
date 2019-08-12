@@ -115,7 +115,7 @@ bool Player::operator==(const Player &other) const
 /*
     std::cerr << "(" << __FUNCTION__ << ") " <<
     " wormsGood : " << wormsGood <<
-    " id : " << (id == other.id) <<
+    " id : " << (id == other.id) << " (" << id << ", " << other.id << ")"
     " command_score : " << (command_score == other.command_score) << " " << command_score << " " << other.command_score <<
     " health : " << (health == other.health) << " " << health << " " << other.health <<
     " currentWormId : " << (currentWormId == other.currentWormId) << " " << currentWormId << " " << other.currentWormId <<
