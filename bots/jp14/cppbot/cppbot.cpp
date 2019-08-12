@@ -12,7 +12,7 @@ std::string executeRound(Bot& bot, std::string& roundNumber)
         rapidjson::Document roundJSON = Utilities::ReadJsonFile(filePath);
         return "C;" + roundNumber + ";" + bot.runStrategy(roundJSON) + "\n";
 
-    } catch(...)        {
+    } catch(...) {
         return "C;" + roundNumber + ";error executeRound \n";
     }
 }

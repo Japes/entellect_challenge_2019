@@ -2,6 +2,7 @@ SRC_DIR := cppbot
 OBJ_DIR := bin
 MY_LIBS_SRC_DIR := ../../src
 ENGINE_SRC_DIR := $(MY_LIBS_SRC_DIR)/GameEngine
+
 #need to add a line here for every subfolder in GameEngine
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands

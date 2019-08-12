@@ -1,14 +1,12 @@
 TODO
 
-   dont snowball yourself
-
-   run compare over LOTS of matches
-      fix engine bugs
-
-   optimization
-      lava progression! precompute
-      simple optimizations: don't use shared ptr
-      do more than 1 playthrough for each tip
+	optimization
+		lava progression! precompute
+		simple optimizations: don't use shared ptr
+		do more than 1 playthrough for each tip
+	  
+	consider shooting into places where he COULD move
+	dont snowball yourself
 
    finish the loading of previous_move into state
       see [.broken] unit test
@@ -35,6 +33,9 @@ TODO
    need to try to get more into the monta carlos.  
       off-by-one banana hits aren't considered...
       shooting where opponent could be
+
+	run compare over LOTS of matches
+    fix engine bugs
 
    Tuning
       make bot tunable via config file

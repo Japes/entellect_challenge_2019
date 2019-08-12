@@ -6,6 +6,7 @@
 #include "GameEngineTestUtils.hpp"
 #include "NextTurn.hpp"
 #include "EvaluationFunctions.hpp"
+#include "../../Bot/Bot.hpp"
 #include <sstream>
 #include <chrono>
 #include <fstream>
@@ -48,89 +49,22 @@ TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
     CHECK(false);
 }
 
-uint64_t gameCount = 0;
-uint64_t turnCount = 0;
-std::mutex mtx;
+TEST_CASE( "Performance tests - realistic loop", "[performance][trim]" ) {
 
-void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, unsigned playthroughDepth)
-{
-    while(Get_ns_since_epoch() < stopTime) {
-        for(unsigned i = 0; i < 50; ++i) {
-            mtx.lock();
-            //choose next node
-            auto next_node = mc->NextNode();
-            mtx.unlock();
+    int playThroughDepth{24};
+    int dirtsForBanana{10};
+    int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+    uint64_t mcTime_ns{3000000000};
+    float mc_c{std::sqrt(2)};
+    int mc_runsBeforeClockCheck{50};
 
-            //load the state
-            auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-            GameEngine eng(state);
-
-            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-            //auto nextMoveFn = [] (bool player1, std::shared_ptr<GameState> gs) -> std::shared_ptr<Command> {return std::make_shared<DoNothingCommand>();};
-            int numplies{0};
-            int thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::ScoreComparison, -1, playthroughDepth, numplies);
-
-            mtx.lock();
-            turnCount += numplies;
-            ++gameCount;
-
-            next_node->score += thisScore;
-            next_node->w += thisScore > 0? 1 : 0;
-            ++next_node->n;
-
-            mc->UpdateNumSamples();
-            mtx.unlock();
-        }
-    }
-}
-
-TEST_CASE( "Performance tests - realistic loop", "[.performance][trim]" ) {
-
-    gameCount = 0;
-    turnCount = 0;
-    uint64_t num_milliseconds = 3000;
-    auto start_time = Get_ns_since_epoch();
+    Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"); //todo need to make sure there are bots in range
-    bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
+    bot.runStrategy(roundJSON);
 
-    NextTurn::Initialise();
-
-    //do some heuristics
-    //banana mine
-    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, 10);
-    if(bananaMove != nullptr) {
-        std::cerr << "(" << __FUNCTION__ << ") this should never be printed it's just here to the compiler doesn't optimise it out" << std::endl;
-    }
-    //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1);
-
-    auto heuristic_time = Get_ns_since_epoch();
-    INFO("heuristic_time: " << (heuristic_time - start_time)/1000000 << "ms")
-
-//from the bot---------------------------------------------------------
-
-    float c = std::sqrt(2);
-    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), c);
-
-    unsigned playthroughDepth = 24;
-
-    uint64_t stopTime = start_time + (num_milliseconds * 1000000LL);
-
-    std::thread t1(runMC, stopTime, mc, state1, ImPlayer1, playthroughDepth);
-    std::thread t2(runMC, stopTime, mc, state1, ImPlayer1, playthroughDepth);
-    t1.join();
-    t2.join();
-
-//from the bot---------------------------------------------------------
-
-
-    INFO("Moves per second: " << (turnCount*1000)/num_milliseconds << ", Moves per game: " << turnCount/gameCount << 
-                " (" << turnCount << " moves in " << gameCount << " games in " << num_milliseconds/1000.0f << " seconds)");
+    INFO("Moves per second: " << (bot.GetNumPlies()*1000000000)/mcTime_ns << " m/s)");
     CHECK(false);
-
-    //700000 moves per second, with just donothings, 2.5M per second
 }
 
 void GetEndGameState(std::string path, std::string& winningPlayer, int& playerAScore, int& playerAHealth, int& playerBScore, int& playerBHealth)

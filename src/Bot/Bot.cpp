@@ -12,7 +12,8 @@ Bot::Bot(int playthroughDepth, int dirtsForBanana, int distanceForLost, uint64_t
     _distanceForLost{distanceForLost},
     _mc_Time_ns{mcTime_ns},
     _mc_c{mc_c},
-    _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck}
+    _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck},
+    _numplies{0}
 {
     NextTurn::Initialise();
 }
@@ -49,6 +50,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
 
     //begin monte carlo----------------------------------------------------------------
     auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), _mc_c);
+    _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc, state1, ImPlayer1, _playthroughDepth);
     std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc, state1, ImPlayer1, _playthroughDepth);
     t1.join();
@@ -61,6 +63,11 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     mc->PrintState();
 
     return selectPrefix + best_move->GetCommandString();
+}
+
+uint64_t Bot::GetNumPlies()
+{
+    return _numplies;
 }
 
 void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, int playthroughDepth)
@@ -84,7 +91,7 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_p
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int numplies{0};
             auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::HealthComparison, distToConsider, playthroughDepth, numplies);
-
+            _numplies += numplies;
             _mtx.lock();
 
             next_node->score += thisScore;
