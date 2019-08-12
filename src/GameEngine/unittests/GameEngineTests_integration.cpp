@@ -22,33 +22,6 @@ uint64_t Get_ns_since_epoch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
 }
 
-TEST_CASE( "Performance tests - just advance state", "[.performance]" ) {
-
-    unsigned gameCount = 0;
-    unsigned turnCount = 0;
-    unsigned num_seconds = 3;
-    auto start_time = Get_ns_since_epoch();
-
-    auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-    auto original_state = GameStateLoader::LoadGameStatePtr(roundJSON);
-
-    while(Get_ns_since_epoch() < start_time + (num_seconds * 1000000000)) {
-    //while(true) {
-
-        auto state = std::make_shared<GameState>(*original_state); //no idea why it needs to be done this way
-        GameEngine eng(state);
-
-        while(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS) {
-            eng.AdvanceState(*NextTurn::GetRandomValidMoveForPlayer(true, state, false).get(), *NextTurn::GetRandomValidMoveForPlayer(false, state, false).get());
-            ++turnCount;
-        }
-        ++gameCount;
-    }
-
-    INFO("Moves per second: " << turnCount/num_seconds << ", Moves per game: " << turnCount/gameCount << " (" << turnCount << " moves in " << gameCount << " games in " << num_seconds << " seconds)");
-    CHECK(false);
-}
-
 TEST_CASE( "Performance tests - realistic loop", "[performance][trim]" ) {
 
     int playThroughDepth{24};
