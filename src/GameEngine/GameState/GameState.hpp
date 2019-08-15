@@ -144,13 +144,15 @@ class GameState
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    inline void ForAllWorms(std::function<void(Worm&)> wormFn)
+    template <typename TF>
+    inline void ForAllWorms(TF&& wormFn)
     {
         for(auto & worm : player1.worms) { wormFn(worm); }
         for(auto & worm : player2.worms) { wormFn(worm); }
     }
 
-    inline void ForAllLiveWorms(std::function<void(Worm&)> wormFn)
+    template <typename TF>
+    inline void ForAllLiveWorms(TF&& wormFn)
     {
         for(auto & worm : player1.worms) {
             if(!worm.IsDead()) {
@@ -164,7 +166,8 @@ class GameState
         }
     }
 
-    inline void ForAllLiveWorms(bool _player1, std::function<void(Worm&)> wormFn)
+    template <typename TF>
+    inline void ForAllLiveWorms(bool _player1, TF&& wormFn)
     {
         if(_player1) {
             for(auto & worm : player1.worms) {
