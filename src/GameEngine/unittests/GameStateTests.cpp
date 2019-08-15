@@ -153,6 +153,25 @@ TEST_CASE( "GameState load lava", "[state_load_lava]" ) {
     }
 }
 
+TEST_CASE( "GameState static lava state", "[state_load_lava_static]" ) {
+    GIVEN("A game state file loaded with lavas already")
+    {
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
+        GameState state = GameStateLoader::LoadGameState(roundJSON);
+        REQUIRE(state.LavaAt({1,15}));
+
+        WHEN("We create another game state")
+        {
+            GameState secondOne;
+
+            THEN("Lavas in other rounds aren't affected")
+            {
+                REQUIRE(!secondOne.LavaAt({1,15}));
+            }
+        }
+    }
+}
+
 TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
     WHEN("We make a copy of a state")
     {
