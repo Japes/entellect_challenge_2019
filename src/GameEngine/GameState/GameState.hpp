@@ -111,15 +111,19 @@ class GameState
 
     inline Worm* Worm_at(Position pos)
     {
-        Worm* ret = nullptr;
-
-        ForAllWorms([&](Worm& w) {
+        //not using ForAllWorms for performance reasons
+        for(auto & w : player1.worms) { 
             if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
-                ret = &w;
+                return &w;
             }
-        });
+         }
+        for(auto & w : player2.worms) { 
+            if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
+                return &w;
+            }
+         }
 
-        return ret;
+        return nullptr;
     }
 
     inline int DirtsBananaWillHit(const Position& pos) {
