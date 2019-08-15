@@ -21,8 +21,8 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
         return; //nothing more to do here
     }
 
-    SetupLava(_state->roundNumber);
     ApplyLava();
+    _state->ClearLavasRemovedThisRound();
 
     //thaw out worms
     _state->ForAllLiveWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
@@ -75,40 +75,6 @@ void GameEngine::ProcessWormFlags(Worm* worm)
 {
     worm->movedThisRound = false;
     worm->diedByLavaThisRound = false;
-}
-
-//TODO can make this much faster by precomputing lava for all rounds up front
-void GameEngine::SetupLava(unsigned roundNum)
-{
-    int center = (GameConfig::mapSize - 1) / 2.0;
-    Position mapCenter(center, center);
-
-    float brStartRound = GameConfig::maxRounds * GameConfig::battleRoyaleStart;
-    if (roundNum < brStartRound) {
-        return;
-    }
-
-    float brEndRound = GameConfig::maxRounds * GameConfig::battleRoyaleEnd;
-    float fullPercentageRange = (roundNum - brStartRound) / (brEndRound - brStartRound);
-    //clamp tp [0,1]
-    float currentProgress = fullPercentageRange > 0 ? fullPercentageRange : 0;
-    currentProgress = currentProgress > 1 ? 1 : currentProgress;
-
-    float safeAreaRadius = (GameConfig::mapSize / 2) * (1 - currentProgress);
-
-    unsigned countLavas = 0;
-    for(int x = 0; x < GameConfig::mapSize; ++x) {
-        for(int y = 0; y < GameConfig::mapSize; ++y) {
-            Position pos(x,y);
-            if(mapCenter.EuclideanDistanceTo(pos) > (safeAreaRadius + 1)) {
-                _state->AddLavaAt(pos);
-                ++countLavas;
-            }
-        }
-    }
-
-    //std::cerr << "(" << __FUNCTION__ << ") roundNum: " << roundNum << " currentProgress: " << currentProgress 
-    //            << " safeAreaRadius: " << safeAreaRadius << " countLavas: " << countLavas << std::endl;
 }
 
 void GameEngine::ApplyLava()

@@ -20,12 +20,13 @@ class GameState
     PowerUp healthPack; //just here so that cells can reference something static
 
     GameState();
+    static void Initialise();
+
     GameState(const GameState& p);
-    GameState(rapidjson::Document& roundJSON);
 
     void SetCellTypeAt(Position pos, CellType type);
-    void RemoveLavaAt(Position pos);
-    void AddLavaAt(Position pos);
+    static void AddLavaAt(Position pos, int roundNum = -1);
+
     void PlacePowerupAt(Position pos);
     void ClearPowerupAt(Position pos);
     void PlaceWormAt(Position pos, Worm* worm);
@@ -35,43 +36,6 @@ class GameState
 
     Player* GetPlayer(bool player1);
 
-    inline void ForAllWorms(std::function<void(Worm&)> wormFn)
-    {
-        for(auto & worm : player1.worms) { wormFn(worm); }
-        for(auto & worm : player2.worms) { wormFn(worm); }
-    }
-
-    inline void ForAllLiveWorms(std::function<void(Worm&)> wormFn)
-    {
-        for(auto & worm : player1.worms) {
-            if(!worm.IsDead()) {
-                wormFn(worm);
-            }
-        }
-        for(auto & worm : player2.worms) {
-            if(!worm.IsDead()) {
-                wormFn(worm);
-            }
-        }
-    }
-
-    inline void ForAllLiveWorms(bool _player1, std::function<void(Worm&)> wormFn)
-    {
-        if(_player1) {
-            for(auto & worm : player1.worms) {
-                if(!worm.IsDead()) {
-                    wormFn(worm);
-                }
-            }
-        } else {
-            for(auto & worm : player2.worms) {
-                if(!worm.IsDead()) {
-                    wormFn(worm);
-                }
-            }
-        }
-    }
-
     std::vector<Worm*> WormsWithinDistance(Position pos, int dist);
     Position Closest_dirt(const Position& fromPos);
     int Dist_to_closest_enemy(bool player1);
@@ -80,6 +44,10 @@ class GameState
     bool DirtWasDugThisRound(Position pos);
     void ClearDirtsDugThisRound();
 
+    void MarkLavaRemovedThisRound(Position pos);
+    bool LavaWasRemovedThisRound(Position pos);
+    void ClearLavasRemovedThisRound();
+
     bool operator==(const GameState &other) const;
 
     private:
@@ -87,16 +55,24 @@ class GameState
     //for bitsets [0] is the LSB.  So it is stored x/y flipped with respect to map coords, to make calcs easier.    
     std::bitset<MAP_SIZE*MAP_SIZE> mapDeepSpaces; //TODO no need to store this actually, it is always the same
     std::bitset<MAP_SIZE*MAP_SIZE> mapDirts;
-    std::bitset<MAP_SIZE*MAP_SIZE> mapLavas;
+
+    static bool haveSetup;
+    static std::bitset<MAP_SIZE*MAP_SIZE> mapLavas[400]; //one for each round :)
     static std::bitset<MAP_SIZE*MAP_SIZE> bananaBombOverlay;
     static int bananaBombOverlayCentre;
+
     std::vector<Position> healthPackPos;
     std::vector<Position> dirtsDugThisRound;
+    std::vector<Position> lavasRemovedThisRound;
 
+    static void SetupBananaBombOverlay();
+    static void SetupLavas();
     void UpdateRefs();
     void UpdateRefs(Player& player);
 
     public:
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
     inline CellType CellType_at(Position pos)
     {
@@ -114,8 +90,12 @@ class GameState
 
     inline bool LavaAt(Position pos)
     {
+        if(LavaWasRemovedThisRound(pos)) {
+            return false;
+        }
+
         auto posBit = (MAP_SIZE*pos.y + pos.x);
-        return mapLavas[posBit];
+        return mapLavas[roundNumber-1][posBit];
     }
 
     inline PowerUp* PowerUp_at(Position pos)
@@ -156,6 +136,45 @@ class GameState
             return (mapDirts & (bananaBombOverlay << (posBit - bananaBombOverlayCentre)) ).count();
         }
         return (mapDirts & (bananaBombOverlay >> (bananaBombOverlayCentre - posBit)) ).count();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    inline void ForAllWorms(std::function<void(Worm&)> wormFn)
+    {
+        for(auto & worm : player1.worms) { wormFn(worm); }
+        for(auto & worm : player2.worms) { wormFn(worm); }
+    }
+
+    inline void ForAllLiveWorms(std::function<void(Worm&)> wormFn)
+    {
+        for(auto & worm : player1.worms) {
+            if(!worm.IsDead()) {
+                wormFn(worm);
+            }
+        }
+        for(auto & worm : player2.worms) {
+            if(!worm.IsDead()) {
+                wormFn(worm);
+            }
+        }
+    }
+
+    inline void ForAllLiveWorms(bool _player1, std::function<void(Worm&)> wormFn)
+    {
+        if(_player1) {
+            for(auto & worm : player1.worms) {
+                if(!worm.IsDead()) {
+                    wormFn(worm);
+                }
+            }
+        } else {
+            for(auto & worm : player2.worms) {
+                if(!worm.IsDead()) {
+                    wormFn(worm);
+                }
+            }
+        }
     }
 };
 

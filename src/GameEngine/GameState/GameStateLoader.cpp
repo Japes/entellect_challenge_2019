@@ -231,8 +231,9 @@ void GameStateLoader::PopulateMap(GameState& state, rapidjson::Document& roundJS
             std::string cellType = (*colItr)["type"].GetString();
             CellType type =  Cell::strToCellType(cellType);
             state.SetCellTypeAt(pos, type);
+
             if(cellType == "LAVA") {
-                state.AddLavaAt(pos);
+                state.AddLavaAt(pos, state.roundNumber);
             }
 
             state.ClearPowerupAt(pos);

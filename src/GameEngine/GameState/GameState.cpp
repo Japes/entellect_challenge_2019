@@ -1,4 +1,5 @@
 #include "GameState.hpp"
+#include "GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
@@ -6,6 +7,8 @@
 
 std::bitset<MAP_SIZE*MAP_SIZE> GameState::bananaBombOverlay;
 int GameState::bananaBombOverlayCentre;
+bool GameState::haveSetup{false};
+std::bitset<MAP_SIZE*MAP_SIZE> GameState::mapLavas[400];
 
 GameState::GameState() :
     player1(this),
@@ -15,31 +18,75 @@ GameState::GameState() :
     player1.id = 1;
     player2.id = 2;
 
-    if(bananaBombOverlay.none()) {
-        //initialise to the shadow of a bomb in the topish leftish corner
-        bananaBombOverlay.set(2);
+    if(!haveSetup) {
+        Initialise();
+        haveSetup = true;
+    }
+}
 
-        bananaBombOverlay.set(MAP_SIZE + 1);
-        bananaBombOverlay.set(MAP_SIZE + 2);
-        bananaBombOverlay.set(MAP_SIZE + 3);
+void GameState::Initialise()
+{
+    SetupBananaBombOverlay();
+    SetupLavas();
+}
 
-        bananaBombOverlay.set(MAP_SIZE*2);
-        bananaBombOverlay.set(MAP_SIZE*2 + 1);
-        bananaBombOverlay.set(MAP_SIZE*2 + 2);
-        bananaBombOverlay.set(MAP_SIZE*2 + 3);
-        bananaBombOverlay.set(MAP_SIZE*2 + 4);
+void GameState::SetupBananaBombOverlay()
+{
+    //initialise to the shadow of a bomb in the topish leftish corner
+    bananaBombOverlay.set(2);
 
-        bananaBombOverlay.set(MAP_SIZE*3 + 1);
-        bananaBombOverlay.set(MAP_SIZE*3 + 2);
-        bananaBombOverlay.set(MAP_SIZE*3 + 3);
+    bananaBombOverlay.set(MAP_SIZE + 1);
+    bananaBombOverlay.set(MAP_SIZE + 2);
+    bananaBombOverlay.set(MAP_SIZE + 3);
 
-        bananaBombOverlay.set(MAP_SIZE*4 + 2);
+    bananaBombOverlay.set(MAP_SIZE*2);
+    bananaBombOverlay.set(MAP_SIZE*2 + 1);
+    bananaBombOverlay.set(MAP_SIZE*2 + 2);
+    bananaBombOverlay.set(MAP_SIZE*2 + 3);
+    bananaBombOverlay.set(MAP_SIZE*2 + 4);
 
-        bananaBombOverlayCentre = MAP_SIZE*2 + 2;
+    bananaBombOverlay.set(MAP_SIZE*3 + 1);
+    bananaBombOverlay.set(MAP_SIZE*3 + 2);
+    bananaBombOverlay.set(MAP_SIZE*3 + 3);
 
-        //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay: " << bananaBombOverlay << std::endl;
-        //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay << 1: " << (bananaBombOverlay << 1) << std::endl;
-        //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay << -1: " << (bananaBombOverlay << -1) << std::endl;
+    bananaBombOverlay.set(MAP_SIZE*4 + 2);
+
+    bananaBombOverlayCentre = MAP_SIZE*2 + 2;
+
+    //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay: " << bananaBombOverlay << std::endl;
+    //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay << 1: " << (bananaBombOverlay << 1) << std::endl;
+    //std::cerr << "(" << __FUNCTION__ << ") bananaBombOverlay << -1: " << (bananaBombOverlay << -1) << std::endl;
+}
+
+void GameState::SetupLavas()
+{
+    int center = (GameConfig::mapSize - 1) / 2.0;
+    Position mapCenter(center, center);
+
+    for(int roundNum = 1; roundNum <= GameConfig::maxRounds; ++roundNum) {
+        mapLavas[roundNum-1].reset();
+
+        float brStartRound = GameConfig::maxRounds * GameConfig::battleRoyaleStart;
+        if (roundNum < brStartRound) {
+            continue;
+        }
+
+        float brEndRound = GameConfig::maxRounds * GameConfig::battleRoyaleEnd;
+        float fullPercentageRange = (roundNum - brStartRound) / (brEndRound - brStartRound);
+        //clamp tp [0,1]
+        float currentProgress = fullPercentageRange > 0 ? fullPercentageRange : 0;
+        currentProgress = currentProgress > 1 ? 1 : currentProgress;
+
+        float safeAreaRadius = (GameConfig::mapSize / 2) * (1 - currentProgress);
+
+        for(int x = 0; x < GameConfig::mapSize; ++x) {
+            for(int y = 0; y < GameConfig::mapSize; ++y) {
+                Position pos(x,y);
+                if(mapCenter.EuclideanDistanceTo(pos) > (safeAreaRadius + 1)) {
+                    AddLavaAt(pos, roundNum);
+                }
+            }
+        }
     }
 }
 
@@ -51,7 +98,6 @@ GameState::GameState(const GameState& other) :
     healthPack{other.healthPack},
     mapDeepSpaces{other.mapDeepSpaces},
     mapDirts{other.mapDirts},
-    mapLavas{other.mapLavas},
     healthPackPos{other.healthPackPos}
 {
     UpdateRefs();
@@ -96,16 +142,18 @@ void GameState::SetCellTypeAt(Position pos, CellType type)
     }
 }
 
-void GameState::RemoveLavaAt(Position pos)
+void GameState::AddLavaAt(Position pos, int roundNum)
 {
     auto posBit = (MAP_SIZE*pos.y + pos.x);
-    mapLavas.reset(posBit);
-}
 
-void GameState::AddLavaAt(Position pos)
-{
-    auto posBit = (MAP_SIZE*pos.y + pos.x);
-    mapLavas.set(posBit);
+    if(roundNum >= 1 && roundNum <= GameConfig::maxRounds) {
+        mapLavas[roundNum-1].set(posBit);
+    } else {
+        //this should only be used in unit tests
+        for(int i = 0; i < GameConfig::maxRounds; ++i) {
+            mapLavas[i].set(posBit);
+        }
+    }
 }
 
 void GameState::PlacePowerupAt(Position pos)
@@ -241,6 +289,21 @@ void GameState::ClearDirtsDugThisRound()
     dirtsDugThisRound.clear();
 }
 
+//repeat of the above 3...
+bool GameState::LavaWasRemovedThisRound(Position pos)
+{
+    return std::find(std::begin(lavasRemovedThisRound), std::end(lavasRemovedThisRound), pos) != std::end(lavasRemovedThisRound);
+}
+
+void GameState::MarkLavaRemovedThisRound(Position pos)
+{
+    lavasRemovedThisRound.push_back(pos);
+}
+
+void GameState::ClearLavasRemovedThisRound()
+{
+    lavasRemovedThisRound.clear();
+}
 
 bool GameState::operator==(const GameState &other) const
 {

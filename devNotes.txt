@@ -1,6 +1,7 @@
 TODO
 
 	optimization
+      dont need to store lavas for every turn, just the diffs
 		lava progression! precompute
 		simple optimizations: don't use shared ptr
 		do more than 1 playthrough for each tip
@@ -10,14 +11,14 @@ TODO
 
    finish the loading of previous_move into state
       see [.broken] unit test
-      
-   make unit test to confirm that carry-over state is correct
-      num selects
-      num bananas
-      num snowballs
+      make unit test to confirm that carry-over state is correct
+         num selects
+         num bananas
+         num snowballs
 
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
+      bias based on observed behaviour
       
    handle monte carlo ties
       make wins/losses comparable as well - will reduce ties

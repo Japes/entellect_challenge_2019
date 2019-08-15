@@ -23,9 +23,9 @@ TEST_CASE( "Lava flow sanity", "[lava]" ) {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
 
-        WHEN("It is earlier than battleRoyaleStart, there is no lave")
+        WHEN("It is earlier than battleRoyaleStart, there is no lava")
         {
-            while(state->roundNumber < GameConfig::maxRounds * GameConfig::battleRoyaleStart) {
+            while( (state->roundNumber + 1) < GameConfig::maxRounds * GameConfig::battleRoyaleStart) {
                 eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
                 state->player1.consecutiveDoNothingCount = 0;
                 state->player2.consecutiveDoNothingCount = 0;

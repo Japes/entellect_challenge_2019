@@ -22,7 +22,7 @@ uint64_t Get_ns_since_epoch() {
     return std::chrono::duration_cast<std::chrono::nanoseconds>( std::chrono::high_resolution_clock::now().time_since_epoch() ).count();
 }
 
-TEST_CASE( "Performance tests - realistic loop", "[performance][trim]" ) {
+TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
 
     int playThroughDepth{24};
     int dirtsForBanana{10};
@@ -182,6 +182,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     //std::vector<std::string> matches;
+    //matches.push_back("Test_files/matches/2019.08.08.22.29.04/");
     //matches.push_back("Test_files/matches/2019.08.09.16.35.29/");
     //matches.push_back("Test_files/matches/2019.08.10.09.34.19/");
     //matches.push_back("Test_files/matches/2019.08.10.09.52.21/");
