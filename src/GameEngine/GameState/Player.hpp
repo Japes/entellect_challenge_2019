@@ -35,6 +35,9 @@ struct Player
 
     bool operator==(const Player &other) const;
 
+private:
+    std::vector<Worm*> _livingWorms; //for performance reasons
+
 };
 
 #endif

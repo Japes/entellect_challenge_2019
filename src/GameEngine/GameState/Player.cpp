@@ -68,22 +68,23 @@ Worm* Player::GetWormById(int id)
 void Player::UpdateCurrentWorm()
 {
     int livingIndexOfCurrentWorm = -1;
-    std::vector<Worm*> livingWorms;
+    _livingWorms.clear();
+    
     for(auto &worm : worms) {
         if(!worm.IsDead()) {
             if(worm.id == static_cast<unsigned>(currentWormId)) {
-                livingIndexOfCurrentWorm = livingWorms.size();
+                livingIndexOfCurrentWorm = _livingWorms.size();
             }
-            livingWorms.push_back(&worm);
+            _livingWorms.push_back(&worm);
         }
     }
 
-    if(livingWorms.empty()) {
+    if(_livingWorms.empty()) {
         return;
     }
 
-    int nextIndex = (livingIndexOfCurrentWorm + 1) % livingWorms.size();
-    currentWormId = livingWorms[nextIndex]->id;
+    int nextIndex = (livingIndexOfCurrentWorm + 1) % _livingWorms.size();
+    currentWormId = _livingWorms[nextIndex]->id;
 }
 
 void Player::RecalculateHealth()
