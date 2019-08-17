@@ -20,7 +20,7 @@ struct Player
     int currentWormId; //1-indexed
     int consecutiveDoNothingCount;
     int remainingWormSelections;
-    std::vector<Worm> worms;
+    std::array<Worm, 3> worms;
     std::shared_ptr<Command> previousCommand;
 
     Player(GameState* _state);

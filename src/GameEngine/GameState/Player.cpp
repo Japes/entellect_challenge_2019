@@ -7,36 +7,28 @@ Player::Player(GameState* _state) :
     health{0},
     currentWormId{1},
     consecutiveDoNothingCount{0},
-    remainingWormSelections{GameConfig::wormSelectTokens}
+    remainingWormSelections{GameConfig::wormSelectTokens},
+    worms{Worm(_state), Worm(_state), Worm(_state)}
 {
     //not sure why the usual vector constructors aren't working here...
-    Worm worm1(state);
-    worm1.SetProffession(Worm::Proffession::COMMANDO);
-    Worm worm2(state);
-    worm2.SetProffession(Worm::Proffession::AGENT);
-    Worm worm3(state);
-    worm3.SetProffession(Worm::Proffession::TECHNOLOGIST);
-    worm1.id = 1;
-    worm2.id = 2;
-    worm3.id = 3;
-    worms.push_back(worm1);
-    worms.push_back(worm2);
-    worms.push_back(worm3);
+    worms[0].SetProffession(Worm::Proffession::COMMANDO);
+    worms[1].SetProffession(Worm::Proffession::AGENT);
+    worms[2].SetProffession(Worm::Proffession::TECHNOLOGIST);
+    worms[0].id = 1;
+    worms[1].id = 2;
+    worms[2].id = 3;
     RecalculateHealth();
 }
 
-Player::Player(const Player& other)
+Player::Player(const Player& other) :
+    id{other.id},
+    command_score{other.command_score},
+    health{other.health},
+    currentWormId{other.currentWormId},
+    consecutiveDoNothingCount{other.consecutiveDoNothingCount},
+    remainingWormSelections{other.remainingWormSelections},
+    worms{other.worms}
 {
-    id = other.id;
-    command_score = other.command_score;
-    health = other.health;
-    currentWormId = other.currentWormId;
-    consecutiveDoNothingCount = other.consecutiveDoNothingCount;
-    remainingWormSelections = other.remainingWormSelections;
-
-    for(auto& otherworm : other.worms) {
-        worms.push_back(otherworm);
-    }
 }
 
 Worm* Player::GetCurrentWorm()

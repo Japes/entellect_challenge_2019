@@ -27,13 +27,17 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     int playThroughDepth{24};
     int dirtsForBanana{10};
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+    //uint64_t mcTime_ns{3000000000000};
     uint64_t mcTime_ns{3000000000};
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
     Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-    auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"); //todo need to make sure there are bots in range
+    //auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
+    auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapFight.json");
+    //auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapBanana.json");
+    //auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapSnowball.json");
     bot.runStrategy(roundJSON);
 
     INFO("Moves per second: " << (bot.GetNumPlies()*1000000000)/mcTime_ns << " m/s)");
