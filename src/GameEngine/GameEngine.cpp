@@ -27,8 +27,8 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     //thaw out worms
     _state->ForAllLiveWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
 
-    bool player1Good = player1_command.IsValid(true, _state);
-    bool player2Good = player2_command.IsValid(false, _state);
+    bool player1Good = player1_command.IsValid(true, _state.get());
+    bool player2Good = player2_command.IsValid(false, _state.get());
 
     //determine which move should be executed first
     bool player1GoesFirst = player1_command.Order() <= player2_command.Order(); //they seem to favour player 1...
@@ -103,7 +103,7 @@ bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
         return false;
     }
 
-    command.Execute(player1, _state);
+    command.Execute(player1, _state.get());
     return true;
 }
 

@@ -21,7 +21,7 @@ BananaCommand::BananaCommand(Position pos) : _pos{pos}
     }
 }
 
-void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void BananaCommand::Execute(bool player1, GameStatePtr state) const
 {
     /*
         splash damage:
@@ -97,7 +97,7 @@ void BananaCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
 }
 
 
-bool BananaCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool BananaCommand::IsValid(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();

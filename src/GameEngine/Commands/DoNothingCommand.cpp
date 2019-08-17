@@ -5,7 +5,7 @@ DoNothingCommand::DoNothingCommand()
     _order = 0; //this is also used to identify a command of this type
 }
 
-void DoNothingCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void DoNothingCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -17,7 +17,7 @@ void DoNothingCommand::Execute(bool player1, std::shared_ptr<GameState> state) c
     player->command_score += GameConfig::scores.doNothing;
 }
 
-bool DoNothingCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool DoNothingCommand::IsValid(bool player1, GameStatePtr state) const
 {
     return true;
 }

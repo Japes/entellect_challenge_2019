@@ -94,7 +94,8 @@ TEST_CASE( "Convert string to command", "[GetCommandFromString]" ) {
             {
                 INFO(move);
                 REQUIRE(cmd != nullptr);
-                REQUIRE(!cmd->IsValid(true, std::make_shared<GameState>()));
+                GameState state;
+                REQUIRE(!cmd->IsValid(true, &state));
             }
         }
     }

@@ -86,7 +86,7 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
 
     Position noShot{0,0};
     state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
-        Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state);
+        Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state.get());
         if(shootVec != noShot) {
             auto it = std::find(_surroundingWormSpaces.begin(), _surroundingWormSpaces.end(), shootVec);
             if (it != _surroundingWormSpaces.end()) {

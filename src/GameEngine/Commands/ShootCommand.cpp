@@ -39,7 +39,7 @@ ShootCommand::ShootCommand(Position dir)
     _shootVector = dir;
 }
 
-void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void ShootCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -72,7 +72,7 @@ void ShootCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
 }
 
 //returns worm that would be hit if currentWorm shot in direction of shootvector
-Worm* ShootCommand::WormOnTarget(const Worm* worm, const std::shared_ptr<GameState> state, const Position& shootvector)
+Worm* ShootCommand::WormOnTarget(const Worm* worm, const GameStatePtr state, const Position& shootvector)
 {
     Position pos = worm->position + shootvector;
 
@@ -105,14 +105,14 @@ Worm* ShootCommand::WormOnTarget(const Worm* worm, const std::shared_ptr<GameSta
     return nullptr;
 }
 
-bool ShootCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool ShootCommand::IsValid(bool player1, GameStatePtr state) const
 {
     return true; //always valid!
 }
 
 //returns a vector pointing in the direction of a clear shot to targetWorm
 //returns {0,0} if no shot available
-Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, std::shared_ptr<GameState> state)
+Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, GameStatePtr state)
 {
     if(targetWorm.IsDead()) {
         return {0,0};

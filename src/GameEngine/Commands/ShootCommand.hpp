@@ -19,12 +19,12 @@ class ShootCommand : public Command
 
     ShootCommand(ShootCommand::ShootDirection dir);
     ShootCommand(Position dir);
-    void Execute(bool player1, std::shared_ptr<GameState> state) const override;
-    bool IsValid(bool player1, std::shared_ptr<GameState> state) const override;
+    void Execute(bool player1, GameStatePtr state) const override;
+    bool IsValid(bool player1, GameStatePtr state) const override;
     std::string GetCommandString() const override;
     
-    static Worm* WormOnTarget(const Worm* worm, const std::shared_ptr<GameState> state, const Position& shootvector);
-    static Position GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, std::shared_ptr<GameState> state);
+    static Worm* WormOnTarget(const Worm* worm, const GameStatePtr state, const Position& shootvector);
+    static Position GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, GameStatePtr state);
 
     bool operator==(const ShootCommand& other);
 

@@ -10,7 +10,7 @@ SelectCommand::SelectCommand(int wormIndex, std::shared_ptr<Command> selectedCmd
 }
 
 //note: assumes move is valid.
-void SelectCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void SelectCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -23,7 +23,7 @@ void SelectCommand::Execute(bool player1, std::shared_ptr<GameState> state) cons
     _selectedCmd->Execute(player1, state);
 }
 
-bool SelectCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool SelectCommand::IsValid(bool player1, GameStatePtr state) const
 {
     if(_wormIndex < 1 || _wormIndex > 3) {
         return false;

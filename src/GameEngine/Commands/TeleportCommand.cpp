@@ -12,7 +12,7 @@ TeleportCommand::TeleportCommand(Position pos, bool* forceRandom) :
 }
 
 //note: assumes move is valid.
-void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void TeleportCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -52,7 +52,7 @@ void TeleportCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     worm->movedThisRound = true;
 }
 
-bool TeleportCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool TeleportCommand::IsValid(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();

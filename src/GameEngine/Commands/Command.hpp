@@ -5,6 +5,9 @@
 #include <memory>
 #include <string>
 
+//using GameStatePtr = std::shared_ptr<GameState>;
+using GameStatePtr = GameState*;
+
 class Command
 {
 	public:
@@ -26,8 +29,8 @@ class Command
         return _order;
     }
 
-    virtual void Execute(bool player1, std::shared_ptr<GameState> state) const = 0;
-    virtual bool IsValid(bool player1, std::shared_ptr<GameState> state) const = 0;
+    virtual void Execute(bool player1, GameStatePtr state) const = 0;
+    virtual bool IsValid(bool player1, GameStatePtr state) const = 0;
     virtual std::string GetCommandString() const = 0;
 
     protected:

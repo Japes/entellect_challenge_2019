@@ -8,7 +8,7 @@ SnowballCommand::SnowballCommand(Position pos) : _pos{pos}
     _order = static_cast<int>(CommandType::SNOWBALL);
 }
 
-void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void SnowballCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -54,7 +54,7 @@ void SnowballCommand::Execute(bool player1, std::shared_ptr<GameState> state) co
     player->command_score += points;
 }
 
-bool SnowballCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool SnowballCommand::IsValid(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();

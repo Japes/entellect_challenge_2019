@@ -8,7 +8,7 @@ DigCommand::DigCommand(Position pos) : _pos{pos}
 }
 
 //NOTE this assumes move is valid
-void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
+void DigCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -24,7 +24,7 @@ void DigCommand::Execute(bool player1, std::shared_ptr<GameState> state) const
     player->command_score += GameConfig::scores.dig;
 }
 
-bool DigCommand::IsValid(bool player1, std::shared_ptr<GameState> state) const
+bool DigCommand::IsValid(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();

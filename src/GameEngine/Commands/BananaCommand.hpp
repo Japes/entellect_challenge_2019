@@ -9,8 +9,8 @@ class BananaCommand : public Command
     Position _pos;
 
     BananaCommand(Position pos);
-    void Execute(bool player1, std::shared_ptr<GameState> state) const override;
-    bool IsValid(bool player1, std::shared_ptr<GameState> state) const override;
+    void Execute(bool player1, GameStatePtr state) const override;
+    bool IsValid(bool player1, GameStatePtr state) const override;
     std::string GetCommandString() const override;
     
     bool operator==(const BananaCommand& other);

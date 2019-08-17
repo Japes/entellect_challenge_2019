@@ -629,16 +629,16 @@ TEST_CASE( "Shoot command: WormOnTarget", "[shoot][WormOnTarget]" ) {
 
             Worm* worm12 = &state->player1.worms[1];
 
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,-1}) == nullptr);
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {0,-1}) == worm12);
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {1,-1}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {-1,-1}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {0,-1}) == worm12);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {1,-1}) == nullptr);
 
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,0}) == nullptr);
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {1,0}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {-1,0}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {1,0}) == nullptr);
 
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {-1,1}) == worm22);
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {0,1}) == nullptr);
-            REQUIRE(ShootCommand::WormOnTarget(worm21, state, {1,1}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {-1,1}) == worm22);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {0,1}) == nullptr);
+            REQUIRE(ShootCommand::WormOnTarget(worm21, state.get(), {1,1}) == nullptr);
         }
     }
 }
