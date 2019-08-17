@@ -1,13 +1,11 @@
 TODO
 
-	optimization
-      dont need to store lavas for every turn, just the diffs
-		lava progression! precompute
-		simple optimizations: don't use shared ptr
-		do more than 1 playthrough for each tip
-	  
 	consider shooting into places where he COULD move
+      try taking out shooting directly - "safe mode"
 	dont snowball yourself
+
+	optimization
+		check with different states - there might be other bottlenecks  
 
    finish the loading of previous_move into state
       see [.broken] unit test
@@ -15,25 +13,21 @@ TODO
          num selects
          num bananas
          num snowballs
+      Need to prevent getting danced
+         opponent move tracking
 
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
       bias based on observed behaviour
       
+   store MC results of first level
+
    handle monte carlo ties
-      make wins/losses comparable as well - will reduce ties
       make monte carlo choose random if tie
       better yet use heuristic
-   
-   Need to prevent getting danced
-      get opponent turn subsystem (check forum if it's coming)
-      opponent move tracking
-
-   store MC results of first level
 
    need to try to get more into the monta carlos.  
       off-by-one banana hits aren't considered...
-      shooting where opponent could be
 
 	run compare over LOTS of matches
     fix engine bugs
@@ -49,17 +43,13 @@ TODO
          C value
          playthrough weights
 
-
    update reference bot so it's more usefull...
       use bananas
       use select
 
-   2 weird cases:
-      end of game showdown, i have more health - why not shoot him??
-         cant see till the end of the game, points wise makes sense to rather dodge
-      my (not last) worm about to die - why not evade?
-
    explicit exclude of potential game ending move
+      safe mode
+         only shoot at places opponent could move to
       explicit exclude of all chances for opponent to shoot?
          add unit tests for this
 
@@ -171,4 +161,10 @@ to run bot on state file:--------------------------------------------
  - cd into bin folder
  - run bot
  - input round number
+
+======================================================================================================
+
+last time i checked it looks like we're spending about 50% of the time in GetRandomValidMoveForPlayer
+
+
 
