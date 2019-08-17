@@ -109,19 +109,24 @@ class GameState
         return nullptr;
     }
 
-    inline Worm* Worm_at(Position pos)
+    inline bool Worm_at(Worm& w, const Position& pos)
+    {
+        if ( (!w.IsDead() || w.diedByLavaThisRound) && w.position == pos ) {
+            return true;
+        }
+        return false;
+    }
+
+    inline Worm* Worm_at(const Position& pos)
     {
         //not using ForAllWorms for performance reasons
-        for(auto & w : player1.worms) { 
-            if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
-                return &w;
-            }
-         }
-        for(auto & w : player2.worms) { 
-            if(w.position == pos && (!w.IsDead() || w.diedByLavaThisRound) ) {
-                return &w;
-            }
-         }
+        if(Worm_at(player1.worms[0], pos)) { return &player1.worms[0]; }
+        if(Worm_at(player1.worms[1], pos)) { return &player1.worms[1]; }
+        if(Worm_at(player1.worms[2], pos)) { return &player1.worms[2]; }
+
+        if(Worm_at(player2.worms[0], pos)) { return &player2.worms[0]; }
+        if(Worm_at(player2.worms[1], pos)) { return &player2.worms[1]; }
+        if(Worm_at(player2.worms[2], pos)) { return &player2.worms[2]; }
 
         return nullptr;
     }
