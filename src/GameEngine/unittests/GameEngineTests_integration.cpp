@@ -34,14 +34,17 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
 
     Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-    //auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-    auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapFight.json");
-    //auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapBanana.json");
-    //auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapSnowball.json");
-    bot.runStrategy(roundJSON);
+    std::vector<rapidjson::Document> files;
+    files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"));
+    files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapFight.json"));
+    files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapBanana.json"));
+    files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapSnowball.json"));
 
-    INFO("Moves per second: " << (bot.GetNumPlies()*1000000000)/mcTime_ns << " m/s)");
-    CHECK(false);
+    for(auto & file : files) {
+        bot.runStrategy(file);
+        INFO("Moves per second: " << (bot.GetNumPlies()*1000000000)/mcTime_ns << " m/s)");
+        CHECK(false);
+    }
 }
 
 void GetEndGameState(std::string path, std::string& winningPlayer, int& playerAScore, int& playerAHealth, int& playerBScore, int& playerBHealth)
