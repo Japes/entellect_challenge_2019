@@ -8,17 +8,17 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
 
     GIVEN("A game state and a dig command")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         place_worm(true, 1, {10,10}, state);
         place_worm(false, 1, {12,12}, state);
-        state->SetCellTypeAt({11, 10}, CellType::DIRT);
-        state->SetCellTypeAt({11, 11}, CellType::DIRT);
-        state->SetCellTypeAt({10, 11}, CellType::DEEP_SPACE);
-        GameEngine eng(state);
+        state.SetCellTypeAt({11, 10}, CellType::DIRT);
+        state.SetCellTypeAt({11, 11}, CellType::DIRT);
+        state.SetCellTypeAt({10, 11}, CellType::DEEP_SPACE);
+        GameEngine eng(&state);
 
         int expectedDoNothings = 0;
-        REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+        REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
 
         DigCommand player1move({0,0});
         DigCommand player2move({0,0});
@@ -26,51 +26,51 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
         THEN("out of bounds (too low) is invalid")
         {
             player1move = DigCommand({-11,-1});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("out of bounds (too high) is invalid")
         {
             player1move = DigCommand({200,200});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("too far away is invalid")
         {
             player1move = DigCommand({1,1});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("too far away is invalid")
         {
             player1move = DigCommand({10,12});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("empty space is invalid")
         {
             player1move = DigCommand({10,9});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("deep space is invalid")
         {
             player1move = DigCommand({10,11});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("digging dirt is valid")
         {
             player1move = DigCommand({11,10});    eng.AdvanceState(player1move,player2move);    //++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->CellType_at({11, 10}) == CellType::AIR);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.CellType_at({11, 10}) == CellType::AIR);
         }
 
         THEN("digging dirt diagonally is valid")
         {
             player1move = DigCommand({11,11});    eng.AdvanceState(player1move,player2move);    //++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->CellType_at({11, 11}) == CellType::AIR);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.CellType_at({11, 11}) == CellType::AIR);
         }
 
         THEN("Both worms digging same hole is valid")
@@ -79,15 +79,14 @@ TEST_CASE( "Dig command", "[Dig_command]" ) {
             player2move = DigCommand({11,11});    
             eng.AdvanceState(player1move,player2move);    
             //++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->player2.consecutiveDoNothingCount == expectedDoNothings);
-            REQUIRE(state->CellType_at({11, 11}) == CellType::AIR);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player2.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.CellType_at({11, 11}) == CellType::AIR);
         }
     }
 }
 
 TEST_CASE( "Get dig string", "[Dig_string]" ) {
-    auto state = std::make_shared<GameState>();
     DigCommand move({11,11});
     REQUIRE(move.GetCommandString() == "dig 11 11");
 

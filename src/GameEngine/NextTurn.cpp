@@ -53,7 +53,7 @@ void NextTurn::Initialise()
 // 0 1 2
 // 3 w 4
 // 5 6 7
-std::bitset<8> NextTurn::GetValidTeleportDigs(Worm* worm, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<8> NextTurn::GetValidTeleportDigs(Worm* worm, GameStatePtr state, bool trimStupidMoves)
 {
     std::bitset<8> ret(0);
 
@@ -73,7 +73,7 @@ std::bitset<8> NextTurn::GetValidTeleportDigs(Worm* worm, std::shared_ptr<GameSt
 // 0 1 2
 // 3 w 4
 // 5 6 7
-std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<8> NextTurn::GetValidShoots(bool player1, GameStatePtr state, bool trimStupidMoves)
 {
     if (!trimStupidMoves) {
         return std::bitset<8>(255);
@@ -86,7 +86,7 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
 
     Position noShot{0,0};
     state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
-        Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state.get());
+        Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state);
         if(shootVec != noShot) {
             auto it = std::find(_surroundingWormSpaces.begin(), _surroundingWormSpaces.end(), shootVec);
             if (it != _surroundingWormSpaces.end()) {
@@ -101,7 +101,7 @@ std::bitset<8> NextTurn::GetValidShoots(bool player1, std::shared_ptr<GameState>
 }
 
 //returns nullptr if there is a dirt or an enemy within distanceForLost
-std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, std::shared_ptr<GameState> state, int distanceForLost)
+std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, GameStatePtr state, int distanceForLost)
 {
     if(distanceForLost == -1) {
         return nullptr;
@@ -141,7 +141,7 @@ std::shared_ptr<Command> NextTurn::GetNearestDirtHeuristic(bool player1, std::sh
     return std::make_shared<TeleportCommand>(bestMoveTarget);
 }
 
-std::shared_ptr<Command> NextTurn::GetBananaProspect(bool player1, std::shared_ptr<GameState> state, int thresh)
+std::shared_ptr<Command> NextTurn::GetBananaProspect(bool player1, GameStatePtr state, int thresh)
 {
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
 
@@ -162,7 +162,7 @@ std::shared_ptr<Command> NextTurn::GetBananaProspect(bool player1, std::shared_p
 
 //returns banana moves that will hit at least [thresh] dirts
 //uses same format as GetValidBananas
-std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, std::shared_ptr<GameState> state, int thresh)
+std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, GameStatePtr state, int thresh)
 {
     if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0) {
         return std::bitset<121>(0);
@@ -217,7 +217,7 @@ std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, std::shared_ptr<Ga
 
 //there are 3 bits in each corner that are out of range - they will always be 0
 //NB ASSUMES SAME RANGE FOR BANANA AND SNOWBALL
-std::bitset<121> NextTurn::GetValidBombThrow(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<121> NextTurn::GetValidBombThrow(bool player1, GameStatePtr state, bool trimStupidMoves)
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -241,7 +241,7 @@ std::bitset<121> NextTurn::GetValidBombThrow(bool player1, std::shared_ptr<GameS
     return ret;
 }
 
-std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<121> NextTurn::GetValidBananas(bool player1, GameStatePtr state, bool trimStupidMoves)
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -253,7 +253,7 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, std::shared_ptr<GameSta
     return GetValidBombThrow(player1, state, trimStupidMoves);
 }
 
-std::bitset<121> NextTurn::GetValidSnowballs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::bitset<121> NextTurn::GetValidSnowballs(bool player1, GameStatePtr state, bool trimStupidMoves)
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -265,7 +265,7 @@ std::bitset<121> NextTurn::GetValidSnowballs(bool player1, std::shared_ptr<GameS
     return GetValidBombThrow(player1, state, trimStupidMoves);
 }
 
-std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
+std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, GameStatePtr state, unsigned index)
 {
     Position targetPos{worm->position + _surroundingWormSpaces[index]};
 
@@ -282,21 +282,21 @@ std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, std::shared_ptr<Ga
     return std::make_shared<DoNothingCommand>();
 }
 
-std::shared_ptr<Command> NextTurn::GetBanana(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
+std::shared_ptr<Command> NextTurn::GetBanana(Worm* worm, GameStatePtr state, unsigned index)
 {
     Position targetPos{worm->position + _relativeBombTargets[index]};
 
     return std::make_shared<BananaCommand>(targetPos);
 }
 
-std::shared_ptr<Command> NextTurn::GetSnowball(Worm* worm, std::shared_ptr<GameState> state, unsigned index)
+std::shared_ptr<Command> NextTurn::GetSnowball(Worm* worm, GameStatePtr state, unsigned index)
 {
     Position targetPos{worm->position + _relativeBombTargets[index]};
 
     return std::make_shared<SnowballCommand>(targetPos);
 }
 
-std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves)
 {
     //get random moves (teleport/dig) and shoots
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
@@ -338,7 +338,7 @@ std::shared_ptr<Command> NextTurn::GetRandomValidMoveForPlayer(bool player1, std
     }
 }
 
-std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves)
+std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves)
 {
     std::vector<std::shared_ptr<Command>> ret;
     Worm* worm = player1? state->player1.GetCurrentWorm() : state->player2.GetCurrentWorm();
@@ -376,7 +376,7 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
 
 //checks if a select should happen (based on a heuristic...)
 //if so, progresses gamestate until it's that worm's turn, and returns a non-empty string with the "select" command that should be applied.
-std::string NextTurn::TryApplySelect(bool player1, std::shared_ptr<GameState> state)
+std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state)
 {
     Player* original_state_player = state->GetPlayer(player1);
 
@@ -398,7 +398,7 @@ std::string NextTurn::TryApplySelect(bool player1, std::shared_ptr<GameState> st
 
     while(player->GetCurrentWorm() != worm) {
 
-        if(!player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, myState, true).any()) {
+        if(!player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, myState.get(), true).any()) {
             //cool we have a candidate.  project the given state forward so the caller can use it
             GameEngine eng(state);
             for(int i = 0; i < numAdvancesApplied; ++i) {

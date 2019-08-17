@@ -269,7 +269,7 @@ TEST_CASE( "Snowball command: behavior", "[snowball]" ) {
         Player* enemyPlayer = player1? &state->player2 : &state->player1;
 
         Position powerupPos{5,2};
-        place_powerup(powerupPos, state);
+        place_powerup(powerupPos, *state.get());
 
         state->SetCellTypeAt({3, 1}, CellType::DIRT);
         state->SetCellTypeAt({3, 2}, CellType::DIRT);

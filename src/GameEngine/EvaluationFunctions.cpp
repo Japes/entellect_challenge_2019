@@ -2,7 +2,7 @@
 #include "GameEngine.hpp"
 #include <limits>
 
-float EvaluationFunctions::ScoreComparison (bool player1, std::shared_ptr<GameState> state)
+float EvaluationFunctions::ScoreComparison (bool player1, GameStatePtr state)
 {
     Player* myPlayer = state->GetPlayer(player1);
     Player* otherPlayer = state->GetPlayer(!player1);
@@ -19,7 +19,7 @@ float EvaluationFunctions::ScoreComparison (bool player1, std::shared_ptr<GameSt
     return myPlayer->GetScore() - otherPlayer->GetScore();
 }
 
-float EvaluationFunctions::HealthComparison (bool player1, std::shared_ptr<GameState> state)
+float EvaluationFunctions::HealthComparison (bool player1, GameStatePtr state)
 {
     Player* myPlayer = state->GetPlayer(player1);
     Player* otherPlayer = state->GetPlayer(!player1);

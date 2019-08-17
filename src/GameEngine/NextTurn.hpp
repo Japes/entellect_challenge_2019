@@ -17,27 +17,27 @@ class NextTurn
     
     static void Initialise();
 
-    static std::bitset<8> GetValidTeleportDigs(Worm* worm, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetTeleportDig(Worm* worm, std::shared_ptr<GameState> state, unsigned index);
+    static std::bitset<8> GetValidTeleportDigs(Worm* worm, GameStatePtr state, bool trimStupidMoves);
+    static std::shared_ptr<Command> GetTeleportDig(Worm* worm, GameStatePtr state, unsigned index);
 
-    static std::bitset<8> GetValidShoots(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
+    static std::bitset<8> GetValidShoots(bool player1, GameStatePtr state, bool trimStupidMoves);
 
-    static std::bitset<121> GetBananaMiningTargets(Worm* worm, std::shared_ptr<GameState> state, int thresh);
-    static std::bitset<121> GetValidBombThrow(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static std::bitset<121> GetValidBananas(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetBanana(Worm* worm, std::shared_ptr<GameState> state, unsigned index);
+    static std::bitset<121> GetBananaMiningTargets(Worm* worm, GameStatePtr state, int thresh);
+    static std::bitset<121> GetValidBombThrow(bool player1, GameStatePtr state, bool trimStupidMoves);
+    static std::bitset<121> GetValidBananas(bool player1, GameStatePtr state, bool trimStupidMoves);
+    static std::shared_ptr<Command> GetBanana(Worm* worm, GameStatePtr state, unsigned index);
 
-    static std::bitset<121> GetValidSnowballs(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetSnowball(Worm* worm, std::shared_ptr<GameState> state, unsigned index);
+    static std::bitset<121> GetValidSnowballs(bool player1, GameStatePtr state, bool trimStupidMoves);
+    static std::shared_ptr<Command> GetSnowball(Worm* worm, GameStatePtr state, unsigned index);
 
 
-    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);    
-    static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, std::shared_ptr<GameState> state, bool trimStupidMoves);
+    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);    
+    static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);
     
     //heuristic related stuff
-    static std::shared_ptr<Command> GetNearestDirtHeuristic(bool player1, std::shared_ptr<GameState> state, int distanceForLost);
-    static std::shared_ptr<Command> GetBananaProspect(bool player1, std::shared_ptr<GameState> state, int thresh);
-    static std::string TryApplySelect(bool player1, std::shared_ptr<GameState> state);
+    static std::shared_ptr<Command> GetNearestDirtHeuristic(bool player1, GameStatePtr state, int distanceForLost);
+    static std::shared_ptr<Command> GetBananaProspect(bool player1, GameStatePtr state, int thresh);
+    static std::string TryApplySelect(bool player1, GameStatePtr state);
 
     private:
     static std::shared_ptr<pcg32> _rng;

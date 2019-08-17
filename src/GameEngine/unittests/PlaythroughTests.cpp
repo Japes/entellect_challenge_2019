@@ -69,7 +69,7 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
         int depth = 3;
         WHEN("We set it up so that player1 wins")
         {
-            auto fakeNextMoveFn = [](bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> { 
+            auto fakeNextMoveFn = [](bool player1, GameStatePtr state) -> std::shared_ptr<Command> { 
                 if(player1) {
                     return std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S);
                 } else {
@@ -109,7 +109,7 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
         WHEN("We set it up so that player2 wins")
         {
-            auto fakeNextMoveFn = [](bool player1, std::shared_ptr<GameState> state)  -> std::shared_ptr<Command> { 
+            auto fakeNextMoveFn = [](bool player1, GameStatePtr state)  -> std::shared_ptr<Command> { 
                 if(!player1) {
                     return std::make_shared<ShootCommand>(ShootCommand::ShootDirection::S);
                 } else {
@@ -165,7 +165,7 @@ TEST_CASE( "Playthroughs - radius of interest", "[playthrough][playthrough_radiu
         place_worm(false, 3, {0,28}, state);
 
         //worms always move east...
-        auto nextMoveFn = [] (bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> {
+        auto nextMoveFn = [] (bool player1, GameStatePtr state) -> std::shared_ptr<Command> {
             Player* player = state->GetPlayer(player1);
             Worm* worm = player->GetCurrentWorm();
             return std::make_shared<TeleportCommand>(worm->position + Position(1,0) );
@@ -175,7 +175,7 @@ TEST_CASE( "Playthroughs - radius of interest", "[playthrough][playthrough_radiu
         int plies{0};
         WHEN("We run a playthrough only considering worms in a radius")
         {
-            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, radiusToConsider, depth, plies);
+            eng.Playthrough(true, nextMoveFn(true, state.get()), nextMoveFn, EvaluationFunctions::ScoreComparison, radiusToConsider, depth, plies);
 
             THEN("Only those worms move")
             {
@@ -190,7 +190,7 @@ TEST_CASE( "Playthroughs - radius of interest", "[playthrough][playthrough_radiu
 
         WHEN("We run a playthrough considering all worms")
         {
-            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
+            eng.Playthrough(true, nextMoveFn(true, state.get()), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
 
             THEN("all worms move")
             {
@@ -223,7 +223,7 @@ TEST_CASE( "Playthroughs - radius of interest - maxDoNothings", "[playthrough][p
 
         state->player2.consecutiveDoNothingCount = GameConfig::maxDoNothings - 1;
 
-        auto nextMoveFn = [] (bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> {
+        auto nextMoveFn = [] (bool player1, GameStatePtr state) -> std::shared_ptr<Command> {
             Player* player = state->GetPlayer(player1);
             if(player->id == 1) {
                 Worm* worm = player->GetCurrentWorm();
@@ -237,7 +237,7 @@ TEST_CASE( "Playthroughs - radius of interest - maxDoNothings", "[playthrough][p
         int plies{0};
         WHEN("We run a playthrough only considering worms in a radius")
         {
-            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, radiusToConsider, depth, plies);
+            eng.Playthrough(true, nextMoveFn(true, state.get()), nextMoveFn, EvaluationFunctions::ScoreComparison, radiusToConsider, depth, plies);
 
             THEN("MaxDoNothings is ignored")
             {
@@ -254,7 +254,7 @@ TEST_CASE( "Playthroughs - radius of interest - maxDoNothings", "[playthrough][p
 
         WHEN("We run a playthrough considering all worms")
         {
-            eng.Playthrough(true, nextMoveFn(true, state), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
+            eng.Playthrough(true, nextMoveFn(true, state.get()), nextMoveFn, EvaluationFunctions::ScoreComparison, -1, depth, plies);
             
             THEN("MaxDoNothings is enforced")
             {

@@ -4,21 +4,21 @@
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
 
-void SetupAgent(std::shared_ptr<GameState> state, GameEngine& eng)
+void SetupAgent(GameState& state, GameEngine& eng)
 {
     place_worm(true, 1, {10,10}, state);
     place_worm(true, 2, {11,11}, state);
 
     //make it agent's turn
-    state->player1.worms[2].SetProffession(Worm::Proffession::AGENT);
-    state->player1.worms[0].health = -1;
-    state->player1.worms[1].health = -1;
+    state.player1.worms[2].SetProffession(Worm::Proffession::AGENT);
+    state.player1.worms[0].health = -1;
+    state.player1.worms[1].health = -1;
     eng.AdvanceState(TeleportCommand({10,11}), DoNothingCommand());
 
-    Worm* currentWorm = state->player1.GetCurrentWorm();
+    Worm* currentWorm = state.player1.GetCurrentWorm();
     REQUIRE(currentWorm->proffession == Worm::Proffession::AGENT);
     REQUIRE(currentWorm->banana_bomb_count == GameConfig::agentWorms.banana.count);
-    REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+    REQUIRE(state.player1.consecutiveDoNothingCount == 0);
 }
 
 TEST_CASE( "Banana validation", "[banana]" ) {
@@ -92,16 +92,16 @@ TEST_CASE( "Banana range", "[banana][banana_range]" ) {
 
     GIVEN("A game state and it's the agent worm's turn")
     {
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         place_worm(true, 3, {15,15}, state); //3 is always the agent
         place_worm(false, 3, {29,29}, state); //put him somewhere sensible
 
-        SetupAgent(state,eng);
-        state->player1.worms[2].health = 1000; //so he doesn't kill himself during this test
-        state->player1.worms[2].banana_bomb_count = 1000; //its just a test
+        SetupAgent(state, eng);
+        state.player1.worms[2].health = 1000; //so he doesn't kill himself during this test
+        state.player1.worms[2].banana_bomb_count = 1000; //its just a test
 
-        auto wormpos = state->player1.GetCurrentWorm()->position;
+        auto wormpos = state.player1.GetCurrentWorm()->position;
 
         Position startPos = wormpos - Position(GameConfig::agentWorms.banana.range + 1, GameConfig::agentWorms.banana.range + 1);
         Position endPos = wormpos + Position(GameConfig::agentWorms.banana.range + 1, GameConfig::agentWorms.banana.range + 1);
@@ -115,12 +115,12 @@ TEST_CASE( "Banana range", "[banana][banana_range]" ) {
 
                 BananaCommand player1move(targetPos);
 
-                Worm* player2Worm = state->player2.GetCurrentWorm();
+                Worm* player2Worm = state.player2.GetCurrentWorm();
                 Position player2moveTarget = flipPlayer2Pos? player2Worm->position + Position(-1,-1) : player2Worm->position + Position(1,1);
                 TeleportCommand player2move(player2moveTarget);
                 flipPlayer2Pos = !flipPlayer2Pos;
 
-                state->player1.consecutiveDoNothingCount = 0;
+                state.player1.consecutiveDoNothingCount = 0;
 
                 WHEN("We advance state")
                 {
@@ -129,9 +129,9 @@ TEST_CASE( "Banana range", "[banana][banana_range]" ) {
                     THEN("The right places are throwable")
                     {
                         if(wormpos.EuclideanDistanceTo(targetPos) <= GameConfig::agentWorms.banana.range) {
-                            REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+                            REQUIRE(state.player1.consecutiveDoNothingCount == 0);
                         } else {
-                            REQUIRE(state->player1.consecutiveDoNothingCount == 1);
+                            REQUIRE(state.player1.consecutiveDoNothingCount == 1);
                         }
                     }
                 }
@@ -155,20 +155,20 @@ TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
         7   .   .   .   .   .   .   D   .            
         */
 
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         place_worm(true, 1, {25,25}, state);
         place_worm(true, 2, {26,26}, state);
         place_worm(true, 3, {5,5}, state);
         SetupAgent(state, eng);
         for(int x = 0; x < 7; ++x) {
             for(int y = 0; y < 5; ++y) {
-                state->SetCellTypeAt({x, y}, CellType::DIRT);
+                state.SetCellTypeAt({x, y}, CellType::DIRT);
             }
         }
-        state->SetCellTypeAt({6, 5}, CellType::DIRT);
-        state->SetCellTypeAt({6, 6}, CellType::DIRT);
-        state->SetCellTypeAt({6, 7}, CellType::DIRT);
+        state.SetCellTypeAt({6, 5}, CellType::DIRT);
+        state.SetCellTypeAt({6, 6}, CellType::DIRT);
+        state.SetCellTypeAt({6, 7}, CellType::DIRT);
 
         WHEN("We chuck a banana into empty space")
         {
@@ -176,8 +176,8 @@ TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
 
             THEN("It's fine")
             {
-                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+                REQUIRE(state.player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state.player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
             }
         }
 
@@ -187,8 +187,8 @@ TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
 
             THEN("It's fine")
             {
-                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+                REQUIRE(state.player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state.player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
             }
         }
 
@@ -198,8 +198,8 @@ TEST_CASE( "Banana can be lobbed over dirt", "[banana]" ) {
 
             THEN("It's fine")
             {
-                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+                REQUIRE(state.player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state.player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
             }
         }
     }
@@ -221,20 +221,20 @@ TEST_CASE( "Banana bomb lobbed into deep space", "[banana][deepspacebanana]" ) {
         7   .   .   .   .   .   .   .   .            
         */
 
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         place_worm(true, 3, {5,5}, state);
         SetupAgent(state, eng);
         for(int x = 0; x < 7; ++x) {
             for(int y = 0; y < 5; ++y) {
-                state->SetCellTypeAt({x, y}, CellType::DEEP_SPACE);
+                state.SetCellTypeAt({x, y}, CellType::DEEP_SPACE);
             }
         }
-        state->SetCellTypeAt({1, 5}, CellType::DIRT);
+        state.SetCellTypeAt({1, 5}, CellType::DIRT);
         place_worm(false, 1, {2,5}, state);
-        state->SetCellTypeAt({3, 5}, CellType::DIRT);
+        state.SetCellTypeAt({3, 5}, CellType::DIRT);
 
-        REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
+        REQUIRE(state.player2.worms[0].health == GameConfig::commandoWorms.initialHp);
 
         WHEN("We chuck a banana into deep space")
         {
@@ -242,15 +242,15 @@ TEST_CASE( "Banana bomb lobbed into deep space", "[banana][deepspacebanana]" ) {
 
             THEN("It's fine")
             {
-                REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-                REQUIRE(state->player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
+                REQUIRE(state.player1.consecutiveDoNothingCount == 0);
+                REQUIRE(state.player1.GetCurrentWorm()->banana_bomb_count == GameConfig::agentWorms.banana.count - 1);
             }
 
             THEN("It doesn't actually go off")
             {
-                REQUIRE(state->CellType_at({1, 5}) == CellType::DIRT);
-                REQUIRE(state->CellType_at({3, 5}) == CellType::DIRT);
-                REQUIRE(state->player2.worms[0].health == GameConfig::commandoWorms.initialHp);
+                REQUIRE(state.CellType_at({1, 5}) == CellType::DIRT);
+                REQUIRE(state.CellType_at({3, 5}) == CellType::DIRT);
+                REQUIRE(state.player2.worms[0].health == GameConfig::commandoWorms.initialHp);
             }
         }
     }
@@ -297,7 +297,7 @@ TEST_CASE( "Banana command: behavior", "[banana]" ) {
         state->SetCellTypeAt({4, 6}, CellType::DIRT);
 
         Position powerupPos{5,2};
-        place_powerup(powerupPos, state);
+        place_powerup(powerupPos, *state.get());
 
         //set up 2 kills
         state->player1.worms[2].health = 1;

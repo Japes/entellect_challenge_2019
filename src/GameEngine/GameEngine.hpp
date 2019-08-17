@@ -27,17 +27,18 @@ class GameEngine
     };
 
     GameEngine();
+    GameEngine(GameStatePtr state);
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
     float Playthrough(bool player1, std::shared_ptr<Command> command, 
-        std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn, 
-        std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
+        std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn, 
+        std::function<float(bool, GameStatePtr)> evaluationFn,
         int radiusToConsider,
         int depth,
         int& numPlies);
     GameResult GetResult();
-    static GameResult GetResult(const std::shared_ptr<GameState> state);
+    static GameResult GetResult(const GameStatePtr state);
 
     private:
     bool DoCommand(const Command& command, bool player1, bool valid);
@@ -47,7 +48,7 @@ class GameEngine
     void UpdateWinCondition();
     void SetupLava(unsigned roundNum);
 
-    std::shared_ptr<GameState> _state;
+    GameStatePtr _state;
     GameResult _currentResult;
 };
 

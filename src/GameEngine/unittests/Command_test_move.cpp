@@ -8,7 +8,7 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
 
     GIVEN("A game state and a move command")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         /*
             the situation (worm under test is in the middle):
@@ -27,18 +27,18 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
         place_worm(false, 2, enemy_worm_pos, state);
 
         Position dirt_pos_straight{11,10};
-        state->SetCellTypeAt(dirt_pos_straight, CellType::DIRT);
+        state.SetCellTypeAt(dirt_pos_straight, CellType::DIRT);
 
         Position dirt_pos_diag{11,11};
-        state->SetCellTypeAt(dirt_pos_diag, CellType::DIRT);
+        state.SetCellTypeAt(dirt_pos_diag, CellType::DIRT);
 
         Position deep_space_pos{10,11};
-        state->SetCellTypeAt(deep_space_pos, CellType::DEEP_SPACE);
+        state.SetCellTypeAt(deep_space_pos, CellType::DEEP_SPACE);
 
-        GameEngine eng(state);
+        GameEngine eng(&state);
 
         int expectedDoNothings = 0;
-        REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+        REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
 
         TeleportCommand player1move({0,0});
         TeleportCommand player2move({0,0});
@@ -46,87 +46,87 @@ TEST_CASE( "Move command validation", "[Move_command_validation]" ) {
         THEN("out of bounds (too low) is invalid")
         {
             player1move = TeleportCommand({-1,-1});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("out of bounds (too high) is invalid")
         {
             player1move = TeleportCommand({200,200});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("too far (really far) away is invalid")
         {
             player1move = TeleportCommand({1,1});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("too far away (just out of range) is invalid")
         {
             player1move = TeleportCommand({10,12});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("too far away is invalid")
         {
             player1move = TeleportCommand({8,8});    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("dirt is invalid")
         {
             player1move = TeleportCommand(dirt_pos_straight);    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("dirt (diag) is invalid")
         {
             player1move = TeleportCommand(dirt_pos_diag);    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("deep space is invalid")
         {
             player1move = TeleportCommand(deep_space_pos);    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("Spot with a friendly worm is invalid")
         {
             player1move = TeleportCommand(friendly_worm_pos);    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
 
         THEN("Spot with an enemy worm is invalid")
         {
             player1move = TeleportCommand(enemy_worm_pos);    eng.AdvanceState(player1move,player2move);    ++expectedDoNothings;
-            REQUIRE(state->player1.consecutiveDoNothingCount == expectedDoNothings);
+            REQUIRE(state.player1.consecutiveDoNothingCount == expectedDoNothings);
         }
     }
 }
 
-void Check_valid_move(GameEngine& eng, std::shared_ptr<GameState> state, Position startPos, Position destPos)
+void Check_valid_move(GameEngine& eng, GameState& state, Position startPos, Position destPos)
 {
-    REQUIRE(state->Worm_at(startPos) == state->player1.GetWormById(1));
-    REQUIRE(state->Worm_at(destPos) == nullptr);
+    REQUIRE(state.Worm_at(startPos) == state.player1.GetWormById(1));
+    REQUIRE(state.Worm_at(destPos) == nullptr);
 
     TeleportCommand player2move({0,0});
     TeleportCommand player1move(destPos);    
     eng.AdvanceState(player1move,player2move);
 
-    REQUIRE(state->player1.consecutiveDoNothingCount == 0);
-    bool happy = state->player1.GetWormById(1)->position == destPos;
+    REQUIRE(state.player1.consecutiveDoNothingCount == 0);
+    bool happy = state.player1.GetWormById(1)->position == destPos;
     REQUIRE(happy);
 
-    REQUIRE(state->Worm_at(startPos) == nullptr);
-    REQUIRE(state->Worm_at(destPos) == state->player1.GetWormById(1));
+    REQUIRE(state.Worm_at(startPos) == nullptr);
+    REQUIRE(state.Worm_at(destPos) == state.player1.GetWormById(1));
 }
 
 TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 
     GIVEN("A game state and a move command")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         /*
             the situation (worm under test is in the middle):
@@ -141,20 +141,20 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
         Position lava_pos{11,10};
         Position air_pos3{9,10};
 
-        state->AddLavaAt(lava_pos);
+        state.AddLavaAt(lava_pos);
 
-        Worm* worm_under_test = &state->player1.worms[0];
+        Worm* worm_under_test = &state.player1.worms[0];
         worm_under_test->position = worm_under_test->previous_position = worm_under_test_pos;
-        state->PlaceWormAt(worm_under_test_pos, worm_under_test);
+        state.PlaceWormAt(worm_under_test_pos, worm_under_test);
 
-        Worm* enemy_worm = &state->player2.worms[0];
+        Worm* enemy_worm = &state.player2.worms[0];
         enemy_worm->position =  enemy_worm->previous_position = enemy_worm_pos;
-        state->PlaceWormAt(enemy_worm_pos, enemy_worm);
+        state.PlaceWormAt(enemy_worm_pos, enemy_worm);
 
-        GameEngine eng(state);
+        GameEngine eng(&state);
 
         int expectedDoNothings = 0;
-        REQUIRE(state->player1.consecutiveDoNothingCount == 0);
+        REQUIRE(state.player1.consecutiveDoNothingCount == 0);
 
         TeleportCommand player1move({0,0});
         TeleportCommand player2move({0,0});
@@ -174,11 +174,11 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             Check_valid_move(eng, state, worm_under_test_pos, air_pos3);
         }
 
-        auto healthBefore1 = state->player1.GetWormById(1)->health;
-        auto healthBefore2 = state->player2.GetWormById(1)->health;
+        auto healthBefore1 = state.player1.GetWormById(1)->health;
+        auto healthBefore2 = state.player2.GetWormById(1)->health;
 
-        auto pointsBefore1 = state->player1.command_score;
-        auto pointsBefore2 = state->player2.command_score;
+        auto pointsBefore1 = state.player1.command_score;
+        auto pointsBefore2 = state.player2.command_score;
 
         THEN("Worm collision works - pushback")
         {
@@ -188,16 +188,16 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             player2move = TeleportCommand(air_pos3, &forcePushback);
             eng.AdvanceState(player1move,player2move);
 
-            CHECK(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            bool happy = state->player1.GetWormById(1)->position == worm_under_test_pos;
+            CHECK(state.player1.consecutiveDoNothingCount == expectedDoNothings);
+            bool happy = state.player1.GetWormById(1)->position == worm_under_test_pos;
             CHECK(happy);
-            happy = state->player2.GetWormById(1)->position == enemy_worm_pos;
+            happy = state.player2.GetWormById(1)->position == enemy_worm_pos;
             CHECK(happy);
 
-            CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
-            CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
-            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move); //no points deducted for knockback
-            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move); //no points deducted for knockback
+            CHECK(state.player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
+            CHECK(state.player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state.player1.command_score == pointsBefore1 + GameConfig::scores.move); //no points deducted for knockback
+            CHECK(state.player2.command_score == pointsBefore2 + GameConfig::scores.move); //no points deducted for knockback
         }
 
         THEN("Worm collision works - swap")
@@ -207,16 +207,16 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
             player2move = TeleportCommand(air_pos3, &forcePushback);
             eng.AdvanceState(player1move,player2move);
 
-            CHECK(state->player1.consecutiveDoNothingCount == expectedDoNothings);
-            bool happy = state->player1.GetWormById(1)->position == enemy_worm_pos;
+            CHECK(state.player1.consecutiveDoNothingCount == expectedDoNothings);
+            bool happy = state.player1.GetWormById(1)->position == enemy_worm_pos;
             CHECK(happy);
-            happy = state->player2.GetWormById(1)->position == worm_under_test_pos;
+            happy = state.player2.GetWormById(1)->position == worm_under_test_pos;
             CHECK(happy);
 
-            CHECK(state->player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
-            CHECK(state->player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
-            CHECK(state->player1.command_score == pointsBefore1 + GameConfig::scores.move); //no points deducted for knockback
-            CHECK(state->player2.command_score == pointsBefore2 + GameConfig::scores.move); //no points deducted for knockback
+            CHECK(state.player1.GetWormById(1)->health == healthBefore1 - GameConfig::pushbackDamage);
+            CHECK(state.player1.GetWormById(1)->health == healthBefore2 - GameConfig::pushbackDamage);
+            CHECK(state.player1.command_score == pointsBefore1 + GameConfig::scores.move); //no points deducted for knockback
+            CHECK(state.player2.command_score == pointsBefore2 + GameConfig::scores.move); //no points deducted for knockback
         }
 
 
@@ -227,7 +227,6 @@ TEST_CASE( "Move command execution", "[Move_command_execution]" ) {
 }
 
 TEST_CASE( "Get move string", "[Move_string]" ) {
-    auto state = std::make_shared<GameState>();
     TeleportCommand move({12,11});
     REQUIRE(move.GetCommandString() == "move 12 11");
 

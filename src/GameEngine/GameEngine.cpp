@@ -7,8 +7,14 @@ GameEngine::GameEngine()
     NextTurn::Initialise();
 }
 
-GameEngine::GameEngine(std::shared_ptr<GameState> state) : 
+GameEngine::GameEngine(GameStatePtr state) : 
     _state{state}
+{
+    NextTurn::Initialise();
+}
+
+GameEngine::GameEngine(std::shared_ptr<GameState> state) : 
+    _state{state.get()}
 {
     NextTurn::Initialise();
 }
@@ -27,8 +33,8 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     //thaw out worms
     _state->ForAllLiveWorms([&](Worm& worm) { worm.roundsUntilUnfrozen = std::max(worm.roundsUntilUnfrozen - 1, 0); });
 
-    bool player1Good = player1_command.IsValid(true, _state.get());
-    bool player2Good = player2_command.IsValid(false, _state.get());
+    bool player1Good = player1_command.IsValid(true, _state);
+    bool player2Good = player2_command.IsValid(false, _state);
 
     //determine which move should be executed first
     bool player1GoesFirst = player1_command.Order() <= player2_command.Order(); //they seem to favour player 1...
@@ -103,7 +109,7 @@ bool GameEngine::DoCommand(const Command& command, bool player1, bool valid)
         return false;
     }
 
-    command.Execute(player1, _state.get());
+    command.Execute(player1, _state);
     return true;
 }
 
@@ -133,8 +139,8 @@ void GameEngine::ApplyPowerups()
 //TODO pass in strategies for each player
 //TODO pass in whether or not it should return binary or weights
 float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, 
-                            std::function<std::shared_ptr<Command>(bool, std::shared_ptr<GameState>)> nextMoveFn,
-                            std::function<float(bool, std::shared_ptr<GameState>)> evaluationFn,
+                            std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn,
+                            std::function<float(bool, GameStatePtr)> evaluationFn,
                             int radiusToConsider,
                             int depth,
                             int& numPlies)
@@ -144,7 +150,7 @@ float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
     Worm* worm = player->GetCurrentWorm();
     std::vector<Worm*> considered_worms = _state->WormsWithinDistance(worm->position, radiusToConsider);
 
-    auto filteredNextMoveFn = [&] (bool player1, std::shared_ptr<GameState> state) -> std::shared_ptr<Command> {
+    auto filteredNextMoveFn = [&] (bool player1, GameStatePtr state) -> std::shared_ptr<Command> {
         Player* player = state->GetPlayer(player1);
         Worm* worm = player->GetCurrentWorm();
         if(std::end(considered_worms) == std::find(std::begin(considered_worms), std::end(considered_worms), worm)) {
@@ -213,7 +219,7 @@ GameEngine::GameResult GameEngine::GetResult()
     return _currentResult;
 }
 
-GameEngine::GameResult GameEngine::GetResult(const std::shared_ptr<GameState> state)
+GameEngine::GameResult GameEngine::GetResult(const GameStatePtr state)
 {
     GameResult ret;
 

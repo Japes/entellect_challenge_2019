@@ -29,9 +29,9 @@ class Bot
     int _mc_runsBeforeClockCheck;
     uint64_t _numplies;
 
-    int Dist_to_closest_enemy(std::shared_ptr<GameState> state1, bool player1);
-    void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, int playthroughDepth);
-    void AdjustOpponentBananaCount(bool player1, std::shared_ptr<GameState> state1);
+    int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
+    void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr state1, bool ImPlayer1, int playthroughDepth);
+    void AdjustOpponentBananaCount(bool player1, GameStatePtr state1);
 };
 
 #endif

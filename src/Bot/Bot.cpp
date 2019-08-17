@@ -25,15 +25,15 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     uint64_t start_time = Utilities::Get_ns_since_epoch();
 
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
+    auto state1 = GameStateLoader::LoadGameState(roundJSON);
 
-    AdjustOpponentBananaCount(ImPlayer1, state1);
-    _last_round_state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
+    AdjustOpponentBananaCount(ImPlayer1, &state1);
+    _last_round_state = std::make_shared<GameState>(state1); //no idea why it needs to be done this way
 
 
     //do some heuristics---------------------------------------------------------------
     //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1);
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, &state1);
 
     //banana mine
     //auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
@@ -49,10 +49,10 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //}
 
     //begin monte carlo----------------------------------------------------------------
-    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, state1, true), _mc_c);
+    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, &state1, true), _mc_c);
     _numplies = 0;
-    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc, state1, ImPlayer1, _playthroughDepth);
-    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc, state1, ImPlayer1, _playthroughDepth);
+    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc, &state1, ImPlayer1, _playthroughDepth);
+    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc, &state1, ImPlayer1, _playthroughDepth);
     t1.join();
     t2.join();
 
@@ -70,7 +70,7 @@ uint64_t Bot::GetNumPlies()
     return _numplies;
 }
 
-void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_ptr<GameState> state1, bool ImPlayer1, int playthroughDepth)
+void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr state1, bool ImPlayer1, int playthroughDepth)
 {
     //int closestDist = Dist_to_closest_enemy();
     //int distToConsider = std::max(closestDist, 7);
@@ -85,8 +85,8 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_p
             _mtx.unlock();
 
             //load the state
-            auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
-            GameEngine eng(state);
+            GameState state = *state1; //make a copy :/
+            GameEngine eng(&state);
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int numplies{0};
@@ -104,7 +104,7 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, std::shared_p
     }
 }
 
-void Bot::AdjustOpponentBananaCount(bool player1, std::shared_ptr<GameState> state1)
+void Bot::AdjustOpponentBananaCount(bool player1, GameStatePtr state1)
 {
     //try to figure out if the opponent threw a banana (rough heuristic here)
     if(_last_round_state != nullptr) {

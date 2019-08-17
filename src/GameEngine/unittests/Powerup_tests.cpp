@@ -8,12 +8,12 @@ TEST_CASE( "Healthpack", "[powerup]" ) {
 
     GIVEN("A game state with a worm next to a powerup")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
         Position worm_under_test_pos{10,10};
         Worm* worm = place_worm(true, 1, worm_under_test_pos, state);
         Position powerup_pos{10,10};
         place_powerup(powerup_pos, state);
-        GameEngine eng(state);
+        GameEngine eng(&state);
 
         THEN("A healthpack can resurrect a worm that is still on the map (i.e. it died in this round")
         {
@@ -23,8 +23,8 @@ TEST_CASE( "Healthpack", "[powerup]" ) {
             eng.AdvanceState(player1move, player2move);
 
             REQUIRE(worm->health == GameConfig::healthPackHp);
-            REQUIRE(worm == state->Worm_at(powerup_pos));
-            REQUIRE(state->PowerUp_at(powerup_pos) == nullptr);
+            REQUIRE(worm == state.Worm_at(powerup_pos));
+            REQUIRE(state.PowerUp_at(powerup_pos) == nullptr);
             REQUIRE(!worm->IsDead());
         }
     }

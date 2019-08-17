@@ -9,22 +9,22 @@ TEST_CASE( "Handle no available moves", "[no_available_moves]" )
 {
     GIVEN("A game state where the worm has no valid moves")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
         
         place_worm(true, 1, {10,10}, state);
-        state->SetCellTypeAt({9, 9}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({9, 10}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({9, 11}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({10, 9}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({11, 9}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({11, 10}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({11, 11}, CellType::DEEP_SPACE);
-        state->SetCellTypeAt({10, 11}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({9, 9}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({9, 10}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({9, 11}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({10, 9}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({11, 9}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({11, 10}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({11, 11}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({10, 11}, CellType::DEEP_SPACE);
 
 
         THEN("We return the donothing command (if we trim stupid shoots)")
         {
-            auto ret = NextTurn::GetRandomValidMoveForPlayer(true, state, true);
+            auto ret = NextTurn::GetRandomValidMoveForPlayer(true, &state, true);
             REQUIRE(ret->GetCommandString() == "nothing");
         }
     }
@@ -81,36 +81,36 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
         7   .   .   .   .   .   .   .   .            
         */
 
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         Worm* worm11 = place_worm(true, 1, {5,5}, state);
         Worm* worm12 = place_worm(true, 2, {6,5}, state);
         place_worm(true, 3, {3,3}, state);
         Worm* worm21 = place_worm(false, 1, {5,6}, state);
         place_worm(false, 2, {4,1}, state);
         place_worm(false, 3, {5,3}, state);
-        state->SetCellTypeAt({5, 4}, CellType::DIRT);
-        state->SetCellTypeAt({4, 5}, CellType::DIRT);
-        state->SetCellTypeAt({4, 6}, CellType::DIRT);
-        state->SetCellTypeAt({7, 5}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({5, 4}, CellType::DIRT);
+        state.SetCellTypeAt({4, 5}, CellType::DIRT);
+        state.SetCellTypeAt({4, 6}, CellType::DIRT);
+        state.SetCellTypeAt({7, 5}, CellType::DEEP_SPACE);
 
         THEN("Valid moves for worm 11 are as expected")
         {
-            auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
+            auto moves = NextTurn::GetValidTeleportDigs(worm11, &state, false);
             INFO("moves: " << moves);
             REQUIRE(moves == 0b10101111);
         }
 
         THEN("Valid moves for worm 21 are as expected")
         {
-            auto moves = NextTurn::GetValidTeleportDigs(worm21, state, false);
+            auto moves = NextTurn::GetValidTeleportDigs(worm21, &state, false);
             INFO("moves: " << moves);
             REQUIRE(moves == 0b11111001);
         }
 
         THEN("Valid moves for worm 12 are as expected")
         {
-            auto moves = NextTurn::GetValidTeleportDigs(worm12, state, false);
+            auto moves = NextTurn::GetValidTeleportDigs(worm12, &state, false);
             INFO("moves: " << moves);
             REQUIRE(moves == 0b11000111);
         }
@@ -123,7 +123,7 @@ TEST_CASE( "GetValidTeleportDigs", "[GetValidTeleportDigs]" ) {
 
             THEN("Valid moves for player 1 are as expected")
             {
-                auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
+                auto moves = NextTurn::GetValidTeleportDigs(worm11, &state, false);
                 INFO("moves: " << moves);
                 REQUIRE(moves == 0b11111010);
             }
@@ -142,26 +142,26 @@ TEST_CASE( "GetTeleportDig", "[GetTeleportDig]" ) {
         2   L   .   22
         */
 
-        auto state = std::make_shared<GameState>();
+        GameState state;
         Worm* worm11 = place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {2,1}, state);
         place_worm(false, 2, {2,2}, state);
-        state->SetCellTypeAt({0, 0}, CellType::DIRT);
-        state->SetCellTypeAt({2, 0}, CellType::DIRT);
-        state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
-        state->AddLavaAt({0, 2});
+        state.SetCellTypeAt({0, 0}, CellType::DIRT);
+        state.SetCellTypeAt({2, 0}, CellType::DIRT);
+        state.SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
+        state.AddLavaAt({0, 2});
 
-        auto moves = NextTurn::GetValidTeleportDigs(worm11, state, false);
+        auto moves = NextTurn::GetValidTeleportDigs(worm11, &state, false);
         REQUIRE(moves == 0b01100111);
 
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 0)->GetCommandString() == "dig 0 0");
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 1)->GetCommandString() == "move 1 0");
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 2)->GetCommandString() == "dig 2 0");
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 3)->GetCommandString() == "nothing"); //error case...
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 4)->GetCommandString() == "nothing"); //error case...
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 5)->GetCommandString() == "move 0 2");
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 6)->GetCommandString() == "move 1 2");
-        REQUIRE(NextTurn::GetTeleportDig(worm11, state, 7)->GetCommandString() == "nothing"); //error case...
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 0)->GetCommandString() == "dig 0 0");
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 1)->GetCommandString() == "move 1 0");
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 2)->GetCommandString() == "dig 2 0");
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 3)->GetCommandString() == "nothing"); //error case...
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 4)->GetCommandString() == "nothing"); //error case...
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 5)->GetCommandString() == "move 0 2");
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 6)->GetCommandString() == "move 1 2");
+        REQUIRE(NextTurn::GetTeleportDig(worm11, &state, 7)->GetCommandString() == "nothing"); //error case...
     }
 }
 
@@ -178,19 +178,19 @@ TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
         4   .   21  .   .   22
         */
 
-        auto state = std::make_shared<GameState>();
+        GameState state;
         place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {2,1}, state);
         place_worm(true, 3, {20,20}, state);
         place_worm(false, 1, {1,4}, state);
         place_worm(false, 2, {4,4}, state);
         place_worm(false, 3, {30,30}, state);
-        state->SetCellTypeAt({0, 0}, CellType::DIRT);
-        state->SetCellTypeAt({2, 0}, CellType::DIRT);
-        state->SetCellTypeAt({1, 3}, CellType::DIRT);
-        state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({0, 0}, CellType::DIRT);
+        state.SetCellTypeAt({2, 0}, CellType::DIRT);
+        state.SetCellTypeAt({1, 3}, CellType::DIRT);
+        state.SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
-        auto shoots = NextTurn::GetValidShoots(true, state, true);
+        auto shoots = NextTurn::GetValidShoots(true, &state, true);
         INFO("shoots: " << shoots)
         REQUIRE(shoots == 0b10000000);
 
@@ -202,7 +202,7 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
 {
     GIVEN("A semi realistic game state and engine")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
         
         place_worm(true, 1, {10,10}, state);
         place_worm(true, 2, {11,10}, state); //friendly E of us
@@ -213,7 +213,7 @@ TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
 
         THEN("GetValidShoots returns correct")
         {
-            auto ret = NextTurn::GetValidShoots(true, state, true);
+            auto ret = NextTurn::GetValidShoots(true, &state, true);
             INFO("shoots: " << ret)
             REQUIRE(ret == 0b10000100);
             REQUIRE(NextTurn::_playerShoots[2]->GetCommandString() == "shoot NE");
@@ -226,8 +226,8 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
 {
     GIVEN("A semi realistic game state and engine")
     {
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         
         Worm* worm12 = place_worm(true, 3, {31,15}, state); //technologist
         place_worm(true, 1, {30,15}, state); //friendly right next to us
@@ -242,7 +242,7 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
         {
             THEN("GetValidSnowballs is always 0")
             {
-                auto ret = NextTurn::GetValidSnowballs(true, state, true);
+                auto ret = NextTurn::GetValidSnowballs(true, &state, true);
                 INFO("shoots: " << ret)
                 REQUIRE(ret.count() == 0);
             }
@@ -257,21 +257,21 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
             {
                 THEN("GetValidSnowballs returns correct")
                 {
-                    auto ret = NextTurn::GetValidSnowballs(true, state, true);
+                    auto ret = NextTurn::GetValidSnowballs(true, &state, true);
                     INFO("shoots: " << ret)
                     CHECK(ret.count() == 1);
                     CHECK(ret.test(16));
                     CHECK(!ret.test(36)); //dedguy
                     CHECK(!ret.test(56)); //returned this when i confused x with y
-                    CHECK(NextTurn::GetSnowball(worm12, state, 16)->GetCommandString() == "snowball 31 11");          
+                    CHECK(NextTurn::GetSnowball(worm12, &state, 16)->GetCommandString() == "snowball 31 11");          
                 }
             }
             AND_WHEN("He has no snowballs")
             {
-                state->player1.worms[2].snowball_count = 0;
+                state.player1.worms[2].snowball_count = 0;
                 THEN("GetValidSnowballs returns zero")
                 {
-                    auto ret = NextTurn::GetValidSnowballs(true, state, true);
+                    auto ret = NextTurn::GetValidSnowballs(true, &state, true);
                     INFO("shoots: " << ret)
                     REQUIRE(ret.count() == 0);
                 }
@@ -284,8 +284,8 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
 {
     GIVEN("A semi realistic game state and engine")
     {
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         
         Worm* worm12 = place_worm(true, 2, {31,15}, state); //agent
         place_worm(true, 1, {30,15}, state); //friendly right next to us
@@ -300,7 +300,7 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
         {
             THEN("GetValidBananas is always 0")
             {
-                auto ret = NextTurn::GetValidBananas(true, state, true);
+                auto ret = NextTurn::GetValidBananas(true, &state, true);
                 INFO("shoots: " << ret)
                 REQUIRE(ret.count() == 0);
             }
@@ -314,21 +314,21 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
             {
                 THEN("GetValidBananas returns correct")
                 {
-                    auto ret = NextTurn::GetValidBananas(true, state, true);
+                    auto ret = NextTurn::GetValidBananas(true, &state, true);
                     INFO("shoots: " << ret)
                     REQUIRE(ret.count() == 1);
                     REQUIRE(ret.test(16));
                     REQUIRE(!ret.test(36)); //dedguy
                     REQUIRE(!ret.test(56)); //returned this when i confused x with y
-                    REQUIRE(NextTurn::GetBanana(worm12, state, 16)->GetCommandString() == "banana 31 11");          
+                    REQUIRE(NextTurn::GetBanana(worm12, &state, 16)->GetCommandString() == "banana 31 11");          
                 }
             }
             AND_WHEN("He has no bananas")
             {
-                state->player1.worms[1].banana_bomb_count = 0;
+                state.player1.worms[1].banana_bomb_count = 0;
                 THEN("GetValidBananas returns zero")
                 {
-                    auto ret = NextTurn::GetValidBananas(true, state, true);
+                    auto ret = NextTurn::GetValidBananas(true, &state, true);
                     INFO("shoots: " << ret)
                     REQUIRE(ret.count() == 0);
                 }
@@ -360,65 +360,65 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
         14  .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .   .
         */
 
-        auto state = std::make_shared<GameState>();
-        GameEngine eng(state);
+        GameState state;
+        GameEngine eng(&state);
         auto thrower = place_worm(true, 2, {9,6}, state);
         //make it the agent's turn...
         eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
         //big clump to the W
-        state->SetCellTypeAt({6, 4}, CellType::DIRT);
-        state->SetCellTypeAt({5, 5}, CellType::DIRT); state->SetCellTypeAt({6, 5}, CellType::DIRT); state->SetCellTypeAt({7, 5}, CellType::DIRT);
-        state->SetCellTypeAt({4, 6}, CellType::DIRT); state->SetCellTypeAt({5, 6}, CellType::DIRT); state->SetCellTypeAt({6, 6}, CellType::DIRT); state->SetCellTypeAt({7, 6}, CellType::DIRT); state->SetCellTypeAt({8, 6}, CellType::DIRT);
-        state->SetCellTypeAt({5, 7}, CellType::DIRT); state->SetCellTypeAt({6, 7}, CellType::DIRT); state->SetCellTypeAt({7, 7}, CellType::DIRT);
-        state->SetCellTypeAt({6, 8}, CellType::DIRT);
+        state.SetCellTypeAt({6, 4}, CellType::DIRT);
+        state.SetCellTypeAt({5, 5}, CellType::DIRT); state.SetCellTypeAt({6, 5}, CellType::DIRT); state.SetCellTypeAt({7, 5}, CellType::DIRT);
+        state.SetCellTypeAt({4, 6}, CellType::DIRT); state.SetCellTypeAt({5, 6}, CellType::DIRT); state.SetCellTypeAt({6, 6}, CellType::DIRT); state.SetCellTypeAt({7, 6}, CellType::DIRT); state.SetCellTypeAt({8, 6}, CellType::DIRT);
+        state.SetCellTypeAt({5, 7}, CellType::DIRT); state.SetCellTypeAt({6, 7}, CellType::DIRT); state.SetCellTypeAt({7, 7}, CellType::DIRT);
+        state.SetCellTypeAt({6, 8}, CellType::DIRT);
 
         //sparse four to the NE
-        state->SetCellTypeAt({10, 1}, CellType::DIRT); state->SetCellTypeAt({8, 3}, CellType::DIRT);
-        state->SetCellTypeAt({12, 3}, CellType::DIRT); state->SetCellTypeAt({10, 5}, CellType::DIRT);
+        state.SetCellTypeAt({10, 1}, CellType::DIRT); state.SetCellTypeAt({8, 3}, CellType::DIRT);
+        state.SetCellTypeAt({12, 3}, CellType::DIRT); state.SetCellTypeAt({10, 5}, CellType::DIRT);
 
         //big clump to the S
-        state->SetCellTypeAt({9, 9}, CellType::DIRT);
-        state->SetCellTypeAt({8, 10}, CellType::DIRT); state->SetCellTypeAt({9, 10}, CellType::DIRT); state->SetCellTypeAt({10, 10}, CellType::DIRT);
-        state->SetCellTypeAt({7, 11}, CellType::DIRT); state->SetCellTypeAt({8, 11}, CellType::DIRT); state->SetCellTypeAt({10, 11}, CellType::DIRT); state->SetCellTypeAt({11, 11}, CellType::DIRT);
-        state->SetCellTypeAt({8, 12}, CellType::DIRT); state->SetCellTypeAt({9, 12}, CellType::DIRT); state->SetCellTypeAt({10, 12}, CellType::DIRT);
-        state->SetCellTypeAt({9, 13}, CellType::DIRT);
+        state.SetCellTypeAt({9, 9}, CellType::DIRT);
+        state.SetCellTypeAt({8, 10}, CellType::DIRT); state.SetCellTypeAt({9, 10}, CellType::DIRT); state.SetCellTypeAt({10, 10}, CellType::DIRT);
+        state.SetCellTypeAt({7, 11}, CellType::DIRT); state.SetCellTypeAt({8, 11}, CellType::DIRT); state.SetCellTypeAt({10, 11}, CellType::DIRT); state.SetCellTypeAt({11, 11}, CellType::DIRT);
+        state.SetCellTypeAt({8, 12}, CellType::DIRT); state.SetCellTypeAt({9, 12}, CellType::DIRT); state.SetCellTypeAt({10, 12}, CellType::DIRT);
+        state.SetCellTypeAt({9, 13}, CellType::DIRT);
 
         WHEN("He has bananas")
         {
             THEN("GetBananaMiningTargets returns correct")
             {
-                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 13);
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, &state, 13);
                 INFO("bananas: " << ret)
                 REQUIRE(ret.count() == 1);
                 REQUIRE(ret.test(57));
-                REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");
+                REQUIRE(NextTurn::GetBanana(thrower, &state, 57)->GetCommandString() == "banana 6 6");
 
             }
 
             THEN("GetBananaMiningTargets returns correct")
             {
-                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 12);
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, &state, 12);
                 INFO("bananas: " << ret)
                 REQUIRE(ret.count() == 2);
                 REQUIRE(ret.test(57));
-                REQUIRE(NextTurn::GetBanana(thrower, state, 57)->GetCommandString() == "banana 6 6");
+                REQUIRE(NextTurn::GetBanana(thrower, &state, 57)->GetCommandString() == "banana 6 6");
                 REQUIRE(ret.test(115));
-                REQUIRE(NextTurn::GetBanana(thrower, state, 115)->GetCommandString() == "banana 9 11");            
+                REQUIRE(NextTurn::GetBanana(thrower, &state, 115)->GetCommandString() == "banana 9 11");            
             }
 
             THEN("GetBananaMiningTargets returns correct")
             {
-                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 4);
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, &state, 4);
                 INFO("bananas: " << ret)
                 REQUIRE(ret.test(28));
-                REQUIRE(NextTurn::GetBanana(thrower, state, 28)->GetCommandString() == "banana 10 3");            
+                REQUIRE(NextTurn::GetBanana(thrower, &state, 28)->GetCommandString() == "banana 10 3");            
                 REQUIRE(ret.count() > 6); //can see at LEAST 6 in that ascii picture
             }
 
             THEN("Banana prospecting returns correct")
             {
-                auto bananaCommand = NextTurn::GetBananaProspect(true, state, 12);
+                auto bananaCommand = NextTurn::GetBananaProspect(true, &state, 12);
                 REQUIRE(bananaCommand != nullptr);
                 bool happy = bananaCommand->GetCommandString() == "banana 6 6" || bananaCommand->GetCommandString() == "banana 9 11";
                 REQUIRE(happy);
@@ -426,7 +426,7 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
 
             THEN("Banana prospecting returns correct")
             {
-                auto bananaCommand = NextTurn::GetBananaProspect(true, state, 4);
+                auto bananaCommand = NextTurn::GetBananaProspect(true, &state, 4);
                 REQUIRE(bananaCommand != nullptr);
             }
         }
@@ -436,13 +436,13 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
             thrower->banana_bomb_count = 0;
             THEN("GetBananaMiningTargets returns zero")
             {
-                auto ret = NextTurn::GetBananaMiningTargets(thrower, state, 1);
+                auto ret = NextTurn::GetBananaMiningTargets(thrower, &state, 1);
                 REQUIRE(ret.count() == 0);
             }
 
             THEN("Banana prospecting returns correct")
             {
-                auto bananaCommand = NextTurn::GetBananaProspect(true, state, 13);
+                auto bananaCommand = NextTurn::GetBananaProspect(true, &state, 13);
                 REQUIRE(bananaCommand == nullptr);
             }
         }
@@ -461,7 +461,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
         //3   .   .   .   .   .
         //4   .   .   .   .   .
 
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         bool player1 = GENERATE(true, false);
         int distanceForLost = GENERATE(2, 5, 10, 25);
@@ -475,7 +475,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
 
             THEN("the heuristic doesn't kick in")
             {
-                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
                 REQUIRE(cmd == nullptr);
             }
         }
@@ -483,12 +483,12 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
         WHEN("there is dirt within the range limit")
         {
             auto dirtPos = playerWorm->position + Position(distanceForLost/2, distanceForLost/2);
-            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+            state.SetCellTypeAt(dirtPos, CellType::DIRT);
 
             //do a generate for places all around the circle
             THEN("the heuristic doesn't kick in")
             {
-                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
                 REQUIRE(cmd == nullptr);
             }
 
@@ -498,7 +498,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
                 place_worm(player1, 1, enemyWormPos, state);
                 THEN("the heuristic doesn't kick in")
                 {
-                    auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                    auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
                     REQUIRE(cmd == nullptr);
                 }   
             }
@@ -508,7 +508,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
         {
             THEN("the heuristic doesn't kick in")
             {
-                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
                 REQUIRE(cmd == nullptr);
             }
         }
@@ -516,11 +516,11 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
         WHEN("there is no enemy or dirt within the range limit (but dirt on the map)")
         {
             auto dirtPos = playerWorm->position + Position(distanceForLost+2, distanceForLost+5);
-            state->SetCellTypeAt(dirtPos, CellType::DIRT);
+            state.SetCellTypeAt(dirtPos, CellType::DIRT);
 
             THEN("The heuristic kicks in")
             {
-                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
                 REQUIRE(cmd != nullptr);
 
                 AND_THEN("The given direction is correct")
@@ -537,7 +537,7 @@ TEST_CASE( "Heuristic to avoid getting lost", "[GetNearestDirtHeuristic]" )
                 place_worm(player1, 2, friendlyPos, state);
                 THEN("The heuristic kicks in")
                 {
-                    auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+                    auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
                     REQUIRE(cmd != nullptr);
 
                     AND_THEN("The given direction is correct")
@@ -564,7 +564,7 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
         //3   .   .   .   .   .
         //4   .   .   .   .   .
 
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         bool player1 = GENERATE(true, false);
         int distanceForLost = GENERATE(2, 5, 10, 25);
@@ -575,8 +575,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
         WHEN("We try to confirm direction...")
         {
             auto dirtPos = playerWorm->position + Position(distanceForLost+2, 0);
-            state->SetCellTypeAt(dirtPos, CellType::DIRT);
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            state.SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("The given direction is correct")
             {
@@ -587,8 +587,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
         WHEN("We try to confirm direction...")
         {
             auto dirtPos = playerWorm->position + Position(0, distanceForLost+2);
-            state->SetCellTypeAt(dirtPos, CellType::DIRT);
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            state.SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
             
             THEN("The given direction is correct")
             {
@@ -599,8 +599,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
         WHEN("We try to confirm direction...")
         {
             auto dirtPos = playerWorm->position + Position(distanceForLost + 1, distanceForLost+2);
-            state->SetCellTypeAt(dirtPos, CellType::DIRT);
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            state.SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
             
             THEN("The given direction is correct")
             {
@@ -611,8 +611,8 @@ TEST_CASE( "Heuristic to avoid getting lost - correct direction", "[GetNearestDi
         WHEN("We try to confirm direction...")
         {
             auto dirtPos = playerWorm->position + Position(distanceForLost + 2, distanceForLost + 1);
-            state->SetCellTypeAt(dirtPos, CellType::DIRT);
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            state.SetCellTypeAt(dirtPos, CellType::DIRT);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
             
             THEN("The given direction is correct")
             {
@@ -628,7 +628,7 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 {
     GIVEN("A game state")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         bool player1 = GENERATE(true, false);
         int wormIndex = 1;
@@ -645,10 +645,10 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //5   S   11  .   .   .
 
             place_worm(player1, wormIndex, {1,5}, state);
-            state->SetCellTypeAt({0,0}, CellType::DIRT);
-            state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            state.SetCellTypeAt({0,0}, CellType::DIRT);
+            state.SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't crash us into dirt")
             {
@@ -668,11 +668,11 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //5   .   .   .   .   .
 
             place_worm(player1, wormIndex, {0,1}, state);
-            state->SetCellTypeAt({4,0}, CellType::DIRT);
-            state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({4,0}, CellType::DIRT);
+            state.SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't crash us into dirt")
             {
@@ -692,11 +692,11 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //5   S   S   .   .   D
 
             place_worm(player1, wormIndex, {0,4}, state);
-            state->SetCellTypeAt({4,5}, CellType::DIRT);
-            state->SetCellTypeAt({1,5}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({4,5}, CellType::DIRT);
+            state.SetCellTypeAt({1,5}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't crash us into dirt")
             {
@@ -721,10 +721,10 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //30   S   S   S   .   .    .   .   D
 
             place_worm(player1, wormIndex, {0,21}, state);
-            state->SetCellTypeAt({7,30}, CellType::DIRT);
-            state->SetCellTypeAt({0,22}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({7,30}, CellType::DIRT);
+            state.SetCellTypeAt({0,22}, CellType::DEEP_SPACE);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't crash us into dirt")
             {
@@ -745,10 +745,10 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             place_worm(player1, 1, {1,5}, state);
             place_worm(player1, 2, {0,4}, state);
-            state->SetCellTypeAt({0,0}, CellType::DIRT);
-            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,0}, CellType::DIRT);
+            state.SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't crash us into the friendly worm")
             {
@@ -769,11 +769,11 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
 
             place_worm(player1, 1, {1,5}, state);
             place_worm(player1, 2, {1,4}, state);
-            state->SetCellTypeAt({0,0}, CellType::DIRT);
-            state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,0}, CellType::DIRT);
+            state.SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't crash us into the friendly worm")
             {
@@ -797,11 +797,11 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             place_worm(player1, 1, {1,5}, state);
             place_worm(player1, 2, {1,4}, state);
             place_worm(player1, 3, {2,4}, state);
-            state->SetCellTypeAt({0,0}, CellType::DIRT);
-            state->SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,0}, CellType::DIRT);
+            state.SetCellTypeAt({0,4}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,5}, CellType::DEEP_SPACE);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("The heuristic does the best it can")
             {
@@ -822,14 +822,14 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //5   .   .   .   .   .
 
             place_worm(player1, wormIndex, {0,1}, state);
-            state->SetCellTypeAt({4,0}, CellType::DIRT);
-            state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
-            state->AddLavaAt({1,1});
-            state->AddLavaAt({1,2});
-            state->AddLavaAt({0,2});
+            state.SetCellTypeAt({4,0}, CellType::DIRT);
+            state.SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
+            state.AddLavaAt({1,1});
+            state.AddLavaAt({1,2});
+            state.AddLavaAt({0,2});
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("It doesn't care")
             {
@@ -849,14 +849,14 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
             //5   .   .   .   .   .
 
             place_worm(player1, wormIndex, {0,1}, state);
-            state->SetCellTypeAt({4,0}, CellType::DIRT);
-            state->SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
-            state->SetCellTypeAt({1,1}, CellType::DIRT);
-            state->SetCellTypeAt({1,2}, CellType::DIRT);
+            state.SetCellTypeAt({4,0}, CellType::DIRT);
+            state.SetCellTypeAt({1,0}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({0,0}, CellType::DEEP_SPACE);
+            state.SetCellTypeAt({1,1}, CellType::DIRT);
+            state.SetCellTypeAt({1,2}, CellType::DIRT);
             place_worm(!player1, wormIndex, {0,2}, state);
 
-            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, state, distanceForLost);
+            auto cmd = NextTurn::GetNearestDirtHeuristic(player1, &state, distanceForLost);
 
             THEN("He gives up")
             {
@@ -894,19 +894,19 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
         //8   .   .   .   .   .   .   .   .   .   
         //9   .   .   .   .   .   .   .   .   .   
 
-        auto state = std::make_shared<GameState>();
+        GameState state;
         place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {1,7}, state);
         place_worm(true, 3, {6,3}, state);
         place_worm(false, 1, {2,6}, state);
         place_worm(false, 2, {6,7}, state);
 
-        REQUIRE(state->player1.remainingWormSelections > 0);
-        REQUIRE(state->player2.remainingWormSelections > 0);
+        REQUIRE(state.player1.remainingWormSelections > 0);
+        REQUIRE(state.player2.remainingWormSelections > 0);
 
         WHEN("our heuristic should kick in")
         {
-            auto selectStatement = NextTurn::TryApplySelect(true, state);
+            auto selectStatement = NextTurn::TryApplySelect(true, &state);
 
             //worm 1's turn, we should select either worm 2 or 3
             THEN("It does")
@@ -917,39 +917,39 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
             }
             AND_THEN("It projects the game state forward so it looks like it's that guy's turn")
             {
-                INFO("current worm: " << state->player1.GetCurrentWorm()->id);
-                REQUIRE( (state->player1.GetCurrentWorm()->id == 2 || state->player1.GetCurrentWorm()->id == 3) );
+                INFO("current worm: " << state.player1.GetCurrentWorm()->id);
+                REQUIRE( (state.player1.GetCurrentWorm()->id == 2 || state.player1.GetCurrentWorm()->id == 3) );
             }
         }
 
         WHEN("We have no selects left")
         {
-            state->player1.remainingWormSelections = 0;
+            state.player1.remainingWormSelections = 0;
             THEN("Heuristic should not kick in")
             {
-                REQUIRE(NextTurn::TryApplySelect(true, state) == "");
+                REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
             }
         }
 
         WHEN("The dude is frozen")
         {
-            state->player1.worms[1].roundsUntilUnfrozen = 5;
-            state->player1.worms[2].roundsUntilUnfrozen = 5;
+            state.player1.worms[1].roundsUntilUnfrozen = 5;
+            state.player1.worms[2].roundsUntilUnfrozen = 5;
             THEN("Heuristic should not kick in")
             {
-                REQUIRE(NextTurn::TryApplySelect(true, state) == "");
+                REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
             }
         }
 
         WHEN("our heuristic SHOULDN'T kick in")
         {
-            GameEngine eng(state);
+            GameEngine eng(&state);
             eng.AdvanceState(DoNothingCommand(), DoNothingCommand());
 
             THEN("It doesn't")
             {
                 //worm 2's turn - he is in trouble already
-                REQUIRE(NextTurn::TryApplySelect(true, state) == "");
+                REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
             }
         }
     }
@@ -970,24 +970,24 @@ TEST_CASE( "Get random move", "[get_random_move][.statistics]" )
         4   .   21  .   .   22
         */
 
-        auto state = std::make_shared<GameState>();
+        GameState state;
         place_worm(true, 1, {1,1}, state);
         place_worm(true, 2, {2,1}, state);
         place_worm(true, 3, {20,20}, state);
         place_worm(false, 1, {1,4}, state);
         place_worm(false, 2, {4,4}, state);
         place_worm(false, 3, {30,30}, state);
-        state->SetCellTypeAt({0, 0}, CellType::DIRT);
-        state->SetCellTypeAt({2, 0}, CellType::DIRT);
-        state->SetCellTypeAt({1, 3}, CellType::DIRT);
-        state->SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
+        state.SetCellTypeAt({0, 0}, CellType::DIRT);
+        state.SetCellTypeAt({2, 0}, CellType::DIRT);
+        state.SetCellTypeAt({1, 3}, CellType::DIRT);
+        state.SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
-        auto cmds = NextTurn::AllValidMovesForPlayer(true, state, true);
+        auto cmds = NextTurn::AllValidMovesForPlayer(true, &state, true);
 
         std::vector<int> num_times_this_got_chosen(cmds.size());
 
         for(unsigned i = 0; i < 10000; ++i) {
-            auto cmd =  NextTurn::GetRandomValidMoveForPlayer(true, state, true);
+            auto cmd =  NextTurn::GetRandomValidMoveForPlayer(true, &state, true);
 
             for(unsigned j = 0; j < cmds.size(); ++j) {
                 if(cmd->GetCommandString() == cmds[j]->GetCommandString()) {

@@ -8,23 +8,23 @@ TEST_CASE( "Select command", "[Select_command]" ) {
 
     GIVEN("A game state and a select command")
     {
-        auto state = std::make_shared<GameState>();
+        GameState state;
 
         place_worm(true, 3, {10,10}, state);
-        GameEngine eng(state);
+        GameEngine eng(&state);
 
         SelectCommand sel(3, std::make_shared<TeleportCommand>(Position(11,11)));
 
-        int numSelectsBefore = state->player1.remainingWormSelections;
-        int doNothingsBefore = state->player1.consecutiveDoNothingCount;
+        int numSelectsBefore = state.player1.remainingWormSelections;
+        int doNothingsBefore = state.player1.consecutiveDoNothingCount;
 
         WHEN("We apply a select command")
         {
             eng.AdvanceState(sel, DoNothingCommand());
-            REQUIRE(state->player1.consecutiveDoNothingCount == doNothingsBefore);
+            REQUIRE(state.player1.consecutiveDoNothingCount == doNothingsBefore);
 
             THEN("A select is used up for that player") {
-                REQUIRE(state->player1.remainingWormSelections == numSelectsBefore -1);
+                REQUIRE(state.player1.remainingWormSelections == numSelectsBefore -1);
             }
         }
     }
@@ -59,8 +59,6 @@ TEST_CASE( "Get select move order", "[Select_string]" ) {
 }
 
 TEST_CASE( "Get select string", "[Select_string]" ) {
-    auto state = std::make_shared<GameState>();
-
     SelectCommand sel(2, std::make_shared<DigCommand>(Position(11,11)));
     REQUIRE(sel.GetCommandString() == "select 2;dig 11 11");
 
