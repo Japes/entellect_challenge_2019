@@ -56,29 +56,40 @@ bool TeleportCommand::IsValid(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
+    return CanMoveThere(worm, _pos, state);
+}
+
+bool TeleportCommand::CanMoveThere(Worm* worm, const Position& pos, GameStatePtr state, bool printErrors)
+{
     if(worm->IsFrozen()) {
         return true;
     }
 
-    if (_pos.x >= MAP_SIZE || _pos.y >= MAP_SIZE ||
-        _pos.x < 0 || _pos.y < 0 ) {
-        std::cerr << latestBot << "------Cant move off the map..." << _pos << std::endl;
+    if (pos.x >= MAP_SIZE || pos.y >= MAP_SIZE ||
+        pos.x < 0 || pos.y < 0 ) {
+        if ( printErrors ) { std::cerr << latestBot << "------Cant move off the map..." << pos << std::endl; }
+
         return false;
     }
 
-    if(IsBlocking(state->CellType_at(_pos))) {
-        std::cerr << latestBot << "------Cant move through dirt or deep-space..." << _pos << std::endl;
+    if(IsBlocking(state->CellType_at(pos))) {
+        if ( printErrors ) { std::cerr << latestBot << "------Cant move through dirt or deep-space..." << pos << std::endl; }
+
         return false;
     }
 
-    if (worm->position.MovementDistanceTo(_pos) > worm->movementRange) {
-        std::cerr << latestBot << " " << _pos << "------is too far to move: " << worm->position.MovementDistanceTo(_pos) << " > " << worm->movementRange << ". Worm is at pos " << worm->position << std::endl;
+    if (worm->position.MovementDistanceTo(pos) > worm->movementRange) {
+        if ( printErrors ) { std::cerr << latestBot << " " << pos << "------is too far to move: " 
+                            << worm->position.MovementDistanceTo(pos) << " > " << worm->movementRange << ". Worm is at pos " << worm->position << std::endl; }
+
         return false;
     }
 
-    Worm* worm_there = state->Worm_at(_pos);
+    Worm* worm_there = state->Worm_at(pos);
     if(worm_there != nullptr && !worm_there->movedThisRound) {
-        std::cerr << latestBot << "------Cant move into space " << _pos << ", occupied by worm " << worm_there->id << " (" << worm_there << ").  I am worm " << worm->id << "(" << worm << ")" << std::endl;
+        if ( printErrors ) { std::cerr << latestBot << "------Cant move into space " << pos 
+                            << ", occupied by worm " << worm_there->id << " (" << worm_there << ").  I am worm " << worm->id << "(" << worm << ")" << std::endl; }
+
         return false;
     }
 

@@ -20,7 +20,8 @@ class NextTurn
     static std::bitset<8> GetValidTeleportDigs(Worm* worm, GameStatePtr state, bool trimStupidMoves);
     static std::shared_ptr<Command> GetTeleportDig(Worm* worm, GameStatePtr state, unsigned index);
 
-    static std::bitset<8> GetValidShoots(bool player1, GameStatePtr state, bool trimStupidMoves);
+    static std::bitset<8> GetValidShoots(bool player1, GameStatePtr state, bool trimStupidMoves, bool considerMovement = true);
+    static void TryAddShot(std::bitset<8>& ret, Worm* shootingWorm, const Position& targetPos, GameStatePtr state);
 
     static std::bitset<121> GetBananaMiningTargets(Worm* worm, GameStatePtr state, int thresh);
     static std::bitset<121> GetValidBombThrow(bool player1, GameStatePtr state, bool trimStupidMoves);

@@ -3,6 +3,8 @@
 #include <sstream>
 #include <algorithm>
 
+const Position ShootCommand::noShot{0,0};
+
 ShootCommand::ShootCommand(ShootCommand::ShootDirection dir)
 {
     _order = static_cast<int>(CommandType::SHOOT);
@@ -71,7 +73,7 @@ void ShootCommand::Execute(bool player1, GameStatePtr state) const
     player->command_score += points;
 }
 
-//returns worm that would be hit if currentWorm shot in direction of shootvector
+//returns worm that would be hit if worm shot in direction of shootvector
 Worm* ShootCommand::WormOnTarget(const Worm* worm, const GameStatePtr state, const Position& shootvector)
 {
     Position pos = worm->position + shootvector;
@@ -110,19 +112,15 @@ bool ShootCommand::IsValid(bool player1, GameStatePtr state) const
     return true; //always valid!
 }
 
-//returns a vector pointing in the direction of a clear shot to targetWorm
+//returns a vector pointing in the direction of a clear shot to target
 //returns {0,0} if no shot available
-Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, GameStatePtr state)
+Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Position& target, GameStatePtr state)
 {
-    if(targetWorm.IsDead()) {
+    if(shootingWorm.position.MovementDistanceTo(target) > shootingWorm.weapon.range) {
         return {0,0};
     }
 
-    if(shootingWorm.position.MovementDistanceTo(targetWorm.position) > shootingWorm.weapon.range) {
-        return {0,0};
-    }
-
-    Position posDiff = targetWorm.position - shootingWorm.position;
+    Position posDiff = target - shootingWorm.position;
 
     bool isStraight = posDiff.x == 0 || posDiff.y == 0;
     bool isInLine = ( isStraight || posDiff.x == posDiff.y || posDiff.x == -posDiff.y);
@@ -136,12 +134,53 @@ Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& target
 
     //finally, check for obstacles
     Position shootVec = posDiff.Normalized();
-    if (WormOnTarget(&shootingWorm, state, shootVec) != &targetWorm) {
+    if (!ClearShot(&shootingWorm, state, shootVec, target)) {
         return {0,0};
     }
 
     return shootVec;
 }
+
+//returns true if worm can shoot the target position
+bool ShootCommand::ClearShot(const Worm* worm, const GameStatePtr state, const Position& shootvector, const Position& targetPos)
+{
+    Position pos = worm->position + shootvector;
+
+    bool diag = shootvector.x != 0 && shootvector.y != 0;
+
+    while (pos.IsOnMap() && worm->position.MovementDistanceTo(pos) <= worm->weapon.range) {
+
+        //check diag
+        if( diag && worm->position.MovementDistanceTo(pos) > worm->weapon.diagRange) {
+            //std::cerr << "OUT OF RANGE! (" <<worm->position.MovementDistanceTo(pos) << " > " << worm->weapon.diagRange << ")" << std::endl;
+            return false;
+        }
+
+        //check dirt/deep space
+        if (IsBlocking(state->CellType_at(pos))) {
+            //std::cerr << "HIT DIRT (or deep space)!" << std::endl;
+            return false;
+        }
+
+        if (pos == targetPos) {
+            //std::cerr << "I CAN SHOOT HERE!" << std::endl;
+            return true;
+        }
+
+        //check worms 
+        Worm* w = state->Worm_at(pos);
+        if (w != nullptr) {
+            //std::cerr << "WORM IN THE WAY!" << std::endl;
+            return false;
+        }
+
+        pos += shootvector;
+    }
+
+    //if we get this far, shot didn't hit anything
+    return false;
+}
+
 
 bool ShootCommand::operator==(const ShootCommand& other)
 {

@@ -190,7 +190,7 @@ TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
         state.SetCellTypeAt({1, 3}, CellType::DIRT);
         state.SetCellTypeAt({0, 1}, CellType::DEEP_SPACE);
 
-        auto shoots = NextTurn::GetValidShoots(true, &state, true);
+        auto shoots = NextTurn::GetValidShoots(true, &state, true, false);
         INFO("shoots: " << shoots)
         REQUIRE(shoots == 0b10000000);
 
@@ -200,26 +200,174 @@ TEST_CASE( "GetValidShoots", "[GetValidShoots]" ) {
 
 TEST_CASE( "Get sensible shoots", "[get_sensible_shoots]" )
 {
+
+    /*
+        0   1   2   3   4   5   6   7   8   9   10
+    0   .   .   .   .   .   .   .   .   .   .   .
+    1   .   .   .   21  .   .   .   .   .   .   .
+    2   13  .   11  12  .   .   .   .   .   .   .
+    3   .   .   .   .   .   .   .   .   .   .   .
+    4   .   .   .   .   .   .   .   .   .   .   .
+    5   .   .   .   .   .   22  .   .   .   .   .
+    6   .   .   .   .   .   .   .   .   .   .   .
+    7   .   .   23  .   .   .   .   .   .   .   .
+    8   .   .   .   .   .   .   .   .   .   .   .
+    9   .   .   .   .   .   .   .   .   .   .   .
+    10  .   .   .   .   .   .   .   .   .   .   .
+    */
+
     GIVEN("A semi realistic game state and engine")
     {
         GameState state;
         
-        place_worm(true, 1, {10,10}, state);
-        place_worm(true, 2, {11,10}, state); //friendly E of us
-        place_worm(true, 3, {8,10}, state); //friendly W of us
-        place_worm(false, 1, {11,9}, state); //enemy NE 1 step
-        place_worm(false, 2, {13,13}, state); //enemy SE 2 step
-        place_worm(false, 3, {10,15}, state); //just out of range
+        bool player1 = GENERATE(true, false);
+        place_worm(player1, 1, {2,2}, state);
+        place_worm(player1, 2, {3,2}, state); //friendly E of us
+        place_worm(player1, 3, {0,2}, state); //friendly W of us
+        place_worm(!player1, 1, {3,1}, state); //enemy NE 1 step
+        place_worm(!player1, 2, {5,5}, state); //enemy SE 2 step
+        place_worm(!player1, 3, {2,7}, state); //just out of range
 
         THEN("GetValidShoots returns correct")
         {
-            auto ret = NextTurn::GetValidShoots(true, &state, true);
+            auto ret = NextTurn::GetValidShoots(player1, &state, true, false);
             INFO("shoots: " << ret)
             REQUIRE(ret == 0b10000100);
             REQUIRE(NextTurn::_playerShoots[2]->GetCommandString() == "shoot NE");
             REQUIRE(NextTurn::_playerShoots[7]->GetCommandString() == "shoot SE");            
         }
     }
+}
+
+TEST_CASE( "Get sensible shoots - blocking", "[get_sensible_shoots_blocking]" )
+{
+
+    /*
+        0   1   2   3   4   5   6   7   8   9   10
+    0   .   .   .   .   .   .   .   .   .   .   .
+    1   .   .   .   .   .   .   .   .   .   .   .
+    2   13  .   11  12  .   21  .   .   .   .   .
+    3   .   .   .   .   .   .   .   .   .   .   .
+    4   .   .   .   .   D   .   .   .   .   .   .
+    5   .   .   .   .   .   22  .   .   .   .   .
+    6   .   .   23  .   .   .   .   .   .   .   .
+    7   .   .   .   .   .   .   .   .   .   .   .
+    8   .   .   .   .   .   .   .   .   .   .   .
+    9   .   .   .   .   .   .   .   .   .   .   .
+    10  .   .   .   .   .   .   .   .   .   .   .
+    */
+
+    GIVEN("A semi realistic game state and engine")
+    {
+        GameState state;
+        
+        bool player1 = GENERATE(true, false);
+        place_worm(player1, 1, {2,2}, state);
+        place_worm(player1, 2, {3,2}, state);
+        place_worm(player1, 3, {0,2}, state);
+        place_worm(!player1, 1, {5,2}, state);
+        place_worm(!player1, 2, {5,5}, state);
+        place_worm(!player1, 3, {2,6}, state);
+        state.SetCellTypeAt({4, 4}, CellType::DIRT);
+
+        THEN("GetValidShoots returns correct")
+        {
+            auto ret = NextTurn::GetValidShoots(player1, &state, true, false);
+            INFO("shoots: " << ret)
+            REQUIRE(ret == 0b01000000);
+            REQUIRE(NextTurn::_playerShoots[6]->GetCommandString() == "shoot S");            
+        }
+    }
+}
+
+TEST_CASE( "Get sensible shoots one-off", "[get_sensible_shoots]" )
+{
+    /*
+        0   1   2   3   4   5   6   7   8   9   10
+    0   .   .   .   .   .   .   .   .   .   .   .
+    1   .   .   .   21  .   .   .   .   .   .   .
+    2   13  .   11  12  .   .   .   .   .   .   .
+    3   .   .   .   .   .   .   .   .   .   .   .
+    4   .   .   .   .   D   .   .   .   .   .   .
+    5   .   .   .   .   .   .   22  .   .   .   .
+    6   .   .   .   .   .   .   .   .   .   .   .
+    7   .   .   23  .   .   .   .   .   .   .   .
+    8   .   .   .   .   .   .   .   .   .   .   .
+    9   .   .   .   .   .   .   .   .   .   .   .
+    10  .   .   .   .   .   .   .   .   .   .   .
+    */
+
+    GIVEN("A semi realistic game state and engine")
+    {
+        GameState state;
+        
+        bool player1 = GENERATE(true, false);
+        place_worm(player1, 1, {2,2}, state);
+        place_worm(player1, 2, {3,2}, state);
+        place_worm(player1, 3, {0,2}, state);
+        place_worm(!player1, 1, {3,1}, state);
+        place_worm(!player1, 2, {6,5}, state);
+        place_worm(!player1, 3, {2,7}, state);
+        state.SetCellTypeAt({4, 4}, CellType::DIRT);
+
+        THEN("GetValidShoots returns correct")
+        {
+            auto ret = NextTurn::GetValidShoots(player1, &state, true, true);
+            INFO("shoots: " << ret)
+            REQUIRE(ret == 0b00000110); //S, NE, N
+        }
+    }
+
+}
+
+TEST_CASE( "Get sensible shoots one-off ... correct worm only", "[get_sensible_shoots_correct_worm]" )
+{
+    /*
+        0   1   2   3   4   
+    0   .   .   .   .   .   
+    1   .   .  (12)(D)  .   
+    2   .   22  11  21  .
+    3   .   .  (S) (L)  .   
+    4   .   .   .   .   .   
+    */
+
+    GIVEN("A semi realistic game state and engine")
+    {
+        GameState state;
+        
+        bool player1 = GENERATE(true, false);
+        place_worm(player1, 1, {2,2}, state);
+        auto rightEnemy = place_worm(!player1, 1, {3,2}, state);
+        auto leftEnemy = place_worm(!player1, 2, {1,2}, state);
+
+        place_worm(player1, 3, {21,20}, state);
+        place_worm(!player1, 3, {22,20}, state);
+
+        THEN("GetValidShoots only considers that currentWorm could move")
+        {
+            auto ret = NextTurn::GetValidShoots(player1, &state, true, true);
+            REQUIRE(ret == 0b11011110); //E, NE, SE
+        }
+
+        THEN("GetValidShoots understands that frozen worms can't move")
+        {
+            rightEnemy->roundsUntilUnfrozen = 10;
+            leftEnemy->roundsUntilUnfrozen = 10;
+            auto ret = NextTurn::GetValidShoots(player1, &state, true, true);
+            REQUIRE(ret == 0b00011000);
+        }
+
+        THEN("GetValidShoots understands rules about movement")
+        {
+            place_worm(player1, 2, {2,1}, state);
+            state.SetCellTypeAt({3, 1}, CellType::DIRT);
+            state.SetCellTypeAt({2, 3}, CellType::DEEP_SPACE);
+            state.AddLavaAt({3, 3});
+            auto ret = NextTurn::GetValidShoots(player1, &state, true, true);
+            REQUIRE(ret == 0b10011000);
+        }
+    }
+    
 }
 
 TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
@@ -889,16 +1037,16 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
         //3   .   .   .   .   .   .   .   13  .   
         //4   .   .   .   .   .   .   .   .   .   
         //5   .   .   .   .   .   .   .   .   .   
-        //6   .   .   21  .   .   .   .   .   .   
-        //7   .   12  .   .   .   .   .   22  .   
-        //8   .   .   .   .   .   .   .   .   .   
+        //6   .   .   .   .   .   .   .   .   .   
+        //7   .   .   21  .   .   .   .   22  .   
+        //8   .   12  .   .   .   .   .   .   .   
         //9   .   .   .   .   .   .   .   .   .   
 
         GameState state;
         place_worm(true, 1, {1,1}, state);
-        place_worm(true, 2, {1,7}, state);
+        place_worm(true, 2, {1,8}, state);
         place_worm(true, 3, {6,3}, state);
-        place_worm(false, 1, {2,6}, state);
+        place_worm(false, 1, {2,7}, state);
         place_worm(false, 2, {6,7}, state);
 
         REQUIRE(state.player1.remainingWormSelections > 0);

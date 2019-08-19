@@ -73,31 +73,65 @@ std::bitset<8> NextTurn::GetValidTeleportDigs(Worm* worm, GameStatePtr state, bo
 // 0 1 2
 // 3 w 4
 // 5 6 7
-std::bitset<8> NextTurn::GetValidShoots(bool player1, GameStatePtr state, bool trimStupidMoves)
+std::bitset<8> NextTurn::GetValidShoots(bool player1, GameStatePtr state, bool trimStupidMoves, bool considerMovement)
 {
     if (!trimStupidMoves) {
         return std::bitset<8>(255);
     }
+
+    /* //If an enemy worm is somewhere in this shadow (and not blocked), consider shooting there
+        0   1   2   3   4   5   6   7   8   9   10
+    0   .   .   .   .   o   o   o   .   .   .   . 
+    1   .   o   o   o   o   X   o   o   o   o   . 
+    2   .   o   X   o   o   X   o   o   X   o   . 
+    3   .   o   o   X   o   X   o   X   o   o   . 
+    4   o   o   o   o   X   X   X   o   o   o   o 
+    5   o   X   X   X   X   W   X   X   X   X   o
+    6   o   o   o   o   X   X   X   o   o   o   o 
+    7   .   o   o   X   o   X   o   X   o   o   . 
+    8   .   o   X   o   o   X   o   o   X   o   . 
+    9   .   o   o   o   o   X   o   o   o   o   . 
+    10  .   .   .   .   o   o   o   .   .   .   . 
+    */
 
     std::bitset<8> ret(0);
 
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
-    Position noShot{0,0};
     state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
-        Position shootVec = ShootCommand::GetValidShot(*worm, enemyWorm, state);
-        if(shootVec != noShot) {
-            auto it = std::find(_surroundingWormSpaces.begin(), _surroundingWormSpaces.end(), shootVec);
-            if (it != _surroundingWormSpaces.end()) {
-                int index = std::distance(_surroundingWormSpaces.begin(), it);
-                ret.set(index);
-            }
+        if(worm->position.MovementDistanceTo(enemyWorm.position) > (GameConfig::commandoWorms.weapon.range + 1)) {
+            return;
+        }
 
+        TryAddShot(ret, worm, enemyWorm.position, state);
+
+        if(considerMovement) {
+            Player* enemyPlayer = state->GetPlayer(!player1);
+            if(enemyPlayer->GetCurrentWorm() == &enemyWorm && !enemyWorm.IsFrozen()) {
+                for(auto const & space : _surroundingWormSpaces) {
+                    Position potentialPos = enemyWorm.position + space;
+                    if(TeleportCommand::CanMoveThere(&enemyWorm, potentialPos, state, false)) {
+                        TryAddShot(ret, worm, potentialPos, state);
+                    }
+                }
+            }
         }
     });
 
     return ret;
+}
+
+void NextTurn::TryAddShot(std::bitset<8>& ret, Worm* shootingWorm, const Position& targetPos, GameStatePtr state)
+{
+    Position shootVec = ShootCommand::GetValidShot(*shootingWorm, targetPos, state);
+    if(shootVec != ShootCommand::noShot) {
+        auto it = std::find(_surroundingWormSpaces.begin(), _surroundingWormSpaces.end(), shootVec);
+        if (it != _surroundingWormSpaces.end()) {
+            int index = std::distance(_surroundingWormSpaces.begin(), it);
+            ret.set(index);
+        }
+    }
 }
 
 //returns nullptr if there is a dirt or an enemy within distanceForLost

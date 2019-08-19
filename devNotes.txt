@@ -4,6 +4,10 @@ TODO
       try taking out shooting directly - "safe mode"
 	dont snowball yourself
 
+   UPDATE TO NEW STARTER PACK
+   
+   test aggro vs points bot
+
 	optimization
 		check with different states - there might be other bottlenecks  
 

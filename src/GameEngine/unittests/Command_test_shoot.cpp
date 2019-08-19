@@ -643,14 +643,91 @@ TEST_CASE( "Shoot command: WormOnTarget", "[shoot][WormOnTarget]" ) {
     }
 }
 
+//returns true if worm can shoot the target position
+TEST_CASE( "Shoot command: ClearShot", "[shoot][ClearShot]" ) {
+    GIVEN("A contrived situation")
+    {
+        /*
+            0   1   2   3   4   5   6   7
+        0   .   *   .   .   .   .   .   .
+        1   .   *   .   .   .   .   .   .
+        2   .   .   S   .   12  .   .   .
+        3   .   .   11  D   21  .   .   .
+        4   .   .   .   .   .   .   .   .
+        5   13  .   22  .   L   .   .   .
+        6   .   .   *   .   .   *   .   .
+        7   .   .   .   .   .   .   .   .            
+        8   .   .   .   .   23  .   .   *            
+        9   .   .   .   .   .   .   .   .            
+        */
 
-//TODO ADD UNIT TESTS FOR 
-//Position ShootCommand::GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, std::shared_ptr<GameState> state)
+        bool player1 = GENERATE(true, false);
+        GameState state;
+        GameEngine eng(&state);
+        Worm* shootingWorm = place_worm(player1, 1, {2,3}, state);
+        place_worm(player1, 2, {4,2}, state);
+        place_worm(player1, 3, {0,5}, state);
+        place_worm(!player1, 1, {4,3}, state);
+        place_worm(!player1, 2, {2,5}, state);
+        place_worm(!player1, 3, {4,8}, state);
 
+        state.SetCellTypeAt({3, 3}, CellType::DIRT);
+        state.SetCellTypeAt({2, 2}, CellType::DEEP_SPACE);
+
+        THEN("non-inline point cant be hit")
+        {
+            Position shootVector{0, -1};
+            Position targetPos{1, 1};
+            REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+            targetPos = Position(1, 0);
+            REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("enemy worms can be hit")
+        {
+            Position shootVector{0, 1}; Position targetPos{2, 5}; REQUIRE(ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("friendly worms can be hit")
+        {
+            Position shootVector{-1, 1}; Position targetPos{0, 5}; REQUIRE(ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("space behind worm can't be hit")
+        {
+            Position shootVector{0, 1}; Position targetPos{2, 6}; REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("space behind dirt can't be hit")
+        {
+            Position shootVector{1, 0}; Position targetPos{4, 3}; REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("dirt itself cant be hit")
+        {
+            Position shootVector{1, 0}; Position targetPos{3, 3}; REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("space behind deep space can't be hit")
+        {
+            Position shootVector{0, -1}; Position targetPos{2, 1}; REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("space behind lava can be hit")
+        {
+            Position shootVector{1, 1}; Position targetPos{5, 6}; REQUIRE(ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("lava itself can be hit")
+        {
+            Position shootVector{1, 1}; Position targetPos{4, 5}; REQUIRE(ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("out of range can't be hit")
+        {
+            Position shootVector{1, 1}; Position targetPos{7, 8}; REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        THEN("wacky directions can't be hit")
+        {
+            Position shootVector{-1, -1}; Position targetPos{3, 4}; REQUIRE(!ShootCommand::ClearShot(shootingWorm, &state, shootVector, targetPos));
+        }
+        
+    }
+}
 
 
 //TODO check correct behaviour when 2 worms shoot the same guy in the same turn
-
 
 
 /*

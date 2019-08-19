@@ -17,6 +17,8 @@ class ShootCommand : public Command
         NW  //UP_LEFT   (-1, -1);
     };
 
+    static const Position noShot;
+
     ShootCommand(ShootCommand::ShootDirection dir);
     ShootCommand(Position dir);
     void Execute(bool player1, GameStatePtr state) const override;
@@ -24,7 +26,9 @@ class ShootCommand : public Command
     std::string GetCommandString() const override;
     
     static Worm* WormOnTarget(const Worm* worm, const GameStatePtr state, const Position& shootvector);
-    static Position GetValidShot(const Worm& shootingWorm, const Worm& targetWorm, GameStatePtr state);
+    static Position GetValidShot(const Worm& shootingWorm, const Position& target, GameStatePtr state);
+
+    static bool ClearShot(const Worm* worm, const GameStatePtr state, const Position& shootvector, const Position& targetPos);
 
     bool operator==(const ShootCommand& other);
 
