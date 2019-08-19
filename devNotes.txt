@@ -1,15 +1,14 @@
 TODO
 
-	consider shooting into places where he COULD move
-      try taking out shooting directly - "safe mode"
-	dont snowball yourself
-
    UPDATE TO NEW STARTER PACK
+      run compare over LOTS of matches
+         fix engine bugs
+
+   "read leon's email" and send him my best bot
    
    test aggro vs points bot
 
-	optimization
-		check with different states - there might be other bottlenecks  
+   could consider snowballing where ppl COULD be
 
    finish the loading of previous_move into state
       see [.broken] unit test
@@ -20,10 +19,21 @@ TODO
       Need to prevent getting danced
          opponent move tracking
 
+	optimization
+		Worm_at is a bottleneck, can maybe maintain a lookup table of worm positions, and just return that
+         will have to update it every time a worm is moved
+
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
       bias based on observed behaviour
       
+   explicit exclude of potential game ending move
+      try taking out shooting directly - "safe mode"
+      safe mode
+         only shoot at places opponent could move to
+      explicit exclude of all chances for opponent to shoot?
+         add unit tests for this
+
    store MC results of first level
 
    handle monte carlo ties
@@ -32,9 +42,6 @@ TODO
 
    need to try to get more into the monta carlos.  
       off-by-one banana hits aren't considered...
-
-	run compare over LOTS of matches
-    fix engine bugs
 
    Tuning
       make bot tunable via config file
@@ -50,12 +57,6 @@ TODO
    update reference bot so it's more usefull...
       use bananas
       use select
-
-   explicit exclude of potential game ending move
-      safe mode
-         only shoot at places opponent could move to
-      explicit exclude of all chances for opponent to shoot?
-         add unit tests for this
 
 sort out deployment---------------
         copy bot folder
@@ -166,9 +167,27 @@ to run bot on state file:--------------------------------------------
  - run bot
  - input round number
 
+when making new bot:--------------------------------------------
+ - up version in bot.json
+ - up version in command.cpp
+
 ======================================================================================================
 
 last time i checked it looks like we're spending about 50% of the time in GetRandomValidMoveForPlayer
+   when there are worms nearby GetValidShoots dominates because of the "consider movement" thing
+   otherwise a noticable bottleneck is GameState::Worm_at in NextTurn::GetValidTeleportDigs
 
 
 
+
+#1  GameState::Worm_at(Position const&) (pos=<synthetic pointer>, this=0x7ffffe53fa60) at ../GameState/GameState.hpp:129
+#2  NextTurn::GetValidTeleportDigs(Worm*, GameState*, bool) (worm=worm@entry=0x7ffffe53fbe8, state=state@entry=0x7ffffe53fa60, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63
+#3  0x00000000004a4db6 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffe53fa60, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:338
+
+#1  GameState::Worm_at(Position const&) (pos=<synthetic pointer>, this=0x7ffffdd2fa60) at ../GameState/GameState.hpp:129
+#2  NextTurn::GetValidTeleportDigs(Worm*, GameState*, bool) (worm=worm@entry=0x7ffffdd2fa80, state=state@entry=0x7ffffdd2fa60, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63
+#3  0x00000000004a4bd5 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffdd2fa60, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:338
+
+#1  GameState::Worm_at(Position const&) (pos=<synthetic pointer>, this=0x7ffffe53fa60) at ../GameState/GameState.hpp:123
+#2  NextTurn::GetValidTeleportDigs(Worm*, GameState*, bool) (worm=worm@entry=0x7ffffe53fa80, state=state@entry=0x7ffffe53fa60, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63
+#3  0x00000000004a4bd5 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffe53fa60, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:338
