@@ -20,6 +20,7 @@ struct Worm
     };
 
     GameState* state;
+    unsigned playerId;
     unsigned id;
     int health;
     Position position;
@@ -36,7 +37,7 @@ struct Worm
     bool diedByLavaThisRound;
     bool frozenThisRound;
     int roundsUntilUnfrozen;
-
+    std::vector<Worm*> lastAttackedBy;
 
     Worm(GameState* _state, Worm::Proffession _proffession = Worm::Proffession::COMMANDO);
 
@@ -44,7 +45,7 @@ struct Worm
 
     bool IsDead() const;
     bool IsFrozen() const;
-    void TakeDamage(int dmgAmount);
+    void TakeDamage(int dmgAmount, Worm* attacker = nullptr);
 
     bool operator==(const Worm &other) const;
 

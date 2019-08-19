@@ -189,15 +189,8 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     //std::vector<std::string> matches;
-    //matches.push_back("Test_files/matches/2019.08.08.22.29.04/");
-    //matches.push_back("Test_files/matches/2019.08.09.16.35.29/");
-    //matches.push_back("Test_files/matches/2019.08.10.09.34.19/");
-    //matches.push_back("Test_files/matches/2019.08.10.09.52.21/");
-    //matches.push_back("Test_files/matches/2019.08.10.09.52.25/");
-    //matches.push_back("Test_files/matches/2019.08.10.10.19.24/");
-    //matches.push_back("Test_files/matches/2019.08.10.12.07.57/"); //snowball before banana pls
-    //matches.push_back("Test_files/matches/2019.08.11.06.06.54/"); //dig points for simultaneous dig/banana
-    //matches.push_back("Test_files/matches/2019.08.10.11.41.52/");
+    //matches.push_back("Test_files/matches/2019.08.19.13.54.04/");
+
 
     for(auto & match: matches) {
         match = match + std::string("/");

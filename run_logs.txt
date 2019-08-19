@@ -258,3 +258,7 @@ Engine version: 2019.3.0 -- 2019_August_17__04_31_20 -- ParallelID: 1
 (wins/draws/losses):     jp15                     jp16                     
 jp15:                    0/0/0                    32/0/54                    (2/0/8)
 
+consider shooting where opponents could move================================================================================================================================================
+Engine version: 2019.3.0 -- 2019_August_19__03_13_52 -- ParallelID: 
+(wins/draws/losses):     jp16                     jp17                     
+jp16:                    0/0/0                    21/0/31                   (9/0/17)

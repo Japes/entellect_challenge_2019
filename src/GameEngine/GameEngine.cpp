@@ -66,6 +66,7 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     ProcessWormFlags(p2worm);
 
     ApplyPowerups();
+    GiveKillScores();
 
     _state->player1.UpdateCurrentWorm();
     _state->player2.UpdateCurrentWorm();
@@ -81,6 +82,23 @@ void GameEngine::ProcessWormFlags(Worm* worm)
 {
     worm->movedThisRound = false;
     worm->diedByLavaThisRound = false;
+}
+
+void GameEngine::GiveKillScores()
+{
+    _state->ForAllWorms([&](Worm& worm) {
+        if(worm.IsDead()) {
+            for(auto & attackingWorm : worm.lastAttackedBy ) {
+                Player* attackingWormsPlayer = attackingWorm->playerId == 1? &_state->player1 : &_state->player2;
+                if(attackingWorm->playerId == worm.playerId) {
+                    attackingWormsPlayer->command_score -= GameConfig::scores.killShot;
+                } else {
+                    attackingWormsPlayer->command_score += GameConfig::scores.killShot;
+                }
+            }
+        }
+        worm.lastAttackedBy.clear();
+    });    
 }
 
 void GameEngine::ApplyLava()

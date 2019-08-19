@@ -26,6 +26,8 @@ struct Player
     Player(GameState* _state);
     Player(const Player& other);
 
+    void SetId(int _id);
+
     Worm* GetCurrentWorm();
     Worm* GetWormById(int index);
     void UpdateCurrentWorm();

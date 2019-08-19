@@ -6,6 +6,9 @@ TODO
 
    "read leon's email" and send him my best bot
    
+   update analysis script to show N
+   get match stats for chouf
+   
    test aggro vs points bot
 
    could consider snowballing where ppl COULD be
@@ -22,6 +25,7 @@ TODO
 	optimization
 		Worm_at is a bottleneck, can maybe maintain a lookup table of worm positions, and just return that
          will have to update it every time a worm is moved
+      might need to consider taking shortcuts and not simulating 100%
 
    heavier playthroughs (biases)
       bias towards shooting (for opponent)

@@ -58,13 +58,9 @@ void ShootCommand::Execute(bool player1, GameStatePtr state) const
         return;
     }
 
-    hitworm->TakeDamage(worm->weapon.damage);
+    hitworm->TakeDamage(worm->weapon.damage, worm);
 
     int points = worm->weapon.damage*2;
-    
-    if(hitworm->IsDead()) {
-        points += GameConfig::scores.killShot;
-    }
 
     if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitworm;})) {
         points *= -1;

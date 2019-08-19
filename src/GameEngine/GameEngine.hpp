@@ -44,6 +44,7 @@ class GameEngine
     bool DoCommand(const Command& command, bool player1, bool valid);
     void ProcessWormFlags(Worm* worm);
     void ApplyPowerups();
+    void GiveKillScores();
     void ApplyLava();
     void UpdateWinCondition();
     void SetupLava(unsigned roundNum);

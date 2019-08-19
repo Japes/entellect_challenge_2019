@@ -15,8 +15,8 @@ GameState::GameState() :
     player2(this),
     roundNumber{1}
 {
-    player1.id = 1;
-    player2.id = 2;
+    player1.SetId(1);
+    player2.SetId(2);
 
     if(!haveSetup) {
         Initialise();
@@ -73,16 +73,17 @@ void GameState::SetupLavas()
 
         float brEndRound = GameConfig::maxRounds * GameConfig::battleRoyaleEnd;
         float fullPercentageRange = (roundNum - brStartRound) / (brEndRound - brStartRound);
-        //clamp tp [0,1]
+
         float currentProgress = fullPercentageRange > 0 ? fullPercentageRange : 0;
         currentProgress = currentProgress > 1 ? 1 : currentProgress;
 
-        float safeAreaRadius = (GameConfig::mapSize / 2) * (1 - currentProgress);
+        float nonFloodedRadius = ((GameConfig::mapSize / 2) * (1 - currentProgress));
+        float safeAreaRadius = nonFloodedRadius >= 3? nonFloodedRadius : safeAreaRadius;
 
         for(int x = 0; x < GameConfig::mapSize; ++x) {
             for(int y = 0; y < GameConfig::mapSize; ++y) {
                 Position pos(x,y);
-                if(mapCenter.EuclideanDistanceTo(pos) > (safeAreaRadius + 1)) {
+                if(mapCenter.EuclideanDistanceTo(pos) > safeAreaRadius) {
                     AddLavaAt(pos, roundNum);
                 }
             }

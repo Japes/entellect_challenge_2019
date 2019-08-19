@@ -79,12 +79,9 @@ void BananaCommand::Execute(bool player1, GameStatePtr state) const
             auto hitWorm = state->Worm_at(mapPos);
             if(hitWorm != nullptr) {
                 int dmgPoints = 0;
-                hitWorm->TakeDamage(dmg);
+                hitWorm->TakeDamage(dmg, worm);
                 dmgPoints += dmg*2;
 
-                if(hitWorm->IsDead()) {
-                    dmgPoints += GameConfig::scores.killShot;
-                }
                 if(std::any_of(player->worms.begin(), player->worms.end(), [&](Worm& w){return &w == hitWorm;})) {
                     dmgPoints *= -1;
                 }

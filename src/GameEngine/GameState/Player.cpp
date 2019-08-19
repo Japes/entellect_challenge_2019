@@ -21,7 +21,6 @@ Player::Player(GameState* _state) :
 }
 
 Player::Player(const Player& other) :
-    id{other.id},
     command_score{other.command_score},
     health{other.health},
     currentWormId{other.currentWormId},
@@ -29,6 +28,15 @@ Player::Player(const Player& other) :
     remainingWormSelections{other.remainingWormSelections},
     worms{other.worms}
 {
+    SetId(other.id);
+}
+
+void Player::SetId(int _id)
+{
+    id = _id;
+    worms[0].playerId = _id;
+    worms[1].playerId = _id;
+    worms[2].playerId = _id;
 }
 
 Worm* Player::GetCurrentWorm()

@@ -1,9 +1,10 @@
 #include "Worm.hpp"
 #include "GameState.hpp"
 
-Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, id{0}, position{-1,-1}, 
+Worm::Worm(GameState* _state, Worm::Proffession _proffession) : state{_state}, playerId{0}, id{0}, position{-1,-1}, 
                                                                 movedThisRound{false}, diedByLavaThisRound{false}, frozenThisRound{false}, roundsUntilUnfrozen{0}
 {
+    lastAttackedBy.reserve(6);
     SetProffession(_proffession);
 }
 
@@ -52,9 +53,12 @@ bool Worm::IsFrozen() const
     return roundsUntilUnfrozen > 0;
 }
 
-void Worm::TakeDamage(int dmgAmount)
+void Worm::TakeDamage(int dmgAmount, Worm* attacker)
 {
     health -= dmgAmount;
+    if(attacker != nullptr && health <= 20) { //only need to add if he could still get killed this turn
+        lastAttackedBy.push_back(attacker);
+    }
     state->player1.RecalculateHealth();
     state->player2.RecalculateHealth();
 }
@@ -75,7 +79,8 @@ bool Worm::operator==(const Worm &other) const
     std::endl;
     */
 
-    return (id == other.id &&
+    return (playerId == other.playerId &&
+            id == other.id &&
             proffession == other.proffession &&
             health == other.health &&
             position == other.position &&
