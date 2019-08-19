@@ -1,0 +1,12 @@
+{
+	"name": "Guided_alpha_beta_bot",
+	"DEBUG": false,
+	"show_timings": false,
+	"score_scale": 0.05,
+	"total_health_scale": 1,
+	"max_health_scale": 1,
+	"select_scale": 7,
+	"banana_scale": 20,
+	"frost_scale": 8,
+	"worm_count_scale": -10
+}

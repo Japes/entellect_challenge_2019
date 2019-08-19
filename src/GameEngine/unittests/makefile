@@ -44,6 +44,7 @@ debug: all
 run: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME)
 	./$(OBJ_DIR)/$(EXENAME) $(TEST)
 #	./$(OBJ_DIR)/$(EXENAME) $(TEST) [performance]
+#	./$(OBJ_DIR)/$(EXENAME) $(TEST) [comparison]
 
 $(OBJ_DIR)/$(EXENAME): $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $^ -o $@

@@ -721,6 +721,44 @@ TEST_CASE( "Correct player wins on a knockout", "[KO]" ) {
     }
 }
 
+TEST_CASE( "If a worm is killed, everyone who damaged him that round gets kill points", "[killpoints]" ) {
+
+    GIVEN("A contrived situation")
+    {
+        GameState state;
+        GameEngine eng(&state);
+        bool player1 = true;//GENERATE(true, false);
+
+        Worm* dyingWorm = place_worm(player1, 2, {10,10}, state);
+        place_worm(player1, 1, {13,10}, state);
+        Worm* player2Worm = place_worm(!player1, 1, {5,10}, state);
+        dyingWorm->health = 24; //just enough for a banana and a shot to kill him
+        player2Worm->SetProffession(Worm::Proffession::AGENT);
+
+        ShootCommand player1move(ShootCommand::ShootDirection::W);
+        BananaCommand player2move({10,10});
+
+        Player* player1Player = player1? &state.player1 : &state.player2;
+        Player* player2Player = !player1? &state.player1 : &state.player2;
+        int player1ScoreBefore = player1Player->command_score;
+        int player2ScoreBefore = player2Player->command_score;
+
+        WHEN("2 worms damage a guy and he dies that round")
+        {
+            if(player1) {
+                eng.AdvanceState(player1move, player2move);
+            } else {
+                eng.AdvanceState(player2move, player1move);
+            }
+
+            THEN("Both of them get the killshot points") {
+                CHECK(player1Player->command_score == player1ScoreBefore - (GameConfig::scores.killShot + GameConfig::commandoWorms.weapon.damage*2));
+                CHECK(player2Player->command_score == player2ScoreBefore + (GameConfig::scores.killShot + GameConfig::agentWorms.banana.damage*2));
+            }
+        }
+    }
+}
+
 TEST_CASE( "Reminder that we assume that banana and snowball have the same range", "[banana_snowball_reminder]" ) {
     REQUIRE(GameConfig::agentWorms.banana.range == GameConfig::technologistWorms.snowball.range);
     //if this fails, it is a reminder that you need to update BananaSnowballCanReach
