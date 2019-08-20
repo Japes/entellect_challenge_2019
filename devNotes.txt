@@ -1,11 +1,12 @@
 TODO
 
+   smaller structs
+   playoffs with points bot 
+   
    UPDATE TO NEW STARTER PACK
       run compare over LOTS of matches
          fix engine bugs
 
-   "read leon's email" and send him my best bot
-   
    update analysis script to show N
    get match stats for chouf
    
@@ -26,6 +27,9 @@ TODO
 		Worm_at is a bottleneck, can maybe maintain a lookup table of worm positions, and just return that
          will have to update it every time a worm is moved
       might need to consider taking shortcuts and not simulating 100%
+      make data structures smaller
+      precompute as much as possible e.g. can i shoot this guy
+      try to keep precomputed structures small (within cache)
 
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
