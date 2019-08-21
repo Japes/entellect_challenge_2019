@@ -38,69 +38,6 @@ TEST_CASE( "GameState deep copy", "[state_deep_copy]" ) {
     }
 }
 
-TEST_CASE( "Convert string to command", "[GetCommandFromString]" ) {
-
-    GIVEN("A string for a command...")
-    {
-        std::string move = GENERATE(
-            std::string{"move 5 27"}, 
-            std::string{"dig 22 13"}, 
-            std::string{"shoot NE"}, 
-            std::string{"banana 30 20"},
-            std::string{"snowball 13 14"},
-            std::string{"select 1;move 5 27"}, 
-            std::string{"select 2;dig 22 13"}, 
-            std::string{"select 3;shoot NE"}, 
-            std::string{"select 1;banana 30 20"},
-            std::string{"select 2;snowball 13 14"}
-            );
-
-        WHEN("We convert it to a command")
-        {
-            auto cmd = GameStateLoader::GetCommandFromString(move);
-            THEN("It converts correctly...")
-            {
-                INFO(move);
-                REQUIRE(cmd != nullptr);
-                REQUIRE(cmd->GetCommandString() == move);
-            }
-        }
-    }
-
-    GIVEN("the format of a do nothing...")
-    {
-        std::string move{"nothing \"Player chose to do nothing\""};
-
-        WHEN("We convert it to a command")
-        {
-            auto cmd = GameStateLoader::GetCommandFromString(move);
-            THEN("It converts correctly...")
-            {
-                INFO(move);
-                REQUIRE(cmd != nullptr);
-                REQUIRE(cmd->GetCommandString() == "nothing");
-            }
-        }
-    }
-
-    GIVEN("the format of an invalid move...")
-    {
-        std::string move{"invalid"};
-
-        WHEN("We convert it to a command")
-        {
-            auto cmd = GameStateLoader::GetCommandFromString(move);
-            THEN("It converts correctly...")
-            {
-                INFO(move);
-                REQUIRE(cmd != nullptr);
-                GameState state;
-                REQUIRE(!cmd->IsValid(true, &state));
-            }
-        }
-    }
-}
-
 TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
     WHEN("We make a copy of a state")
     {
