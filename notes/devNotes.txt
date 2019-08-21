@@ -1,13 +1,6 @@
 TODO
 
-   get match stats for chouf
-      questions i have:
-         how important is it to get the health pack
-         how important is score (do matches ever go to score)
-            what if 1 worm is a coward?
-         how important is snowball/banana use
-            or does it all come down to shootouts
-         numbers - is it better to have more worms, or rather fewer stronger worms
+
 
    run compare over LOTS of matches
       fix engine bugs
@@ -62,6 +55,15 @@ TODO
    update reference bot so it's more usefull...
       use bananas
       use select
+
+
+questions i have for chouf:--------------------------------------
+         how important is it to get the health pack
+         how important is score (do matches ever go to score)
+            what if 1 worm is a coward?
+         how important is snowball/banana use
+            or does it all come down to shootouts
+         numbers - is it better to have more worms, or rather fewer stronger worms
 
 sort out deployment---------------
         copy bot folder
