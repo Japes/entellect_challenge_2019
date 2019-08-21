@@ -26,7 +26,8 @@ Player::Player(const Player& other) :
     currentWormId{other.currentWormId},
     consecutiveDoNothingCount{other.consecutiveDoNothingCount},
     remainingWormSelections{other.remainingWormSelections},
-    worms{other.worms}
+    worms{other.worms},
+    previousCommand{other.previousCommand}
 {
     SetId(other.id);
 }

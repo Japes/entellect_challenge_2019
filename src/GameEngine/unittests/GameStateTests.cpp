@@ -101,78 +101,6 @@ TEST_CASE( "Convert string to command", "[GetCommandFromString]" ) {
     }
 }
 
-TEST_CASE( "GameState load worms from file", "[state_load_worms]" ) {
-    GIVEN("A game state file with different kinds of worms")
-    {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state = GameStateLoader::LoadGameState(roundJSON);
-
-        THEN("We create the worms correctly")
-        {
-            REQUIRE(state.player1.worms[0].id == 1);
-            REQUIRE(state.player1.worms[0].proffession == Worm::Proffession::COMMANDO);
-            REQUIRE(state.player1.worms[0].roundsUntilUnfrozen == 3);
-            REQUIRE(state.player1.worms[1].id == 2);
-            REQUIRE(state.player1.worms[1].proffession == Worm::Proffession::AGENT);
-            REQUIRE(state.player1.worms[1].roundsUntilUnfrozen == 0);
-            REQUIRE(state.player1.worms[2].id == 3);
-            REQUIRE(state.player1.worms[2].proffession == Worm::Proffession::TECHNOLOGIST);
-            REQUIRE(state.player1.worms[2].roundsUntilUnfrozen == 0);
-        }
-    }
-}
-
-TEST_CASE( "GameState load previous command", "[state_load_previous_cmd][.broken]" ) {
-    GIVEN("A game state file")
-    {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state = GameStateLoader::LoadGameState(roundJSON);
-
-        THEN("Previous command is read correctly")
-        {
-            REQUIRE(state.player1.previousCommand != nullptr);
-            REQUIRE(state.player1.previousCommand->GetCommandString() == "move 26 13");
-            REQUIRE(state.player2.previousCommand != nullptr);
-            REQUIRE(state.player2.previousCommand->GetCommandString() == "nothing");
-        }
-    }
-}
-
-TEST_CASE( "GameState load lava", "[state_load_lava]" ) {
-    GIVEN("A game state file")
-    {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state = GameStateLoader::LoadGameState(roundJSON);
-
-        THEN("Cell types are loaded correctly")
-        {
-            REQUIRE(state.CellType_at({6,0}) == CellType::DEEP_SPACE );
-            REQUIRE(state.CellType_at({11,0}) == CellType::DIRT );
-            REQUIRE(state.CellType_at({15,3}) == CellType::AIR );
-            REQUIRE(state.LavaAt({21,3}));
-        }
-    }
-}
-
-TEST_CASE( "GameState static lava state", "[state_load_lava_static]" ) {
-    GIVEN("A game state file loaded with lavas already")
-    {
-        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
-        GameState state = GameStateLoader::LoadGameState(roundJSON);
-        REQUIRE(state.LavaAt({1,15}));
-
-        WHEN("We create another game state")
-        {
-            GameState secondOne;
-
-            THEN("Lavas in other rounds aren't affected")
-            {
-                REQUIRE(!secondOne.LavaAt({1,15}));
-            }
-        }
-    }
-}
-
 TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
     WHEN("We make a copy of a state")
     {
@@ -222,6 +150,10 @@ TEST_CASE( "Copy constructor", "[copy_constructor]" ) {
             REQUIRE(copied_state->player1.worms[0].health == original_state->player1.worms[0].health);
             REQUIRE(copied_state->player1.worms[1].health == original_state->player1.worms[1].health);
             REQUIRE(copied_state->player1.worms[2].health == original_state->player1.worms[2].health);
+
+            REQUIRE(copied_state->player1.previousCommand == original_state->player1.previousCommand);
+            REQUIRE(copied_state->player2.previousCommand == original_state->player2.previousCommand);
+
         }
     }
 }

@@ -120,7 +120,7 @@ std::shared_ptr<Command> GameStateLoader::GetCommandFromString(std::string cmd)
         std::string indexStr = cmd.substr(firstSpace + 1, 1); 
         int index = std::stoi(indexStr); //will always be 1 digit
 
-        size_t startOfSelected = firstSpace + 3;
+        size_t startOfSelected = firstSpace + 4;
         std::string selectedCmdstr = cmd.substr(startOfSelected, cmd.length() - startOfSelected );
         std::shared_ptr<Command> selectedCmd = GetCommandFromString(selectedCmdstr);
 
