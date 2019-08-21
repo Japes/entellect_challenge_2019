@@ -1,13 +1,5 @@
 TODO
 
-   finish the loading of previous_move into state
-      see [.broken] unit test
-      make unit test to confirm that carry-over state is correct
-         num selects
-         num bananas
-         num snowballs
-
-   update analysis script to show N
    get match stats for chouf
       questions i have:
          how important is it to get the health pack
@@ -36,13 +28,16 @@ TODO
 
    rush for health pack
 
-   smaller structs
-
-   consider 1-off snowballing if the dude can't move
-
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
       bias based on observed behaviour
+         does the dude go for 1-offs
+         does he always shoot
+         does he always dodge
+
+   smaller structs
+
+   consider 1-off snowballing if the dude can't move
 
    store MC results of first level
 
