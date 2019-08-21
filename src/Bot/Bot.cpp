@@ -27,9 +27,8 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
     auto state1 = GameStateLoader::LoadGameState(roundJSON);
 
-    AdjustOpponentBananaCount(ImPlayer1, &state1);
+    AdjustOpponentSpellCount(ImPlayer1, &state1, _last_round_state.get());
     _last_round_state = std::make_shared<GameState>(state1); //no idea why it needs to be done this way
-
 
     //do some heuristics---------------------------------------------------------------
     //select
@@ -104,33 +103,23 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr 
     }
 }
 
-void Bot::AdjustOpponentBananaCount(bool player1, GameStatePtr state1)
+void Bot::AdjustOpponentSpellCount(bool player1, GameStatePtr current_state, GameStatePtr prev_state)
 {
     //try to figure out if the opponent threw a banana (rough heuristic here)
-    if(_last_round_state != nullptr) {
-        Player* opposingPlayerNow = player1? &state1->player2 : &state1->player1;
-        Player* opposingPlayerPreviously = player1? &_last_round_state->player2 : &_last_round_state->player1;
+    if(prev_state != nullptr) {
+        
+        Player* opposingPlayerNow = player1? &current_state->player2 : &current_state->player1;
+        Player* opposingPlayerPreviously = player1? &prev_state->player2 : &prev_state->player1;
 
-        opposingPlayerNow->worms[2].banana_bomb_count = opposingPlayerPreviously->worms[2].banana_bomb_count;
+        Command::CommandType prevCommand = static_cast<Command::CommandType>(opposingPlayerNow->previousCommand->Order());
 
-        if(opposingPlayerNow->worms[2].banana_bomb_count <= 0) {
-            opposingPlayerNow->worms[2].banana_bomb_count = 0; //in case it somehow went negative
-            return;
-        }
+        opposingPlayerNow->worms[1].banana_bomb_count = opposingPlayerPreviously->worms[1].banana_bomb_count;
+        opposingPlayerNow->worms[2].snowball_count = opposingPlayerPreviously->worms[2].snowball_count;
 
-        std::cerr << "(" << __FUNCTION__ << ") --------BANANA COUNT: " << opposingPlayerNow->worms[2].banana_bomb_count << std::endl;
-
-        auto opponentScoreDiff = opposingPlayerNow->command_score - opposingPlayerPreviously->command_score;
-
-        int pointsForDig = GameConfig::scores.dig;
-        int pointsForShot = GameConfig::commandoWorms.weapon.damage*2;
-        int pointsForKillShot = GameConfig::commandoWorms.weapon.damage*2 + GameConfig::scores.killShot;
-        if(opponentScoreDiff > pointsForDig && 
-            opponentScoreDiff != pointsForShot && 
-            opponentScoreDiff != pointsForKillShot && 
-            opposingPlayerNow->worms[2].banana_bomb_count > 0) {
-            --opposingPlayerNow->worms[2].banana_bomb_count;
-            std::cerr << "(" << __FUNCTION__ << ") I RECKON OPPONENT THREW A BANANA----------------COUNT NOW " << opposingPlayerNow->worms[2].banana_bomb_count << std::endl;
+        if(prevCommand == Command::CommandType::BANANA && opposingPlayerNow->worms[1].banana_bomb_count > 0) {
+            --opposingPlayerNow->worms[1].banana_bomb_count;
+        } else if(prevCommand == Command::CommandType::SNOWBALL && opposingPlayerNow->worms[2].snowball_count > 0) {
+            --opposingPlayerNow->worms[2].snowball_count;            
         }
     }
 }

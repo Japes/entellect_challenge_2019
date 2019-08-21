@@ -15,6 +15,7 @@ class Bot
 
     std::string runStrategy(rapidjson::Document& roundJSON);
     uint64_t GetNumPlies();
+    void AdjustOpponentSpellCount(bool player1, GameStatePtr current_state, GameStatePtr prev_state);
 
     private:
 
@@ -31,7 +32,6 @@ class Bot
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
     void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr state1, bool ImPlayer1, int playthroughDepth);
-    void AdjustOpponentBananaCount(bool player1, GameStatePtr state1);
 };
 
 #endif
