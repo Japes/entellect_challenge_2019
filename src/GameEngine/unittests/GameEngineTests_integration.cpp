@@ -42,7 +42,8 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
 
     for(auto & file : files) {
         bot.runStrategy(file);
-        INFO("Moves per second: " << (bot.GetNumPlies()*1000000000)/mcTime_ns << " m/s)");
+        auto mps = (bot.GetNumPlies()*1000000000)/mcTime_ns;
+        INFO("Moves per second: " << mps << " m/s (so N should be " << (mps * 0.88 / playThroughDepth) << ")");
         CHECK(false);
     }
 }

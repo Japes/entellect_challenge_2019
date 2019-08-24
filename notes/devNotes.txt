@@ -1,6 +1,6 @@
 TODO
 
-   why is n wrong in actual runs
+   opponent MC!
 
    run compare over LOTS of matches
       fix engine bugs
@@ -56,6 +56,8 @@ TODO
       use bananas
       use select
 
+   why is n wrong in actual runs
+      things are a bit worse when there's another bot running - test runs on a quieter system
 
 questions i have for chouf:--------------------------------------
          how important is it to get the health pack
