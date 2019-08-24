@@ -15,6 +15,13 @@ jp12 - put in heuristic to avoid getting lost - THIS WAS NOT TESTED 100%, CANNIN
       - updated engine for new rules
       - change MC to optimise for health diff instead of score
       - remove banana and nearestDirt heuristic
+...
+
+jp15 - some engine bugfixes, optimization
+jp16 - optimization
+jp17 - added preemptive shooting
+jp18 - load previous move properly, counts opponent bombs correctly now
+jp19 - use n instead of w/n to determine best monte carlo move
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -266,13 +273,13 @@ jp16:                    0/0/0                    21/0/31                   (9/0
 leon's bot ================================================================================================================================================
 Engine version: 2019.3.0 -- 2019_August_20__04_16_09 -- ParallelID: 
 (wins/draws/losses):     treesearchbot            jp17                     jp16                     
-treesearchbot:           0/0/0                    6/0/46                   8/0/44                   (14/0/90)
-jp17:                    46/0/6                   0/0/0                    32/0/20                  (78/0/26)
-jp16:                    44/0/8                   20/0/32                  0/0/0                    (64/0/40)
+treesearchbot:           0/0/0                    11/0/93                  12/0/92    
+jp17:                    	                      0/0/0                    57/0/47  
 
-Engine version: 2019.3.0 -- 2019_August_20__04_24_14 -- ParallelID: 1
-(wins/draws/losses):     jp16                     jp17                     treesearchbot            
-jp16:                    0/0/0                    27/0/25                  48/0/4                   (75/0/29)
-jp17:                    25/0/27                  0/0/0                    47/0/5                   (72/0/32)
-treesearchbot:           4/0/48                   5/0/47                   0/0/0                    (9/0/95)
+
+use n instead of w/n ================================================================================================================================================
+Engine version: 2019.3.0 -- 2019_August_24__12_36_05 -- ParallelID: 
+(wins/draws/losses):     jp19                     jp18                     
+jp19:                    0/0/0                    5/0/2                 
+
 

@@ -6,9 +6,4 @@
 #include "../MCNode.hpp"
 
 //TODO...
-TEST_CASE( "Best node", "[BestNode]" ) {
-    GIVEN("A bunch of nodes")
-    {
 
-    }
-}

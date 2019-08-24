@@ -8,6 +8,10 @@ MonteCarlo::MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float 
     }
 }
 
+MonteCarlo::MonteCarlo(std::vector<std::shared_ptr<MCNode>> nodes, float c) : _N{0}, _c{c}, _nodes{nodes}
+{
+}
+
 std::shared_ptr<MCNode> MonteCarlo::NextNode()
 {
     for(auto & node: _nodes) {

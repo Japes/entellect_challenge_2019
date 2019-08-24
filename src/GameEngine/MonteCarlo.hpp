@@ -10,6 +10,7 @@ class MonteCarlo
 	public:
 
     MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c);
+    MonteCarlo(std::vector<std::shared_ptr<MCNode>> nodes, float c);
 
     std::shared_ptr<MCNode> NextNode();
     void UpdateNumSamples();
