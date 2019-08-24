@@ -1,17 +1,20 @@
 TODO
 
-   opponent MC!
+   refactors
+      clamping stuff must go in evaluation function
 
-   run compare over LOTS of matches
-      fix engine bugs
-
-	optimization
+   optimization
+      precompute as much as possible e.g. can i shoot this guy
+         want a lookup table of posdiff -> bitvector of shoot directions
+         try to keep precomputed structures small (within cache)
 		Worm_at is a bottleneck, can maybe maintain a lookup table of worm positions, and just return that
          will have to update it every time a worm is moved
       might need to consider taking shortcuts and not simulating 100%
       make data structures smaller
-      precompute as much as possible e.g. can i shoot this guy
-      try to keep precomputed structures small (within cache)
+      
+   run compare over LOTS of matches
+      fix engine bugs
+
 
    "Safe mode"
       explicit exclude of potential game ending move

@@ -31,7 +31,7 @@ class Bot
     uint64_t _numplies;
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
-    void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr state1, bool ImPlayer1, int playthroughDepth);
+    void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> player1_mc, std::shared_ptr<MonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth);
 };
 
 #endif

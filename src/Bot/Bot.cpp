@@ -34,32 +34,28 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //select
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, &state1);
 
-    //banana mine
-    //auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
-    //if(bananaMove != nullptr) {
-    //    return selectPrefix + bananaMove->GetCommandString();
-    //}
-
-    ////heuristic to avoid getting lost
-    //auto nearestDirtMove = NextTurn::GetNearestDirtHeuristic(ImPlayer1, state1, _distanceForLost);
-    //if(nearestDirtMove != nullptr) {
-    //    std::cerr << "(" << __FUNCTION__ << ") USING HEURISTIC TO PREVENT GETTING LOST" << std::endl;
-    //    return selectPrefix + nearestDirtMove->GetCommandString();
-    //}
-
     //begin monte carlo----------------------------------------------------------------
-    auto mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(ImPlayer1, &state1, true), _mc_c);
+    auto player1_mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(true, &state1, true), _mc_c);
+    auto player2_mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(false, &state1, true), _mc_c);
+
     _numplies = 0;
-    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc, &state1, ImPlayer1, _playthroughDepth);
-    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc, &state1, ImPlayer1, _playthroughDepth);
+    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, player1_mc, player2_mc, &state1, _playthroughDepth);
+    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, player1_mc, player2_mc, &state1, _playthroughDepth);
     t1.join();
     t2.join();
 
     //output result--------------------------------------------------------------------
     //choose the best move and do it
-    auto best_move = mc->GetBestMove();
+
+    auto my_mc =     ImPlayer1 ? player1_mc : player2_mc;
+    auto enemy_mc = !ImPlayer1 ? player1_mc : player2_mc;
+
+    auto best_move = my_mc->GetBestMove();
     std::cerr << "JP19:" << std::endl;
-    mc->PrintState();
+    my_mc->PrintState();
+
+    std::cerr << "JP19 Opponent:" << std::endl;
+    enemy_mc->PrintState();
 
     return selectPrefix + best_move->GetCommandString();
 }
@@ -69,14 +65,15 @@ uint64_t Bot::GetNumPlies()
     return _numplies;
 }
 
-void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr state1, bool ImPlayer1, int playthroughDepth)
+void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> player1_mc, std::shared_ptr<MonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth)
 {
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
             _mtx.lock();
             //choose next node
-            auto next_node = mc->NextNode();
+            auto player1_next_node = player1_mc->NextNode();
+            auto player2_next_node = player2_mc->NextNode();
             _mtx.unlock();
 
             //load the state
@@ -85,12 +82,18 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr 
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int numplies{0};
-            auto thisScore = eng.Playthrough(ImPlayer1, next_node->GetCommand(), nextMoveFn, EvaluationFunctions::HealthComparison, playthroughDepth, numplies);
+
+            auto thisScore = eng.Playthrough(player1_next_node->GetCommand(), player2_next_node->GetCommand(),
+                                            nextMoveFn, EvaluationFunctions::HealthComparison, playthroughDepth, numplies);
             _numplies += numplies;
 
             _mtx.lock();
-            next_node->AddPlaythroughResult(thisScore);
-            mc->UpdateNumSamples();
+            //remember Playthrough always returns score in terms of player 1
+            player1_next_node->AddPlaythroughResult(thisScore);
+            player1_mc->UpdateNumSamples();
+
+            player2_next_node->AddPlaythroughResult(1 - thisScore);
+            player2_mc->UpdateNumSamples();
             _mtx.unlock();
         }
     }

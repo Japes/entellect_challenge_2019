@@ -27,7 +27,7 @@ TEST_CASE( "Playthroughs - depth", "[playthrough][playthrough_depth]" )
             int roundBefore = state->roundNumber;
             int depth = 4;
             int plies = 0;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
+            eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
 
             THEN("The game engine advances by that many rounds")
             {
@@ -40,7 +40,7 @@ TEST_CASE( "Playthroughs - depth", "[playthrough][playthrough_depth]" )
             int depth = -1;
             REQUIRE(eng.GetResult().result == GameEngine::ResultType::IN_PROGRESS);
             int plies = 0;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
+            eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
 
             THEN("The game engine advances until the end")
             {
@@ -82,7 +82,8 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
             AND_THEN("We don't run the playthrough to the end of the game")
             {
-                auto ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
+                auto ret = eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), 
+                                            fakeNextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
 
                 THEN("We get something greater than 0.5")
                 {
@@ -95,7 +96,8 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
             AND_THEN("We run the playthrough till the end, player1 wins outright")
             {
-                auto ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, plies);
+                auto ret = eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(),
+                                            fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, plies);
 
                 THEN("We get 1")
                 {
@@ -122,7 +124,8 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
             AND_THEN("We don't run the playthrough to the end of the game")
             {
-                auto ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
+                auto ret = eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), 
+                                            fakeNextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
 
                 THEN("We get something less than 0.5")
                 {
@@ -135,7 +138,8 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
             AND_THEN("We run the playthrough till the end, player2 wins outright")
             {
-                auto ret = eng.Playthrough(true, std::make_shared<DoNothingCommand>(), fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, plies);
+                auto ret = eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), 
+                                            fakeNextMoveFn, EvaluationFunctions::ScoreComparison, -1, plies);
 
                 THEN("We get 0")
                 {

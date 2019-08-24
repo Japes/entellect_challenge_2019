@@ -311,7 +311,7 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
             int plies = 0;
-            eng.Playthrough(true, std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
+            eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
         }
     }
 }
@@ -331,7 +331,7 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int depth = 20;
             int plies = 0;
-            eng.Playthrough(true, nextMoveFn(true, state.get()), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
+            eng.Playthrough(nextMoveFn(true, state.get()), nextMoveFn(false, state.get()), nextMoveFn, EvaluationFunctions::ScoreComparison, depth, plies);
         }
     }
 }

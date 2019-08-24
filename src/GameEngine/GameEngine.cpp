@@ -151,24 +151,26 @@ void GameEngine::ApplyPowerups()
 }
 
 //do a random playthrough to the end and return:
-//+1 if player wins
-//-1 if player loses
+//1 if player 1 wins
+//0 if player 1 loses
+//
+// so returned scores are always in terms of player 1
+//
 //depth is how far to go before applying heuristic, -1 means play to end
 //TODO pass in strategies for each player
 //TODO pass in whether or not it should return binary or weights
-float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, 
+float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command, 
+                            std::shared_ptr<Command> player2_Command, 
                             std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn,
                             std::function<float(bool, GameStatePtr)> evaluationFn,
                             int depth,
                             int& numPlies)
 {
-    Player* player = _state->GetPlayer(player1);
-
-    std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
-    std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
+    std::shared_ptr<Command> p1Command = player1_Command;
+    std::shared_ptr<Command> p2Command = player2_Command;
 
     //run the playthrough
-    auto evaluationBefore = evaluationFn(player1, _state);
+    auto evaluationBefore = evaluationFn(true, _state); //always in terms of player 1
 
     numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
@@ -180,13 +182,13 @@ float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command,
         ++numPlies;
     }
 
-    auto evaluationAfter = evaluationFn(player1, _state);
+    auto evaluationAfter = evaluationFn(true, _state); //always in terms of player 1
 
     //evaluate the playthrough
 
     //first, best/worst possible outcome
     if(_currentResult.result != ResultType::IN_PROGRESS) {
-        if(_currentResult.winningPlayer == player) {
+        if(_currentResult.winningPlayer == &_state->player1) {
             return 1;
         } else {
             return 0;

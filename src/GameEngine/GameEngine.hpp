@@ -31,7 +31,8 @@ class GameEngine
     GameEngine(std::shared_ptr<GameState> state);
 
     void AdvanceState(const Command& player1_command, const Command& player2_command);
-    float Playthrough(bool player1, std::shared_ptr<Command> command, 
+    float Playthrough(std::shared_ptr<Command> player1_Command, 
+        std::shared_ptr<Command> player2_Command, 
         std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn, 
         std::function<float(bool, GameStatePtr)> evaluationFn,
         int depth,
