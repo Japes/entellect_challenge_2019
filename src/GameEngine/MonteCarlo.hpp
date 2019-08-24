@@ -3,27 +3,11 @@
 
 #include <memory>
 #include "Commands/Command.hpp"
+#include "MCNode.hpp"
 
 class MonteCarlo
 {
 	public:
-
-    struct MCNode
-    {
-        MCNode(std::shared_ptr<Command> cmd) : 
-            command{cmd},
-            w{0},
-            n{0},
-            score{0},
-            UCT{0}
-        {};
-
-        std::shared_ptr<Command> command;
-        float w;
-        float n;
-        float score;
-        float UCT;
-    };
 
     MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c);
 
@@ -38,6 +22,5 @@ class MonteCarlo
     std::vector<std::shared_ptr<MCNode>> _nodes;
 };
 
-std::ostream & operator << (std::ostream &out, const MonteCarlo::MCNode &move);
 
 #endif

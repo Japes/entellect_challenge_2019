@@ -1,6 +1,7 @@
 TODO
 
-
+   make unit test for monte carlo
+   pass in reference to nodes instead of commands
 
    run compare over LOTS of matches
       fix engine bugs

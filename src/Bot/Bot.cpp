@@ -89,14 +89,11 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr 
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int numplies{0};
-            auto thisScore = eng.Playthrough(ImPlayer1, next_node->command, nextMoveFn, EvaluationFunctions::HealthComparison, distToConsider, playthroughDepth, numplies);
+            auto thisScore = eng.Playthrough(ImPlayer1, next_node->GetCommand(), nextMoveFn, EvaluationFunctions::HealthComparison, distToConsider, playthroughDepth, numplies);
             _numplies += numplies;
+
             _mtx.lock();
-
-            next_node->score += thisScore;
-            next_node->w += thisScore;
-            ++next_node->n;
-
+            next_node->AddPlaythroughResult(thisScore);
             mc->UpdateNumSamples();
             _mtx.unlock();
         }
