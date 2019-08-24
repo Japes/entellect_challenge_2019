@@ -58,7 +58,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //output result--------------------------------------------------------------------
     //choose the best move and do it
     auto best_move = mc->GetBestMove();
-    std::cerr << "JP18:" << std::endl;
+    std::cerr << "JP19:" << std::endl;
     mc->PrintState();
 
     return selectPrefix + best_move->GetCommandString();
