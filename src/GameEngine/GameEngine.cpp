@@ -159,42 +159,23 @@ void GameEngine::ApplyPowerups()
 float GameEngine::Playthrough(bool player1, std::shared_ptr<Command> command, 
                             std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn,
                             std::function<float(bool, GameStatePtr)> evaluationFn,
-                            int radiusToConsider,
                             int depth,
                             int& numPlies)
 {
-    //filter out worms too far away:
     Player* player = _state->GetPlayer(player1);
-    Worm* worm = player->GetCurrentWorm();
-    std::vector<Worm*> considered_worms = _state->WormsWithinDistance(worm->position, radiusToConsider);
 
-    auto filteredNextMoveFn = [&] (bool player1, GameStatePtr state) -> std::shared_ptr<Command> {
-        Player* player = state->GetPlayer(player1);
-        Worm* worm = player->GetCurrentWorm();
-        if(std::end(considered_worms) == std::find(std::begin(considered_worms), std::end(considered_worms), worm)) {
-            return std::make_shared<DoNothingCommand>();
-        }
-        return nextMoveFn(player1, state);
-    };
-
-    std::shared_ptr<Command> p1Command = player1? command : filteredNextMoveFn(true, _state);
-    std::shared_ptr<Command> p2Command = !player1? command : filteredNextMoveFn(false, _state);
+    std::shared_ptr<Command> p1Command = player1? command : nextMoveFn(true, _state);
+    std::shared_ptr<Command> p2Command = !player1? command : nextMoveFn(false, _state);
 
     //run the playthrough
     auto evaluationBefore = evaluationFn(player1, _state);
 
     numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
-        
-        if(radiusToConsider >= 0) {
-            //don't allow disqualification if we're filtering out worms
-            _state->player1.consecutiveDoNothingCount = 0;
-            _state->player2.consecutiveDoNothingCount = 0;
-        }
 
         AdvanceState(*p1Command.get(), *p2Command.get());
-        p1Command = filteredNextMoveFn(true, _state);
-        p2Command = filteredNextMoveFn(false, _state);
+        p1Command = nextMoveFn(true, _state);
+        p2Command = nextMoveFn(false, _state);
         --depth;
         ++numPlies;
     }

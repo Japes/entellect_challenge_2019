@@ -34,7 +34,6 @@ class GameEngine
     float Playthrough(bool player1, std::shared_ptr<Command> command, 
         std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn, 
         std::function<float(bool, GameStatePtr)> evaluationFn,
-        int radiusToConsider,
         int depth,
         int& numPlies);
     GameResult GetResult();

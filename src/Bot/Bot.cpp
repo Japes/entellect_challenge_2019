@@ -71,10 +71,6 @@ uint64_t Bot::GetNumPlies()
 
 void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr state1, bool ImPlayer1, int playthroughDepth)
 {
-    //int closestDist = Dist_to_closest_enemy();
-    //int distToConsider = std::max(closestDist, 7);
-    int distToConsider = -1;
-
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
@@ -89,7 +85,7 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> mc, GameStatePtr 
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int numplies{0};
-            auto thisScore = eng.Playthrough(ImPlayer1, next_node->GetCommand(), nextMoveFn, EvaluationFunctions::HealthComparison, distToConsider, playthroughDepth, numplies);
+            auto thisScore = eng.Playthrough(ImPlayer1, next_node->GetCommand(), nextMoveFn, EvaluationFunctions::HealthComparison, playthroughDepth, numplies);
             _numplies += numplies;
 
             _mtx.lock();
