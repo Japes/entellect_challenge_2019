@@ -22,6 +22,7 @@ jp16 - optimization
 jp17 - added preemptive shooting
 jp18 - load previous move properly, counts opponent bombs correctly now
 jp19 - use n instead of w/n to determine best monte carlo move
+jp20 - do monte carlo formula for opponents next move as well
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement
@@ -244,6 +245,11 @@ JP13 has various engine bugfixes -----------------------------------------------
 Engine version: 2019.3.0 -- 2019_August_10__12_43_11 -- ParallelID: 1
 (wins/draws/losses):     jp12                     jp13                     
 jp12:                    0/0/0                    24/0/19                  (11/0/11)
+
+
+======================================================================================================================================================
+======================================================================================================================================================
+
 
 Engine version: 2019.3.0 -- 2019_August_11__03_32_55 -- ParallelID: -------------------------------------------------------------------------------------------------------
 (wins/draws/losses):     jp13                     jp12                     

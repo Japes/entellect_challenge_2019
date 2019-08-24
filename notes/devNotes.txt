@@ -11,7 +11,7 @@ TODO
          will have to update it every time a worm is moved
       might need to consider taking shortcuts and not simulating 100%
       make data structures smaller
-      
+
    run compare over LOTS of matches
       fix engine bugs
 
@@ -183,6 +183,7 @@ when making new bot:--------------------------------------------
  - up version in bot.json
  - up version in command.cpp
  - up version in bot.cpp
+ - add descriptions to runs file
 
 ======================================================================================================
 

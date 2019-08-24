@@ -51,10 +51,10 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     auto enemy_mc = !ImPlayer1 ? player1_mc : player2_mc;
 
     auto best_move = my_mc->GetBestMove();
-    std::cerr << "JP19:" << std::endl;
+    std::cerr << "JP20:" << std::endl;
     my_mc->PrintState();
 
-    std::cerr << "JP19 Opponent:" << std::endl;
+    std::cerr << "JP20 Opponent:" << std::endl;
     enemy_mc->PrintState();
 
     return selectPrefix + best_move->GetCommandString();
