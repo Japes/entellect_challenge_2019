@@ -184,6 +184,7 @@ when making new bot:--------------------------------------------
  - up version in command.cpp
  - up version in bot.cpp
  - add descriptions to runs file
+ - tag commit
 
 ======================================================================================================
 
