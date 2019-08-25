@@ -12,18 +12,21 @@ TODO
       might need to consider taking shortcuts and not simulating 100%
       make data structures smaller
 
-   run compare over LOTS of matches
-      fix engine bugs
-
-
    "Safe mode"
+		try taking out shooting directly - "safe mode"
+			only shoot at places opponent could move to
       explicit exclude of potential game ending move
-      try taking out shooting directly - "safe mode"
-      only shoot at places opponent could move to
       explicit exclude of all chances for opponent to shoot?
 
-   rush for health pack
+   rush for health pack?
+   
+   look at selects
+	select away from frozen dude
+	add select to mc?
 
+   run compare over LOTS of matches
+      fix engine bugs
+	  
    heavier playthroughs (biases)
       bias towards shooting (for opponent)
       bias based on observed behaviour
@@ -31,11 +34,9 @@ TODO
          does he always shoot
          does he always dodge
 
-   smaller structs
+   store MC results of first level
 
    consider 1-off snowballing if the dude can't move
-
-   store MC results of first level
 
    handle monte carlo ties
       make monte carlo choose random if tie
@@ -58,6 +59,7 @@ TODO
    update reference bot so it's more usefull...
       use bananas
       use select
+	  
 
    why is n wrong in actual runs
       things are a bit worse when there's another bot running - test runs on a quieter system
@@ -185,6 +187,8 @@ when making new bot:--------------------------------------------
  - up version in bot.cpp
  - add descriptions to runs file
  - tag commit
+
+when making new bot:--------------------------------------------
 
 ======================================================================================================
 

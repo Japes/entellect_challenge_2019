@@ -6,7 +6,6 @@
 #include "../MCNode.hpp"
 #include "../MonteCarlo.hpp"
 
-//TODO...
 TEST_CASE( "Best node", "[BestNode]" ) {
     GIVEN("A bunch of nodes passed to a monte carlo")
     {

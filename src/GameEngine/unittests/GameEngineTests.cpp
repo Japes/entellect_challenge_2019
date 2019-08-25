@@ -3,7 +3,6 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "NextTurn.hpp"
-#include "EvaluationFunctions.hpp"
 #include "GameEngineTestUtils.hpp"
 
 TEST_CASE( "I can make a game engine instance", "[sanity]" ) {

@@ -4,6 +4,7 @@
 #include "rapidjson/document.h"
 #include "GameState.hpp"
 #include "MonteCarlo.hpp"
+#include "../GameEngine/Evaluators/HealthEvaluator.hpp"
 
 #include <mutex>
 
@@ -29,6 +30,9 @@ class Bot
     float _mc_c;
     int _mc_runsBeforeClockCheck;
     uint64_t _numplies;
+
+    HealthEvaluator _evaluator;
+
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
     void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> player1_mc, std::shared_ptr<MonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth);

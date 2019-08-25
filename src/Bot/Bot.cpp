@@ -3,7 +3,6 @@
 #include "NextTurn.hpp"
 #include "GameEngine.hpp"
 #include "GameStateLoader.hpp"
-#include "EvaluationFunctions.hpp"
 #include <thread>
 
 Bot::Bot(int playthroughDepth, int dirtsForBanana, int distanceForLost, uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
@@ -84,7 +83,7 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> player1_mc, std::
             int numplies{0};
 
             auto thisScore = eng.Playthrough(player1_next_node->GetCommand(), player2_next_node->GetCommand(),
-                                            nextMoveFn, EvaluationFunctions::HealthComparison, playthroughDepth, numplies);
+                                            nextMoveFn, &_evaluator, playthroughDepth, numplies);
             _numplies += numplies;
 
             _mtx.lock();

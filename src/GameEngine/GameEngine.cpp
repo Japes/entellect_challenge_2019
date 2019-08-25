@@ -1,6 +1,7 @@
 #include "GameEngine.hpp"
-#include <algorithm>
 #include "NextTurn.hpp"
+#include "../Utilities/Utilities.hpp"
+#include <algorithm>
 
 GameEngine::GameEngine()
 {
@@ -162,7 +163,7 @@ void GameEngine::ApplyPowerups()
 float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command, 
                             std::shared_ptr<Command> player2_Command, 
                             std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn,
-                            std::function<float(bool, GameStatePtr)> evaluationFn,
+                            const EvaluatorBase* evaluator,
                             int depth,
                             int& numPlies)
 {
@@ -170,7 +171,7 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
     std::shared_ptr<Command> p2Command = player2_Command;
 
     //run the playthrough
-    auto evaluationBefore = evaluationFn(true, _state); //always in terms of player 1
+    auto evaluationBefore = evaluator->Evaluate(true, _state); //always in terms of player 1
 
     numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
@@ -182,7 +183,7 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         ++numPlies;
     }
 
-    auto evaluationAfter = evaluationFn(true, _state); //always in terms of player 1
+    auto evaluationAfter = evaluator->Evaluate(true, _state); //always in terms of player 1
 
     //evaluate the playthrough
 
@@ -195,24 +196,10 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         }
     }
 
-    //else clamp scorediff to 0.25 - 0.75
-    //auto diff = evaluationAfter - evaluationBefore;
-    //float bestPossible = static_cast<float>(numPlies) * 16; //should be safe
-    //float frac = diff/bestPossible; //number between +- 1
-    //std::cerr << "(" << __FUNCTION__ << ") frac: " << frac << std::endl;
-    //float scaledFrac = frac/4; //number between +- 0.25
-    //auto ret = scaledFrac + 0.5f; //number between 0.25 - 0.75
-    //std::cerr << "(" << __FUNCTION__ << ") ret: " << ret << std::endl;
-    //return ret;
-
-    //return (((evaluationAfter - evaluationBefore) / (bestPossible)) / 4) + 0.5f; //this was for score
-
-    float bestPossible = GameConfig::commandoWorms.initialHp + 
-                            GameConfig::agentWorms.initialHp + 
-                            GameConfig::technologistWorms.initialHp + 
-                            GameConfig::healthPackHp*2;
-
-    return (((evaluationAfter - evaluationBefore) / bestPossible ) / 4) + 0.5f; //this was for score
+    float bestPossible = evaluator->BestPossiblePerPly()*numPlies;
+    float frac = (evaluationAfter - evaluationBefore) / bestPossible;
+    // clamp scorediff to 0.25 - 0.75
+    return Utilities::NormaliseTo(frac, 0.25, 0.75);
 }
 
 GameEngine::GameResult GameEngine::GetResult()

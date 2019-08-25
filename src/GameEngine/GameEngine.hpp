@@ -3,6 +3,7 @@
 
 #include "GameState.hpp"
 #include "AllCommands.hpp"
+#include "Evaluators/EvaluatorBase.hpp"
 #include <vector>
 #include <random>
 #include <functional>
@@ -34,7 +35,7 @@ class GameEngine
     float Playthrough(std::shared_ptr<Command> player1_Command, 
         std::shared_ptr<Command> player2_Command, 
         std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn, 
-        std::function<float(bool, GameStatePtr)> evaluationFn,
+        const EvaluatorBase* evaluator,
         int depth,
         int& numPlies);
     GameResult GetResult();
