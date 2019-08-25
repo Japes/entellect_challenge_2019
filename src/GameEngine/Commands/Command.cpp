@@ -1,3 +1,3 @@
 #include "Command.hpp"
 
-const std::string Command::latestBot = "JP21";
+const std::string Command::latestBot = "JP22";

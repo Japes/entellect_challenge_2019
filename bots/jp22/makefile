@@ -1,15 +1,17 @@
-SRC_DIR := .
+SRC_DIR := cppbot
 OBJ_DIR := bin
-ENGINE_SRC_DIR := ..
-#need to add a line here for every subfoler in GameEngine
+MY_LIBS_SRC_DIR := ../../src
+ENGINE_SRC_DIR := $(MY_LIBS_SRC_DIR)/GameEngine
+
+#need to add a line here for every subfolder in GameEngine
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
-RNG_SRC_DIR := ../../pcg-cpp-0.98/include
-UTILS_SRC_DIR := ../../Utilities
-BOT_SRC_DIR := ../../Bot
-MC_SRC_DIR := ../../MonteCarlo
+RNG_SRC_DIR := $(MY_LIBS_SRC_DIR)/pcg-cpp-0.98/include
+UTILS_SRC_DIR := $(MY_LIBS_SRC_DIR)/Utilities
+BOT_SRC_DIR := $(MY_LIBS_SRC_DIR)/Bot
+MC_SRC_DIR := $(MY_LIBS_SRC_DIR)/MonteCarlo
 
-EXENAME=unit_tests
+EXENAME=cppbot.exe
 
 INCLUDE+=-I$(SRC_DIR)
 INCLUDE+=-I$(ENGINE_SRC_DIR)
@@ -23,7 +25,6 @@ INCLUDE+=-I$(MC_SRC_DIR)
 CXX=g++
 #these are the flags that I always want
 CXXFLAGS+=-Wall -std=c++14 -fPIC -O3 -pthread -flto
-#CXXFLAGS+=-Wall -std=c++14 -fPIC -pthread
 
 #grab all source files of interest
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -39,15 +40,10 @@ SRC_FILES += $(wildcard $(MC_SRC_DIR)/*.cpp)
 OBJ_FILES := $(patsubst %.cpp,%.o,$(SRC_FILES))
 HEADER_DEPS := $(patsubst %.cpp,%.d,$(SRC_FILES))
 
-all: run
+all: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME)
 
 debug: CXXFLAGS+=-g
 debug: all
-
-run: $(OBJ_DIR) $(OBJ_DIR)/$(EXENAME)
-	./$(OBJ_DIR)/$(EXENAME) $(TEST)
-#	./$(OBJ_DIR)/$(EXENAME) $(TEST) [performance]
-#	./$(OBJ_DIR)/$(EXENAME) $(TEST) [comparison]
 
 $(OBJ_DIR)/$(EXENAME): $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $^ -o $@
@@ -62,6 +58,6 @@ $(OBJ_DIR):
 -include $(HEADER_DEPS)
 	
 clean:
-	rm -f ./bin/*
+	rm -rf ./bin/*
 	rm -f $(OBJ_FILES)
 	rm -f $(HEADER_DEPS)

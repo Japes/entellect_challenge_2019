@@ -4,7 +4,7 @@
 #include "rapidjson/document.h"
 #include "GameState.hpp"
 #include "PlayersMonteCarlo.hpp"
-#include "../GameEngine/Evaluators/HealthEvaluator.hpp"
+#include "Evaluators/HealthEvaluator.hpp"
 
 #include <mutex>
 

@@ -3,8 +3,8 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
-#include "../MCMove.hpp"
-#include "../PlayersMonteCarlo.hpp"
+#include "../MonteCarlo/MCMove.hpp"
+#include "../MonteCarlo/PlayersMonteCarlo.hpp"
 
 TEST_CASE( "Best node", "[BestNode]" ) {
     GIVEN("A bunch of nodes passed to a monte carlo")
