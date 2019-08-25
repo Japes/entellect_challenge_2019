@@ -5,10 +5,10 @@
 #include "GameState.hpp"
 #include "PlayersMonteCarlo.hpp"
 #include "Evaluators/HealthEvaluator.hpp"
+#include "MonteCarloNode.hpp"
 
 #include <mutex>
 
-#include "Bot.hpp"
 class Bot
 {
 	public:
@@ -31,11 +31,11 @@ class Bot
     int _mc_runsBeforeClockCheck;
     uint64_t _numplies;
 
-    HealthEvaluator _evaluator;
+    const HealthEvaluator _evaluator;
 
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
-    void runMC(uint64_t stopTime, std::shared_ptr<PlayersMonteCarlo> player1_mc, std::shared_ptr<PlayersMonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth);
+    void runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc);
 };
 
 #endif

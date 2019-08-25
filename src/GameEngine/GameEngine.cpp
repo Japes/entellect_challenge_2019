@@ -175,7 +175,6 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
 
     numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
-
         AdvanceState(*p1Command.get(), *p2Command.get());
         p1Command = nextMoveFn(true, _state);
         p2Command = nextMoveFn(false, _state);

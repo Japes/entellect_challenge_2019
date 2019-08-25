@@ -24,37 +24,28 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     uint64_t start_time = Utilities::Get_ns_since_epoch();
 
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = GameStateLoader::LoadGameState(roundJSON);
+    auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
 
-    AdjustOpponentSpellCount(ImPlayer1, &state1, _last_round_state.get());
-    _last_round_state = std::make_shared<GameState>(state1); //no idea why it needs to be done this way
+    AdjustOpponentSpellCount(ImPlayer1, state1.get(), _last_round_state.get());
+    _last_round_state = std::make_shared<GameState>(*state1.get()); //no idea why it needs to be done this way
 
     //do some heuristics---------------------------------------------------------------
     //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, &state1);
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1.get());
 
     //begin monte carlo----------------------------------------------------------------
-    auto player1_mc = std::make_shared<PlayersMonteCarlo>(NextTurn::AllValidMovesForPlayer(true, &state1, true), _mc_c);
-    auto player2_mc = std::make_shared<PlayersMonteCarlo>(NextTurn::AllValidMovesForPlayer(false, &state1, true), _mc_c);
+    auto mc = std::make_shared<MonteCarloNode>(state1, &_evaluator, _playthroughDepth, _mc_c);
 
     _numplies = 0;
-    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, player1_mc, player2_mc, &state1, _playthroughDepth);
-    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, player1_mc, player2_mc, &state1, _playthroughDepth);
+    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc);
+    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc);
     t1.join();
     t2.join();
 
     //output result--------------------------------------------------------------------
     //choose the best move and do it
-
-    auto my_mc =     ImPlayer1 ? player1_mc : player2_mc;
-    auto enemy_mc = !ImPlayer1 ? player1_mc : player2_mc;
-
-    auto best_move = my_mc->GetBestMove();
-    std::cerr << Command::latestBot << ":" << std::endl;
-    my_mc->PrintState();
-
-    std::cerr << Command::latestBot << " Opponent:" << std::endl;
-    enemy_mc->PrintState();
+    auto best_move = mc->GetBestMove(ImPlayer1);
+    mc->PrintState(ImPlayer1);
 
     return selectPrefix + best_move->GetCommandString();
 }
@@ -64,36 +55,12 @@ uint64_t Bot::GetNumPlies()
     return _numplies;
 }
 
-void Bot::runMC(uint64_t stopTime, std::shared_ptr<PlayersMonteCarlo> player1_mc, std::shared_ptr<PlayersMonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth)
+void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc)
 {
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
-            _mtx.lock();
-            //choose next node
-            auto player1_next_node = player1_mc->NextNode();
-            auto player2_next_node = player2_mc->NextNode();
-            _mtx.unlock();
-
-            //load the state
-            GameState state = *state1; //make a copy :/
-            GameEngine eng(&state);
-
-            auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-            int numplies{0};
-
-            auto thisScore = eng.Playthrough(player1_next_node->GetCommand(), player2_next_node->GetCommand(),
-                                            nextMoveFn, &_evaluator, playthroughDepth, numplies);
-            _numplies += numplies;
-
-            _mtx.lock();
-            //remember Playthrough always returns score in terms of player 1
-            player1_next_node->AddPlaythroughResult(thisScore);
-            player1_mc->UpdateNumSamples();
-
-            player2_next_node->AddPlaythroughResult(1 - thisScore);
-            player2_mc->UpdateNumSamples();
-            _mtx.unlock();
+            _numplies += mc->AddPlaythrough();
         }
     }
 }
