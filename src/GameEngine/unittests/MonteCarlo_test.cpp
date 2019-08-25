@@ -3,16 +3,16 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
-#include "../MCNode.hpp"
+#include "../MCMove.hpp"
 #include "../MonteCarlo.hpp"
 
 TEST_CASE( "Best node", "[BestNode]" ) {
     GIVEN("A bunch of nodes passed to a monte carlo")
     {
-        std::vector<std::shared_ptr<MCNode>> nodes;
-        auto node1 = std::make_shared<MCNode>(std::make_shared<TeleportCommand>(Position(1,1)));
-        auto node2 = std::make_shared<MCNode>(std::make_shared<TeleportCommand>(Position(2,2)));
-        auto node3 = std::make_shared<MCNode>(std::make_shared<TeleportCommand>(Position(3,3)));
+        std::vector<std::shared_ptr<MCMove>> nodes;
+        auto node1 = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(1,1)));
+        auto node2 = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(2,2)));
+        auto node3 = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(3,3)));
         nodes.push_back(node1);
         nodes.push_back(node2);
         nodes.push_back(node3);

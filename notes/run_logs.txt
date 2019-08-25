@@ -23,6 +23,7 @@ jp17 - added preemptive shooting
 jp18 - load previous move properly, counts opponent bombs correctly now
 jp19 - use n instead of w/n to determine best monte carlo move
 jp20 - do monte carlo formula for opponents next move as well
+jp21 - refactoring and minor change to best possible evaluation range
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement

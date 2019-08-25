@@ -1,7 +1,12 @@
 TODO
 
-   refactors
-      clamping stuff must go in evaluation function
+   store MC results of first level
+
+   "Safe mode"
+		try taking out shooting directly - "safe mode"
+			only shoot at places opponent could move to
+      explicit exclude of potential game ending move
+      explicit exclude of all chances for opponent to shoot?
 
    optimization
       precompute as much as possible e.g. can i shoot this guy
@@ -12,38 +17,13 @@ TODO
       might need to consider taking shortcuts and not simulating 100%
       make data structures smaller
 
-   "Safe mode"
-		try taking out shooting directly - "safe mode"
-			only shoot at places opponent could move to
-      explicit exclude of potential game ending move
-      explicit exclude of all chances for opponent to shoot?
+--not immediate---------------------------------------------------------------------------------------------
 
-   rush for health pack?
-   
    look at selects
 	select away from frozen dude
 	add select to mc?
 
-   run compare over LOTS of matches
-      fix engine bugs
-	  
-   heavier playthroughs (biases)
-      bias towards shooting (for opponent)
-      bias based on observed behaviour
-         does the dude go for 1-offs
-         does he always shoot
-         does he always dodge
-
-   store MC results of first level
-
-   consider 1-off snowballing if the dude can't move
-
-   handle monte carlo ties
-      make monte carlo choose random if tie
-      better yet use heuristic
-
-   need to try to get more into the monta carlos.  
-      off-by-one banana hits aren't considered...
+   rush for health pack?
 
    Tuning
       make bot tunable via config file
@@ -56,13 +36,36 @@ TODO
          C value
          playthrough weights
 
+   run compare over LOTS of matches
+      fix engine bugs
+	  
+   heavier playthroughs (biases)
+      bias towards shooting (for opponent)
+      bias based on observed behaviour
+         does the dude go for 1-offs
+         does he always shoot
+         does he always dodge
+
+   consider 1-off snowballing if the dude can't move
+
+   handle monte carlo ties
+      make monte carlo choose random if tie
+      better yet use heuristic
+
+   need to try to get more into the monta carlos.  
+      off-by-one banana hits aren't considered...
+
+--prob wont do----------------------------------------------------------------------------------------------
+
    update reference bot so it's more usefull...
       use bananas
       use select
 	  
-
    why is n wrong in actual runs
       things are a bit worse when there's another bot running - test runs on a quieter system
+
+====================================================================================================================================================
+====================================================================================================================================================
 
 questions i have for chouf:--------------------------------------
          how important is it to get the health pack
@@ -180,6 +183,24 @@ to run bot on state file:--------------------------------------------
  - cd into bin folder
  - run bot
  - input round number
+
+notes for blog post---------------------------------------------------
+   automation important!
+      running matches
+      making new bot
+      analysis scripts
+   slow and steady - unit tests!
+   analysis
+      scripts
+      spreadsheets (not sure if that was helpful but it was fun)
+   optimization
+      interrupt method - link to stack overflow
+   monte carlo method
+   made sure i had a really solid engine
+   reuse for next time
+      didnt use last years because it was messy etc but could use this stuff for next time
+   put stuff on github and link to it
+   be scientific and record everything (comparison logs)
 
 ======================================================================================================
 

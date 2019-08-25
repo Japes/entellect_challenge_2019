@@ -1,14 +1,14 @@
-#include "MCNode.hpp"
+#include "MCMove.hpp"
 #include <cmath>
 
-MCNode::MCNode(std::shared_ptr<Command> cmd) : 
+MCMove::MCMove(std::shared_ptr<Command> cmd) : 
     _command{cmd},
     _w{0},
     _n{0},
     _UCT{0}
 {}
 
-void MCNode::UpdateUCT(int N, float c)
+void MCMove::UpdateUCT(int N, float c)
 {
     if(_n == 0) {
         _UCT = std::numeric_limits<decltype(_UCT)>::max();
@@ -17,23 +17,23 @@ void MCNode::UpdateUCT(int N, float c)
     }
 }
 
-void MCNode::AddPlaythroughResult(float w)
+void MCMove::AddPlaythroughResult(float w)
 {
     _w += w;
     ++_n;
 }
 
-float MCNode::GetUCT() const
+float MCMove::GetUCT() const
 {
     return _UCT;
 }
 
-float MCNode::GetN() const
+float MCMove::GetN() const
 {
     return _n;
 }
 
-std::shared_ptr<Command> MCNode::GetCommand() const
+std::shared_ptr<Command> MCMove::GetCommand() const
 {
     return _command;
 }

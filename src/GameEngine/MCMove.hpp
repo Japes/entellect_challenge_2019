@@ -1,13 +1,13 @@
-#ifndef MCNODE_H
-#define MCNODE_H
+#ifndef MCMOVE_H
+#define MCMOVE_H
 
 #include <memory>
 #include "Commands/Command.hpp"
 
-class MCNode
+class MCMove
 {
     public:
-    MCNode(std::shared_ptr<Command> cmd);
+    MCMove(std::shared_ptr<Command> cmd);
 
     void UpdateUCT(int N, float c);
     void AddPlaythroughResult(float w);
@@ -16,7 +16,7 @@ class MCNode
     float GetUCT() const;
     float GetN() const;
 
-    friend std::ostream & operator << (std::ostream &out, const MCNode &move)
+    friend std::ostream & operator << (std::ostream &out, const MCMove &move)
     {
         out << move.GetCommand()->GetCommandString() << ", " << move._w << "/" << move._n << ", UCT: " << move.GetUCT();
         return out;

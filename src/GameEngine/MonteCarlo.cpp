@@ -4,22 +4,22 @@
 MonteCarlo::MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c) : _N{0}, _c{c}
 {
     for(auto const& cmd: cmds) {
-        _nodes.push_back(std::make_shared<MCNode>(cmd));
+        _nodes.push_back(std::make_shared<MCMove>(cmd));
     }
 }
 
-MonteCarlo::MonteCarlo(std::vector<std::shared_ptr<MCNode>> nodes, float c) : _N{0}, _c{c}, _nodes{nodes}
+MonteCarlo::MonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c) : _N{0}, _c{c}, _nodes{nodes}
 {
 }
 
-std::shared_ptr<MCNode> MonteCarlo::NextNode()
+std::shared_ptr<MCMove> MonteCarlo::NextNode()
 {
     for(auto & node: _nodes) {
         node->UpdateUCT(_N, _c);
     }
 
     auto next_node = std::max_element(std::begin(_nodes), std::end(_nodes), 
-            [] (std::shared_ptr<MCNode> const lhs, std::shared_ptr<MCNode> const rhs) -> bool { 
+            [] (std::shared_ptr<MCMove> const lhs, std::shared_ptr<MCMove> const rhs) -> bool { 
                 return lhs->GetUCT() < rhs->GetUCT(); });
 
     return (*next_node);
@@ -33,7 +33,7 @@ void MonteCarlo::UpdateNumSamples()
 std::shared_ptr<Command> MonteCarlo::GetBestMove()
 {
     auto it = std::max_element(std::begin(_nodes), std::end(_nodes),
-            [] (std::shared_ptr<MCNode> const lhs, std::shared_ptr<MCNode> const rhs) -> bool { 
+            [] (std::shared_ptr<MCMove> const lhs, std::shared_ptr<MCMove> const rhs) -> bool { 
                 return lhs->GetN() < rhs->GetN(); });
     return (*it)->GetCommand();
 }

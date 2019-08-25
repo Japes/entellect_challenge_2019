@@ -3,7 +3,7 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
-#include "../MCNode.hpp"
+#include "../MCMove.hpp"
 
 //TODO...
 

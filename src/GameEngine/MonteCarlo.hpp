@@ -3,16 +3,16 @@
 
 #include <memory>
 #include "Commands/Command.hpp"
-#include "MCNode.hpp"
+#include "MCMove.hpp"
 
 class MonteCarlo
 {
 	public:
 
     MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c);
-    MonteCarlo(std::vector<std::shared_ptr<MCNode>> nodes, float c);
+    MonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c);
 
-    std::shared_ptr<MCNode> NextNode();
+    std::shared_ptr<MCMove> NextNode();
     void UpdateNumSamples();
     std::shared_ptr<Command> GetBestMove();
     void PrintState();
@@ -20,7 +20,7 @@ class MonteCarlo
     private:
     int _N;
     float _c;
-    std::vector<std::shared_ptr<MCNode>> _nodes;
+    std::vector<std::shared_ptr<MCMove>> _nodes;
 };
 
 
