@@ -181,15 +181,6 @@ to run bot on state file:--------------------------------------------
  - run bot
  - input round number
 
-when making new bot:--------------------------------------------
- - up version in bot.json
- - up version in command.cpp
- - up version in bot.cpp
- - add descriptions to runs file
- - tag commit
-
-when making new bot:--------------------------------------------
-
 ======================================================================================================
 
 last time i checked it looks like we're spending about 50% of the time in GetRandomValidMoveForPlayer

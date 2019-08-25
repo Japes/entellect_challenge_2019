@@ -33,9 +33,10 @@ class Command
     virtual bool IsValid(bool player1, GameStatePtr state) const = 0;
     virtual std::string GetCommandString() const = 0;
 
+    static const std::string latestBot;
+    
     protected:
     int _order; //the order in which this command should be processed.  Some commands must happen before others
-    static const std::string latestBot;
 };
 
 #endif
