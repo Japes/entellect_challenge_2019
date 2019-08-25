@@ -4,7 +4,7 @@
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "../MCMove.hpp"
-#include "../MonteCarlo.hpp"
+#include "../PlayersMonteCarlo.hpp"
 
 TEST_CASE( "Best node", "[BestNode]" ) {
     GIVEN("A bunch of nodes passed to a monte carlo")
@@ -17,7 +17,7 @@ TEST_CASE( "Best node", "[BestNode]" ) {
         nodes.push_back(node2);
         nodes.push_back(node3);
 
-        MonteCarlo mc(nodes, 1);
+        PlayersMonteCarlo mc(nodes, 1);
 
         WHEN("We add some playthroughs to the nodes")
         {

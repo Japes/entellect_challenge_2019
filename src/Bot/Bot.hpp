@@ -3,7 +3,7 @@
 
 #include "rapidjson/document.h"
 #include "GameState.hpp"
-#include "MonteCarlo.hpp"
+#include "PlayersMonteCarlo.hpp"
 #include "../GameEngine/Evaluators/HealthEvaluator.hpp"
 
 #include <mutex>
@@ -35,7 +35,7 @@ class Bot
 
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
-    void runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> player1_mc, std::shared_ptr<MonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth);
+    void runMC(uint64_t stopTime, std::shared_ptr<PlayersMonteCarlo> player1_mc, std::shared_ptr<PlayersMonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth);
 };
 
 #endif

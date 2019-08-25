@@ -1,16 +1,16 @@
-#ifndef MONTE_CARLO_H
-#define MONTE_CARLO_H
+#ifndef PLAYERS_MONTE_CARLO_H
+#define PLAYERS_MONTE_CARLO_H
 
 #include <memory>
 #include "Commands/Command.hpp"
 #include "MCMove.hpp"
 
-class MonteCarlo
+class PlayersMonteCarlo
 {
 	public:
 
-    MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c);
-    MonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c);
+    PlayersMonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c);
+    PlayersMonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c);
 
     std::shared_ptr<MCMove> NextNode();
     void UpdateNumSamples();

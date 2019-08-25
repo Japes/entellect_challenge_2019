@@ -34,8 +34,8 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, &state1);
 
     //begin monte carlo----------------------------------------------------------------
-    auto player1_mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(true, &state1, true), _mc_c);
-    auto player2_mc = std::make_shared<MonteCarlo>(NextTurn::AllValidMovesForPlayer(false, &state1, true), _mc_c);
+    auto player1_mc = std::make_shared<PlayersMonteCarlo>(NextTurn::AllValidMovesForPlayer(true, &state1, true), _mc_c);
+    auto player2_mc = std::make_shared<PlayersMonteCarlo>(NextTurn::AllValidMovesForPlayer(false, &state1, true), _mc_c);
 
     _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, player1_mc, player2_mc, &state1, _playthroughDepth);
@@ -64,7 +64,7 @@ uint64_t Bot::GetNumPlies()
     return _numplies;
 }
 
-void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarlo> player1_mc, std::shared_ptr<MonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth)
+void Bot::runMC(uint64_t stopTime, std::shared_ptr<PlayersMonteCarlo> player1_mc, std::shared_ptr<PlayersMonteCarlo> player2_mc, GameStatePtr state1, int playthroughDepth)
 {
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 

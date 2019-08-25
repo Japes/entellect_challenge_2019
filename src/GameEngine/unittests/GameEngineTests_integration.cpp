@@ -13,7 +13,7 @@
 #include <bitset>
 #include <dirent.h>
 #include "Utilities.hpp"
-#include "MonteCarlo.hpp"
+#include "PlayersMonteCarlo.hpp"
 #include <thread>
 #include <mutex>
 #include <cmath>

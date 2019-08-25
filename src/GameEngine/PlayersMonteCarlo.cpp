@@ -1,18 +1,18 @@
-#include "MonteCarlo.hpp"
+#include "PlayersMonteCarlo.hpp"
 #include <cmath>
 
-MonteCarlo::MonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c) : _N{0}, _c{c}
+PlayersMonteCarlo::PlayersMonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c) : _N{0}, _c{c}
 {
     for(auto const& cmd: cmds) {
         _nodes.push_back(std::make_shared<MCMove>(cmd));
     }
 }
 
-MonteCarlo::MonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c) : _N{0}, _c{c}, _nodes{nodes}
+PlayersMonteCarlo::PlayersMonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c) : _N{0}, _c{c}, _nodes{nodes}
 {
 }
 
-std::shared_ptr<MCMove> MonteCarlo::NextNode()
+std::shared_ptr<MCMove> PlayersMonteCarlo::NextNode()
 {
     for(auto & node: _nodes) {
         node->UpdateUCT(_N, _c);
@@ -25,12 +25,12 @@ std::shared_ptr<MCMove> MonteCarlo::NextNode()
     return (*next_node);
 }
 
-void MonteCarlo::UpdateNumSamples()
+void PlayersMonteCarlo::UpdateNumSamples()
 {
     ++_N;
 }
 
-std::shared_ptr<Command> MonteCarlo::GetBestMove()
+std::shared_ptr<Command> PlayersMonteCarlo::GetBestMove()
 {
     auto it = std::max_element(std::begin(_nodes), std::end(_nodes),
             [] (std::shared_ptr<MCMove> const lhs, std::shared_ptr<MCMove> const rhs) -> bool { 
@@ -38,7 +38,7 @@ std::shared_ptr<Command> MonteCarlo::GetBestMove()
     return (*it)->GetCommand();
 }
 
-void MonteCarlo::PrintState()
+void PlayersMonteCarlo::PrintState()
 {
     std::cerr << "N: " << _N << std::endl; //print this first so it comes up in PlayerCommand.txt
     std::cerr << "MC results: " << std::endl;
