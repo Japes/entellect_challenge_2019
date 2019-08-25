@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "../GameState/GameState.hpp"
-#include "../GameState/GameStateLoader.hpp"
+#include "GameState/GameState.hpp"
+#include "GameState/GameStateLoader.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "Utilities.hpp"
 #include "Command.hpp"

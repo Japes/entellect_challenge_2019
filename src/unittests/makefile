@@ -1,13 +1,13 @@
 SRC_DIR := .
 OBJ_DIR := bin
-ENGINE_SRC_DIR := ..
+ENGINE_SRC_DIR := ../GameEngine
 #need to add a line here for every subfoler in GameEngine
 GAMESTATE_SRC_DIR := $(ENGINE_SRC_DIR)/GameState
 COMMANDS_SRC_DIR := $(ENGINE_SRC_DIR)/Commands
-RNG_SRC_DIR := ../../pcg-cpp-0.98/include
-UTILS_SRC_DIR := ../../Utilities
-BOT_SRC_DIR := ../../Bot
-MC_SRC_DIR := ../../MonteCarlo
+RNG_SRC_DIR := ../pcg-cpp-0.98/include
+UTILS_SRC_DIR := ../Utilities
+BOT_SRC_DIR := ../Bot
+MC_SRC_DIR := ../MonteCarlo
 
 EXENAME=unit_tests
 

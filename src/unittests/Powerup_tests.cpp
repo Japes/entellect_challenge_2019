@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "../GameEngine.hpp"
-#include "../GameConfig.hpp"
+#include "GameEngine.hpp"
+#include "GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
 

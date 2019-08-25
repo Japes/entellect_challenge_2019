@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "../GameConfig.hpp"
+#include "GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "NextTurn.hpp"
 #include "GameEngine.hpp"
