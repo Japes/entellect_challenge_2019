@@ -2,6 +2,12 @@ TODO
 
    store MC results of first level
 
+final stage you want BOMBS SNOWBALLS and MORE HEALTH BUT LESS WORMS
+
+you also want a POINTS ADVANTAGE
+try to keep enemy worms alive but weak
+try not to cluster in the centre?
+
    "Safe mode"
 		try taking out shooting directly - "safe mode"
 			only shoot at places opponent could move to

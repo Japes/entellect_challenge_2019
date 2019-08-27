@@ -4,7 +4,7 @@
 #include "rapidjson/document.h"
 #include "GameState.hpp"
 #include "PlayersMonteCarlo.hpp"
-#include "Evaluators/HealthEvaluator.hpp"
+#include "Evaluators/EvaluatorBase.hpp"
 #include "MonteCarloNode.hpp"
 
 #include <mutex>
@@ -12,7 +12,9 @@
 class Bot
 {
 	public:
-    Bot(int playthroughDepth, int dirtsForBanana, int distanceForLost, uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck);
+    Bot(EvaluatorBase* evaluator, int playthroughDepth, 
+        int dirtsForBanana, int distanceForLost, 
+        uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck);
 
     std::string runStrategy(rapidjson::Document& roundJSON);
     uint64_t GetNumPlies();
@@ -31,7 +33,7 @@ class Bot
     int _mc_runsBeforeClockCheck;
     uint64_t _numplies;
 
-    const HealthEvaluator _evaluator;
+    EvaluatorBase* _evaluator;
 
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);

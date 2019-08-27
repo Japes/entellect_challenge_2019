@@ -5,14 +5,17 @@
 #include "GameStateLoader.hpp"
 #include <thread>
 
-Bot::Bot(int playthroughDepth, int dirtsForBanana, int distanceForLost, uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
+Bot::Bot(EvaluatorBase* evaluator,
+        int playthroughDepth, int dirtsForBanana, int distanceForLost, 
+        uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
     _playthroughDepth{playthroughDepth},
     _dirtsForBanana{dirtsForBanana},
     _distanceForLost{distanceForLost},
     _mc_Time_ns{mcTime_ns},
     _mc_c{mc_c},
     _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck},
-    _numplies{0}
+    _numplies{0},
+    _evaluator{evaluator}
 {
     NextTurn::Initialise();
 }
@@ -34,7 +37,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1.get());
 
     //begin monte carlo----------------------------------------------------------------
-    auto mc = std::make_shared<MonteCarloNode>(state1, &_evaluator, _playthroughDepth, _mc_c);
+    auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, _playthroughDepth, _mc_c);
 
     _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc);

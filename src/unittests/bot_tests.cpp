@@ -5,6 +5,7 @@
 #include "GameEngineTestUtils.hpp"
 #include "Utilities.hpp"
 #include "../GameState/GameStateLoader.hpp"
+#include "Evaluators/HealthEvaluator.hpp"
 #include "../../Bot/Bot.hpp"
 
 TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
@@ -22,7 +23,8 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
-        Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        HealthEvaluator eval;
+        Bot bot(&eval, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         THEN("snowball counts are as we expect")
         {
@@ -77,7 +79,8 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
-        Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        HealthEvaluator eval;
+        Bot bot(&eval, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         THEN("Banana counts are as we expect")
         {

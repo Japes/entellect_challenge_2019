@@ -14,6 +14,7 @@
 #include <dirent.h>
 #include "Utilities.hpp"
 #include "PlayersMonteCarlo.hpp"
+#include "Evaluators/HealthEvaluator.hpp"
 #include <thread>
 #include <mutex>
 #include <cmath>
@@ -32,7 +33,8 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
-    Bot bot(playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+    HealthEvaluator evaluator;
+    Bot bot(&evaluator, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     std::vector<rapidjson::Document> files;
     files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"));
