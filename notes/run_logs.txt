@@ -317,5 +317,5 @@ Engine version: 2019.3.0 -- 2019_August_27__11_15_55 -- ParallelID:
 (wins/draws/losses): jp25                     
 jp22:                60/0/85
 
-
+jp23 is depth of 6
 jp24 is average health evaluator
