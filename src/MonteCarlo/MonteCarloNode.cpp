@@ -16,8 +16,8 @@ int64_t MonteCarloNode::AddPlaythrough()
 {
     _mtx.lock();
     //choose next node
-    auto player1_next_node = _player1_mc.NextNode();
-    auto player2_next_node = _player2_mc.NextNode();
+    auto player1_next_node = _player1_mc.NextMove();
+    auto player2_next_node = _player2_mc.NextMove();
     _mtx.unlock();
 
     //load the state

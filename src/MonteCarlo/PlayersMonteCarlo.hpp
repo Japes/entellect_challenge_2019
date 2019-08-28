@@ -12,7 +12,7 @@ class PlayersMonteCarlo
     PlayersMonteCarlo(const std::vector<std::shared_ptr<Command>>& cmds, float c);
     PlayersMonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c);
 
-    std::shared_ptr<MCMove> NextNode();
+    std::shared_ptr<MCMove> NextMove();
     void UpdateNumSamples();
     std::shared_ptr<Command> GetBestMove();
     void PrintState();
@@ -20,7 +20,7 @@ class PlayersMonteCarlo
     private:
     int _N;
     float _c;
-    std::vector<std::shared_ptr<MCMove>> _nodes;
+    std::vector<std::shared_ptr<MCMove>> _moves;
 };
 
 
