@@ -204,6 +204,7 @@ notes for blog post---------------------------------------------------
       didnt use last years because it was messy etc but could use this stuff for next time
    put stuff on github and link to it
    be scientific and record everything (comparison logs)
+   spent a bit of time going through their source code for engine
 
 ======================================================================================================
 
