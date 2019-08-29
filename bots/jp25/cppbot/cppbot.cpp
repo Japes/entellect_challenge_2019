@@ -23,7 +23,7 @@ std::string executeRound(Bot& bot, std::string& roundNumber)
 
 int main(int argc, char** argv)
 {
-    int playThroughDepth{6};
+    int playThroughDepth{12};
     int dirtsForBanana{10};
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     uint64_t mcTime_ns{880000000};

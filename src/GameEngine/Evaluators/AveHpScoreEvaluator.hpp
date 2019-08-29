@@ -39,7 +39,7 @@ class AveHpScoreEvaluator: public EvaluatorBase
         float healthdiff = (myPlayer->health/numliveWormsMe) - (otherPlayer->health/numliveWormsHim);
         float scorediff =  myPlayer->GetScore() - otherPlayer->GetScore();
 
-        return healthdiff + scorediff/100;
+        return healthdiff + scorediff/10;
     }
 };
 
