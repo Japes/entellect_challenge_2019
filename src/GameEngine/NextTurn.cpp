@@ -280,7 +280,7 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, GameStatePtr state, boo
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
-    if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0) {
+    if(worm->proffession != Worm::Proffession::AGENT || worm->banana_bomb_count <= 0 || worm->health > 50) {
         return std::bitset<121>(0);
     }
 
@@ -292,7 +292,7 @@ std::bitset<121> NextTurn::GetValidSnowballs(bool player1, GameStatePtr state, b
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
-    if(worm->proffession != Worm::Proffession::TECHNOLOGIST || worm->snowball_count <= 0) {
+    if(worm->proffession != Worm::Proffession::TECHNOLOGIST || worm->snowball_count <= 0 || worm->health > 50) {
         return std::bitset<121>(0);
     }
 
