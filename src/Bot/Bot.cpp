@@ -36,6 +36,12 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //select
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1.get());
 
+    //banana mine
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
+    if(bananaMove != nullptr) {
+        return selectPrefix + bananaMove->GetCommandString();
+    }
+
     //begin monte carlo----------------------------------------------------------------
     auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, _playthroughDepth, _mc_c);
 
