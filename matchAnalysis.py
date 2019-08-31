@@ -55,8 +55,25 @@ class PlayerData :
         axes.legend()
 
     def PlotMovesPie(self, axes, playerA):
-        pieData = [len(self.selects), len(self.bananas), len(self.snowballs), len(self.teleports), len(self.digs), len(self.shoots), len(self.invalid_moves)]
-        pieLabels = ['selects', 'bananas', 'snowballs', 'moves', 'digs', 'shoots', 'OTHER(' + str(len(self.invalid_moves)) + ')']
+        numSelects = len(self.selects)
+        numBananas = len(self.bananas)
+        numSnowballs = len(self.snowballs)
+        numTeleports = len(self.teleports)
+        numDigs = len(self.digs)
+        numShoots = len(self.shoots)
+        numInvalid = len(self.invalid_moves)
+
+        pieData = [numSelects, numBananas, numSnowballs, numTeleports, numDigs, numShoots, numInvalid]
+
+        SelectsLabel = "Selects (" + str(numSelects) + ")"
+        BananasLabel = "Bananas (" + str(numBananas) + ")"
+        SnowballsLabel = "Snowballs (" + str(numSnowballs) + ")"
+        TeleportsLabel = "Teleports (" + str(numTeleports) + ")"
+        DigsLabel = "Digs (" + str(numDigs) + ")"
+        ShootsLabel = "Shoots (" + str(numShoots) + ")"
+        InvalidLabel = "Invalid (" + str(numInvalid) + ")"
+
+        pieLabels = [SelectsLabel, BananasLabel, SnowballsLabel, TeleportsLabel, DigsLabel, ShootsLabel, InvalidLabel]
 
         axes.pie(pieData, labels=pieLabels, autopct='%1.1f%%', shadow=True, startangle=90)
 

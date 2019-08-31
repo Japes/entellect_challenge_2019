@@ -39,4 +39,6 @@ class Command
     int _order; //the order in which this command should be processed.  Some commands must happen before others
 };
 
+std::ostream & operator << (std::ostream &out, std::shared_ptr<Command> &cmd);
+
 #endif

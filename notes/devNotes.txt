@@ -1,8 +1,13 @@
 TODO
 
+   so if you make playthrough depth 1 it does what makes sense
+      i think it's the random playout that is assuming he will do something stupid that's the problem
+      i think it will eventually converge to the "right" answer but i can't get that much of a speedup
+
    the heuristic behaviour must be controlled from top level!
 
-   
+selects aint doing shit (for some reason)
+
    somehow prevent throwing bombs too early
       kind of hacky what you've done now
 
@@ -156,46 +161,8 @@ BRAINSTORMING-------------------------------------------------------------------
          (the opponent worms, during the playthrough)
          Prune the search tree by recognising symmetries
 
-insights from replays-----------------------------------------------------------------
-   bots can get "lost" if they are in wide open spaces
-      check confidence of next move, use heuristics if not sure?
-      happened against nico beukes
-   reference bot strategy is quite popular
-        
-   WILLIE:
-      playing style:
-         looks like he's doing a monte carlo search
-      why did he beat me?
-         got me in a shooting dance! used a select to make it so the dancer played on the same turn, and that just made my points collection bad
-      selects:
-         he did a select so that he was playing at the same time as the dude he was in combat with! then he started dancing.  was this deliberate?
-
-   ANDRE MAKAAL
-      playing style:
-         heuristic
-            systematically digs all dirt around his position, then moves towards centre
-            if it sees an enemy nearby, goes for it
-            might be retreating once enemy health is low, not sure
-            looks like he might have some gang up logic
-      why did he beat me?
-         ganged up on 1 worm midgame, both worms were getting hits every turn, this pushed his points up massively
-         also got 2 kills on me
-      selects:
-         he only used one, right at the start so banana guy can go first
-
-   MALLIN
-      playing style:
-         looks like he might be doing some kind of search, but he doesn't get lost
-      why did he beat me?
-         he got a kill right at the end, score boost won it for him
-      selects:
-         he used some at the end, i think in an attempt to grab the last few dirts      
-
-   LEON
-      in the end i think it was my dudes getting lost that did it
-
 to run bot on state file:--------------------------------------------
- - copy file to bin/rounds/roundnumber/state.json
+ - copy JsonMap.json file (in players directory for that round) to bin/rounds/roundnumber/state.json
  - cd into bin folder
  - run bot
  - input round number
