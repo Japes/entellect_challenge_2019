@@ -1,6 +1,6 @@
 #include "Command.hpp"
 
-const std::string Command::latestBot = "JP28";
+const std::string Command::latestBot = "JP29";
 
 //to help with debugging...
 std::ostream & operator << (std::ostream &out, std::shared_ptr<Command> &cmd)
