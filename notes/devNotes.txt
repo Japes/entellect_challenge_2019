@@ -1,9 +1,19 @@
 TODO
 
-   add points to evaluation as well
    somehow prevent throwing bombs too early
+      kind of hacky what you've done now
+
    store MC results of first level
 
+
+dont fight if you have points advantage
+no bananas first game??
+
+
+	i want that sweet sweet playout till the end
+
+
+   store MC results of first level
 
    "Safe mode"
 		try taking out shooting directly - "safe mode"

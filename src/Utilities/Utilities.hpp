@@ -18,6 +18,12 @@ class Utilities
     //+1 should return max
     static inline float NormaliseTo(float fraction, float min, float max)
     {
+        if(fraction > 1) {
+            return max;
+        }
+        if(fraction < -1) {
+            return min;
+        }
         float halfRange = (max-min)/2;
         float halfway = halfRange + min;
         return (fraction*(halfRange)) + halfway;

@@ -1,4 +1,4 @@
-#!/usr/bin/python3.6
+#!/usr/bin/env python3
 
 from collections import defaultdict
 import os
@@ -16,7 +16,7 @@ def Count_moves(filename):
     return mv_count
 
 def Compare_move_counts(amvs, bmvs):
-    for k in ['health', 'score', 'dig', 'move', 'shoot', 'banana', 'select', 'invalid', 'nothing']:
+    for k in ['health', 'score', 'dig', 'move', 'shoot', 'banana', 'snowball', 'select', 'invalid', 'nothing']:
         if amvs[k] < bmvs[k]:
             print(' X ', end='')
         else:
