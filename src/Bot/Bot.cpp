@@ -37,7 +37,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1.get());
 
     //banana mine
-    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1, _dirtsForBanana);
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1.get(), _dirtsForBanana);
     if(bananaMove != nullptr) {
         return selectPrefix + bananaMove->GetCommandString();
     }

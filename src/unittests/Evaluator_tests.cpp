@@ -18,13 +18,13 @@ TEST_CASE( "AveHpScoreEvaluator", "[AveHpScoreEvaluator][.debug]" ) {
         */
 
         bool player1 = GENERATE(true, false);
-        Worm* worm11 = place_worm(player1, 1, {1,1}, state);
-        Worm* worm12 = place_worm(player1, 2, {20,1}, state);
-        Worm* worm13 = place_worm(player1, 3, {20,2}, state);
+        place_worm(player1, 1, {1,1}, state);
+        place_worm(player1, 2, {20,1}, state);
+        place_worm(player1, 3, {20,2}, state);
         
-        Worm* worm21 = place_worm(!player1, 1, {20,3}, state);
-        Worm* worm22 = place_worm(!player1, 2, {20,4}, state);
-        Worm* worm23 = place_worm(!player1, 3, {20,5}, state);
+        place_worm(!player1, 1, {20,3}, state);
+        place_worm(!player1, 2, {20,4}, state);
+        place_worm(!player1, 3, {20,5}, state);
 
         state.SetCellTypeAt({2, 1}, CellType::DIRT);
 
