@@ -122,7 +122,7 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
     }
 }
 
-TEST_CASE( "Basic sanity", "[BotSanity]" ) {
+TEST_CASE( "Basic sanity", "[.BotSanity]" ) {
     GIVEN("a Bot")
     {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/spellCounts/beforeSnowBall.json");

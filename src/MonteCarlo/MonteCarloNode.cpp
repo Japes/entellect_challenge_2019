@@ -18,27 +18,15 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
 {
     _mtx.lock();
     //choose next node
-    auto player1_next_move = _player1_mc.NextMove();
-    auto player2_next_move = _player2_mc.NextMove();
+    std::shared_ptr<MCMove> player1_next_move = _player1_mc.NextMove();
+    std::shared_ptr<MCMove> player2_next_move = _player2_mc.NextMove();
     _mtx.unlock();
-
-    childNodeKey_t key{player1_next_move.get(), player2_next_move.get()};
 
     numplies = 0;
     float thisScore;
     if (_nodeDepth > 0) {
-    
-        _mtx.lock();
-        if (_childNodes.find(key) == _childNodes.end()) {
-            auto child_state = std::make_shared<GameState>(*_state.get()); //make a copy :/
-            GameEngine eng(child_state.get());
-            eng.AdvanceState(*player1_next_move->GetCommand().get(), *player2_next_move->GetCommand().get());
-            _childNodes[key] = std::make_shared<MonteCarloNode>(child_state, _evaluator, _nodeDepth - 1, _playthroughDepth - 1, _c);
-        }
-
-        thisScore = _childNodes[key]->AddPlaythrough(numplies);
-        _mtx.unlock();
-
+        std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild(player1_next_move, player2_next_move);
+        thisScore = childNode->AddPlaythrough(numplies);
     } else {
 
         //load the state
@@ -62,6 +50,28 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     _mtx.unlock();
 
     return thisScore;
+}
+
+std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move)
+{
+    childNodeKey_t key = GetChildKey(p1Move, p2Move);
+
+    _mtx.lock();
+    if (_childNodes.find(key) == _childNodes.end()) {
+        auto child_state = std::make_shared<GameState>(*_state.get()); //make a copy :/
+        GameEngine eng(child_state.get());
+        eng.AdvanceState(*p1Move->GetCommand().get(), *p2Move->GetCommand().get());
+        _childNodes[key] = std::make_shared<MonteCarloNode>(child_state, _evaluator, _nodeDepth - 1, _playthroughDepth - 1, _c);
+    }
+    auto ret = _childNodes[key];
+    _mtx.unlock();
+
+    return ret;
+}
+
+childNodeKey_t MonteCarloNode::GetChildKey(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move)
+{
+    return p1Move->GetCommand()->GetCommandString() + p2Move->GetCommand()->GetCommandString();
 }
 
 std::shared_ptr<Command> MonteCarloNode::GetBestMove(bool player1)

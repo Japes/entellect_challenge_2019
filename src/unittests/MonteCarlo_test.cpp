@@ -8,6 +8,7 @@
 #include "../MonteCarlo/MonteCarloNode.hpp"
 #include "../GameEngine/Evaluators/HealthEvaluator.hpp"
 
+
 TEST_CASE( "Best move", "[BestNode]" ) {
     GIVEN("A bunch of moves passed to a monte carlo")
     {
@@ -64,22 +65,6 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
             int numkids = MCNode.NumChildren();
             for(int i = 0; i < MCNode.NumBranches(); ++i ) {
                 MCNode.AddPlaythrough(dummy);
-
-
-                
-                
-                
-                
-                
-                //this sometimes fails....
-
-
-
-
-
-
-
-
                 REQUIRE(MCNode.NumChildren() == ++numkids); //what the, this isn't always true!
             }
 
@@ -100,29 +85,31 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
 TEST_CASE( "Childnode keys work as I expect", "[BestNode]" ) {
     GIVEN("A map of type childNodeKey_t") {
 
-        std::map<childNodeKey_t, int> nodes;
+        std::unordered_map<childNodeKey_t, int> nodes;
         REQUIRE(nodes.size() == 0);
 
         WHEN("We add a pair of moves")
         {
-            MCMove a (std::make_shared<DoNothingCommand>());
-            MCMove b (std::make_shared<DoNothingCommand>());
+            auto a = std::make_shared<MCMove>(std::make_shared<DoNothingCommand>());
+            auto b = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(1,1)));
 
-            nodes[{&a, &b}] = 1;
+            childNodeKey_t key = MonteCarloNode::GetChildKey(a, b);
+            nodes[key] = 1;
 
             THEN("Size increases") {
                 REQUIRE(nodes.size() == 1);
             }
 
             AND_THEN("We add that same thing again") {
-                nodes[{&a, &b}] = 3;
+                nodes[key] = 3;
                 THEN("Size stays the same ") {
                     REQUIRE(nodes.size() == 1);
                 }
             }
 
             AND_THEN("We add another one but with the moves reversed") {
-                nodes[{&b, &a}] = 1;
+                childNodeKey_t rev_key = MonteCarloNode::GetChildKey(b, a);
+                nodes[rev_key] = 1;
                 THEN("Size increases again ") {
                     REQUIRE(nodes.size() == 2);
                 }

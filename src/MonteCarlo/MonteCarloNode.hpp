@@ -4,9 +4,9 @@
 #include "PlayersMonteCarlo.hpp"
 #include "Evaluators/EvaluatorBase.hpp"
 #include <mutex>
-#include <map>
+#include <unordered_map>
 
-using childNodeKey_t = std::pair<MCMove*, MCMove*>;
+using childNodeKey_t = std::string;
 
 class MonteCarloNode
 {
@@ -14,6 +14,8 @@ class MonteCarloNode
     MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c);
     float AddPlaythrough(int& numplies);
     std::shared_ptr<Command> GetBestMove(bool player1);
+
+    static childNodeKey_t GetChildKey(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move);
 
     //for debug
     int NumChildren();
@@ -30,7 +32,9 @@ class MonteCarloNode
     int _playthroughDepth;
     float _c;
 
-    std::map<childNodeKey_t, std::shared_ptr<MonteCarloNode>> _childNodes;
+    std::unordered_map<childNodeKey_t, std::shared_ptr<MonteCarloNode>> _childNodes;
+
+    std::shared_ptr<MonteCarloNode> GetOrCreateChild(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move);
 
 };
 
