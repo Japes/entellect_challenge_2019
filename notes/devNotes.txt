@@ -1,5 +1,8 @@
 TODO
 
+   the heuristic behaviour must be controlled from top level!
+
+   
    somehow prevent throwing bombs too early
       kind of hacky what you've done now
 

@@ -2,6 +2,7 @@
 #define SCORE_EVALUATOR_H
 
 #include "EvaluatorBase.hpp"
+#include "../GameEngine.hpp"
 
 class ScoreEvaluator: public EvaluatorBase
 {
