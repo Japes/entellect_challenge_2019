@@ -121,3 +121,39 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         }
     }
 }
+
+TEST_CASE( "Basic sanity", "[BotSanity]" ) {
+    GIVEN("a Bot")
+    {
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/spellCounts/beforeSnowBall.json");
+        auto round2JSON = Utilities::ReadJsonFile("./Test_files/spellCounts/afterBanana.json");
+
+        int playThroughDepth{12};
+        int dirtsForBanana{100};
+        int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+        uint64_t mcTime_ns{880000000};
+        float mc_c{std::sqrt(2)};
+        int mc_runsBeforeClockCheck{50};
+        HealthEvaluator eval;
+        Bot bot(&eval, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+
+        WHEN("We request the next move")
+        {
+            auto ret = bot.runStrategy(roundJSON);
+
+            THEN("Nothing breaks")
+            {
+                REQUIRE(true);
+            }
+
+            AND_THEN("We run another move")
+            {
+                auto ret = bot.runStrategy(round2JSON);
+                THEN("Nothing breaks")
+                {
+                    REQUIRE(true);
+                }   
+            }
+        }
+    }
+}

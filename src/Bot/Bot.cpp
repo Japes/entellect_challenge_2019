@@ -43,7 +43,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     }
 
     //begin monte carlo----------------------------------------------------------------
-    auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, _playthroughDepth, _mc_c);
+    auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, 1, _playthroughDepth, _mc_c);
 
     _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc);
@@ -69,7 +69,9 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc)
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
-            _numplies += mc->AddPlaythrough();
+            int numplies = 0;
+            mc->AddPlaythrough(numplies);
+            _numplies += numplies;
         }
     }
 }

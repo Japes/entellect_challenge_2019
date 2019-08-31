@@ -1,5 +1,7 @@
 TODO
 
+   do run with shallow lookahead
+   
    so if you make playthrough depth 1 it does what makes sense
       i think it's the random playout that is assuming he will do something stupid that's the problem
       i think it will eventually converge to the "right" answer but i can't get that much of a speedup
