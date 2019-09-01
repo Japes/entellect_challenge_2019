@@ -7,6 +7,7 @@
 #include "../MonteCarlo/PlayersMonteCarlo.hpp"
 #include "../MonteCarlo/MonteCarloNode.hpp"
 #include "../GameEngine/Evaluators/HealthEvaluator.hpp"
+#include "../GameEngine/Evaluators/ScoreEvaluator.hpp"
 
 
 TEST_CASE( "Best move", "[BestNode]" ) {
@@ -118,7 +119,80 @@ TEST_CASE( "Childnode keys work as I expect", "[BestNode]" ) {
     }
 }
 
-//get that keys are different for different orders (player1, player2)
-//check that child nodes only get created when necessary
+TEST_CASE( "Debug monte carlo", "[DebugMonteCarlo]" ) {
+    GIVEN("A monte carlo node and a contrived game state")
+    {
+
+        //    0   1   2   3   4   5   6   7   8
+        //0   S   .   S   S   S   S   S   .   5
+        //1   S   11  D   S   S   S   D   21  S
+        //2   S   S   S   S   s   S   S   S   S
+        //3   S   .   S   S   S   S   S   .   S
+        //4   S   12  D   S   S   S   D   22  S
+        //5   S   S   S   S   S   S   S   S   S
+        //6   S   .   S   S   S   S   S   .   S
+        //7   S   13  D   S   S   S   D   23  S
+        //8   S   S   S   S   S   S   S   S   S
+        
+        auto state = std::make_shared<GameState>();
+        GameEngine eng(state);
+
+        bool player1 = true;// GENERATE(true, false);
+        
+        place_worm(player1, 1, {1,1}, state);
+        place_worm(player1, 2, {1,4}, state);
+        place_worm(player1, 3, {1,7}, state);
+
+        place_worm(!player1, 1, {7,1}, state);
+        place_worm(!player1, 2, {7,4}, state);
+        place_worm(!player1, 3, {7,7}, state);
+
+        state->player1.worms[0].SetProffession(Worm::Proffession::COMMANDO);
+        state->player1.worms[1].SetProffession(Worm::Proffession::COMMANDO);
+        state->player1.worms[2].SetProffession(Worm::Proffession::COMMANDO);
+        state->player2.worms[0].SetProffession(Worm::Proffession::COMMANDO);
+        state->player2.worms[1].SetProffession(Worm::Proffession::COMMANDO);
+        state->player2.worms[2].SetProffession(Worm::Proffession::COMMANDO);
+
+        for(int x = 0; x <= 8; ++x) {
+            for(int y = 0; y <= 8; ++y) {
+
+                if(x == 2 || x == 6) {
+                    if(y == 1 || y == 4 || y == 7) {
+                        state->SetCellTypeAt({x, y}, CellType::DIRT);
+                        continue;
+                    }
+                }
+
+                if(x == 1 || x == 7) {
+                    if(y == 0 || y == 3 || y == 6 || y == 1 || y == 4 || y == 7) {
+                        continue;
+                    }
+                }
+
+                state->SetCellTypeAt({x, y}, CellType::DEEP_SPACE);
+            }
+        }
+
+        ScoreEvaluator eval;
+        int nodeDepth = 1;
+        int playthroughDepth = 6;
+        float c = 2;
+        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, c);
+
+        WHEN("We do 8 playthroughs")
+        {
+            int dummy;
+            for(unsigned i = 0; i < 5; ++i) {
+                MCNode.AddPlaythrough(dummy);
+            }
+
+        }
+
+    }
+}
+
+
 //test nodedepth
 //check for nodedepth 0, must never make children
+//  and should behave the same as it used to....

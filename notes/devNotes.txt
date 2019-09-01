@@ -1,6 +1,7 @@
 TODO
 
    do run with MaxhealthEval
+   wasn't quite symmetrical last time the dudes weren't throwing bombs
 
    resolve ties with random, not selecting first
       in monte carlo nextnode as well as getbestmove
