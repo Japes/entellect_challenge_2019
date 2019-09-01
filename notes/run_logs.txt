@@ -359,3 +359,10 @@ Engine version: 2019.3.0 -- 2019_August_31__05_38_25 -- ParallelID: 1
 (wins/draws/losses):     ab4                      jp28                     
 ab4:                     0/0/0                    34/0/0                   
 
+setting nodeDepth to 0, eval to scorecomparison, and playing against jp28 (which is a scorecomparison).  Both playout depth = 12===============================================================
+29 always randomly missioning into the lava towards the end.........
+
+Engine version: 2019.3.0 -- 2019_August_31__09_52_47 -- ParallelID: 1
+(wins/draws/losses):     jp28                     jp29                     
+jp28:                    0/0/0                    45/0/5
+

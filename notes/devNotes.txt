@@ -1,24 +1,25 @@
 TODO
 
-   do run with shallow lookahead
+   do run with MaxhealthEval
+
+   resolve ties with random, not selecting first
+      in monte carlo nextnode as well as getbestmove
    
+   store MC results of first level
+
    so if you make playthrough depth 1 it does what makes sense
       i think it's the random playout that is assuming he will do something stupid that's the problem
       i think it will eventually converge to the "right" answer but i can't get that much of a speedup
 
-   the heuristic behaviour must be controlled from top level!
+   all heuristic behaviour must be controlled from top level!
 
-selects aint doing shit (for some reason)
+   selects aint doing shit (for some reason)
 
    somehow prevent throwing bombs too early
       kind of hacky what you've done now
 
-   store MC results of first level
-
-
-dont fight if you have points advantage
-no bananas first game??
-
+   dont fight if you have points advantage
+   no bananas first game??
 
 	i want that sweet sweet playout till the end
 
