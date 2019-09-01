@@ -20,16 +20,22 @@ std::string executeRound(Bot& bot, std::string& roundNumber)
 
 int main(int argc, char** argv)
 {
-    int playThroughDepth{12};
+    //note total play depth is nodeDepth + playThroughDepth
+    int playThroughDepth{11};
     int nodeDepth{1};
-    int dirtsForBanana{100}; //effectively, turn this off
+
+    int dirtsForBanana{100}; //effectively turns this off
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+
     uint64_t mcTime_ns{880000000};
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
     ScoreEvaluator eval;
-    Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+    Bot bot(&eval, 
+            playThroughDepth, nodeDepth, 
+            dirtsForBanana, clearSpaceForHeuristic, 
+            mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     for (std::string roundNumber; std::getline(std::cin, roundNumber);) 
     {

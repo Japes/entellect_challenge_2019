@@ -8,14 +8,14 @@ PlayersMonteCarlo::PlayersMonteCarlo(const std::vector<std::shared_ptr<Command>>
     }
 }
 
-PlayersMonteCarlo::PlayersMonteCarlo(std::vector<std::shared_ptr<MCMove>> nodes, float c) : _N{0}, _c{c}, _moves{nodes}
+PlayersMonteCarlo::PlayersMonteCarlo(std::vector<std::shared_ptr<MCMove>> moves, float c) : _N{0}, _c{c}, _moves{moves}
 {
 }
 
 std::shared_ptr<MCMove> PlayersMonteCarlo::NextMove()
 {
-    for(auto & node: _moves) {
-        node->UpdateUCT(_N, _c);
+    for(auto & move: _moves) {
+        move->UpdateUCT(_N, _c);
     }
 
     auto next_node = std::max_element(std::begin(_moves), std::end(_moves), 

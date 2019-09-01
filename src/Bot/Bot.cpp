@@ -17,7 +17,8 @@ Bot::Bot(EvaluatorBase* evaluator,
     _mc_c{mc_c},
     _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck},
     _numplies{0},
-    _evaluator{evaluator}
+    _evaluator{evaluator},
+    _mc{nullptr}
 {
     NextTurn::Initialise();
 }
@@ -25,40 +26,55 @@ Bot::Bot(EvaluatorBase* evaluator,
 //expects command string to be returned e.g. "dig 5 6"
 std::string Bot::runStrategy(rapidjson::Document& roundJSON)
 {
-    //Setup---------------------------------------------------------------------------
     uint64_t start_time = Utilities::Get_ns_since_epoch();
 
+    //Get state
     bool ImPlayer1 = roundJSON["myPlayer"].GetObject()["id"].GetInt() == 1;
-    auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
+    auto state_now = GameStateLoader::LoadGameStatePtr(roundJSON);
+    AdjustOpponentSpellCount(ImPlayer1, state_now.get(), _last_round_state.get());
+    _last_round_state = std::make_shared<GameState>(*state_now.get()); //no idea why it needs to be done this way
 
-    AdjustOpponentSpellCount(ImPlayer1, state1.get(), _last_round_state.get());
-    _last_round_state = std::make_shared<GameState>(*state1.get()); //no idea why it needs to be done this way
+    //Setup---------------------------------------------------------------------------
+    GetNextMC(state_now);
 
     //do some heuristics---------------------------------------------------------------
     //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state1.get());
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get());
 
     //banana mine
-    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state1.get(), _dirtsForBanana);
+    auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state_now.get(), _dirtsForBanana);
     if(bananaMove != nullptr) {
         return selectPrefix + bananaMove->GetCommandString();
     }
 
     //begin monte carlo----------------------------------------------------------------
-    auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, _nodeDepth, _playthroughDepth, _mc_c);
-
     _numplies = 0;
-    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc);
-    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, mc);
+    std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);
+    std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);
     t1.join();
     t2.join();
 
     //output result--------------------------------------------------------------------
     //choose the best move and do it
-    auto best_move = mc->GetBestMove(ImPlayer1);
-    mc->PrintState(ImPlayer1);
+    auto best_move = _mc->GetBestMove(ImPlayer1);
+    _mc->PrintState(ImPlayer1);
 
     return selectPrefix + best_move->GetCommandString();
+}
+
+void Bot::GetNextMC(std::shared_ptr<GameState> state_now)
+{
+    if(_mc != nullptr) {
+        _mc = _mc->TryGetComputedState(state_now);
+        if(_mc != nullptr) {
+            _mc->Promote();
+            std::cerr << "(" << __FUNCTION__ << ") GOT A CHILD NODE TO REUSE!-----------------------------------------------------" << std::endl;
+            _mc->PrintState(true);
+            return;
+        }
+    }
+
+    _mc = std::make_shared<MonteCarloNode>(state_now, _evaluator, _nodeDepth, _playthroughDepth, _mc_c);
 }
 
 uint64_t Bot::GetNumPlies()
@@ -80,7 +96,6 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc)
 
 void Bot::AdjustOpponentSpellCount(bool player1, GameStatePtr current_state, GameStatePtr prev_state)
 {
-    //try to figure out if the opponent threw a banana (rough heuristic here)
     if(prev_state != nullptr) {
         
         Player* opposingPlayerNow = player1? &current_state->player2 : &current_state->player1;

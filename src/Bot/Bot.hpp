@@ -18,6 +18,7 @@ class Bot
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck);
 
     std::string runStrategy(rapidjson::Document& roundJSON);
+    void GetNextMC(std::shared_ptr<GameState> state_now);
     uint64_t GetNumPlies();
     void AdjustOpponentSpellCount(bool player1, GameStatePtr current_state, GameStatePtr prev_state);
 
@@ -37,6 +38,7 @@ class Bot
 
     EvaluatorBase* _evaluator;
 
+    std::shared_ptr<MonteCarloNode> _mc;
 
     int Dist_to_closest_enemy(GameStatePtr state1, bool player1);
     void runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc);

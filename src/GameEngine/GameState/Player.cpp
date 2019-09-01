@@ -8,7 +8,8 @@ Player::Player(GameState* _state) :
     currentWormId{1},
     consecutiveDoNothingCount{0},
     remainingWormSelections{GameConfig::wormSelectTokens},
-    worms{Worm(_state), Worm(_state), Worm(_state)}
+    worms{Worm(_state), Worm(_state), Worm(_state)},
+    previousCommand{nullptr}
 {
     //not sure why the usual vector constructors aren't working here...
     worms[0].SetProffession(Worm::Proffession::COMMANDO);

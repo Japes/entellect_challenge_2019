@@ -1,5 +1,8 @@
 TODO
    
+
+	dafuq is up with the timeouts the first time i play always
+
    put max division thing inside the evaluators...
 
    prime based on patterns in opponents moves (anti-dance)

@@ -13,13 +13,18 @@ class MonteCarloNode
 {
     public:
     MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c);
+    void Promote();
     float AddPlaythrough(int& numplies);
     std::shared_ptr<Command> GetBestMove(bool player1);
+    std::shared_ptr<MonteCarloNode> GetChild(childNodeID_t id);
+    std::shared_ptr<MonteCarloNode> TryGetComputedState(std::shared_ptr<GameState> state);
+    bool StateEquals(std::shared_ptr<GameState> state);
 
     static childNodeKey_t GetChildKey(childNodeID_t id);
 
     //for debug
     int NumChildren();
+    int MaxTreeDepth();
     int MinNumBranches();
     void PrintState(bool player1);
 
