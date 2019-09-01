@@ -50,7 +50,7 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     std::shared_ptr<MCMove> player2_next_move = _player2_mc.NextMove();
     _mtx.unlock();
 
-    
+    /*
     if(_nodeDepth == 0) {
         std::cerr << "\t";
     }
@@ -60,6 +60,7 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     if(_nodeDepth == 0) {
         std::cerr << std::endl;
     }
+    */
     
 
     numplies = 0;
