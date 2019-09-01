@@ -90,10 +90,10 @@ TEST_CASE( "Childnode keys work as I expect", "[BestNode]" ) {
 
         WHEN("We add a pair of moves")
         {
-            auto a = std::make_shared<MCMove>(std::make_shared<DoNothingCommand>());
-            auto b = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(1,1)));
+            auto a = std::make_shared<DoNothingCommand>();
+            auto b = std::make_shared<TeleportCommand>(Position(1,1));
 
-            childNodeKey_t key = MonteCarloNode::GetChildKey(a, b);
+            childNodeKey_t key = MonteCarloNode::GetChildKey({a, b});
             nodes[key] = 1;
 
             THEN("Size increases") {
@@ -108,7 +108,7 @@ TEST_CASE( "Childnode keys work as I expect", "[BestNode]" ) {
             }
 
             AND_THEN("We add another one but with the moves reversed") {
-                childNodeKey_t rev_key = MonteCarloNode::GetChildKey(b, a);
+                childNodeKey_t rev_key = MonteCarloNode::GetChildKey({b, a});
                 nodes[rev_key] = 1;
                 THEN("Size increases again ") {
                     REQUIRE(nodes.size() == 2);

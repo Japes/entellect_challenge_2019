@@ -6,7 +6,8 @@
 #include <mutex>
 #include <unordered_map>
 
-using childNodeKey_t = std::string;
+using childNodeID_t = std::pair<std::shared_ptr<Command>, std::shared_ptr<Command>>; //unique identifier for child nodes
+using childNodeKey_t = std::string; //key in format required for map
 
 class MonteCarloNode
 {
@@ -15,7 +16,7 @@ class MonteCarloNode
     float AddPlaythrough(int& numplies);
     std::shared_ptr<Command> GetBestMove(bool player1);
 
-    static childNodeKey_t GetChildKey(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move);
+    static childNodeKey_t GetChildKey(childNodeID_t id);
 
     //for debug
     int NumChildren();
@@ -34,7 +35,7 @@ class MonteCarloNode
 
     std::unordered_map<childNodeKey_t, std::shared_ptr<MonteCarloNode>> _childNodes;
 
-    std::shared_ptr<MonteCarloNode> GetOrCreateChild(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move);
+    std::shared_ptr<MonteCarloNode> GetOrCreateChild(childNodeID_t id);
 
 };
 

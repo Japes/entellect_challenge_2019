@@ -25,7 +25,7 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     numplies = 0;
     float thisScore;
     if (_nodeDepth > 0) {
-        std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild(player1_next_move, player2_next_move);
+        std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild({player1_next_move->GetCommand(), player2_next_move->GetCommand()});
         thisScore = childNode->AddPlaythrough(numplies);
     } else {
 
@@ -52,15 +52,17 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     return thisScore;
 }
 
-std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move)
+std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(childNodeID_t id)
 {
-    childNodeKey_t key = GetChildKey(p1Move, p2Move);
+    childNodeKey_t key = GetChildKey(id);
+    auto p1Cmd = id.first;
+    auto p2Cmd = id.second;
 
     _mtx.lock();
     if (_childNodes.find(key) == _childNodes.end()) {
         auto child_state = std::make_shared<GameState>(*_state.get()); //make a copy :/
         GameEngine eng(child_state.get());
-        eng.AdvanceState(*p1Move->GetCommand().get(), *p2Move->GetCommand().get());
+        eng.AdvanceState(*p1Cmd.get(), *p2Cmd.get());
         _childNodes[key] = std::make_shared<MonteCarloNode>(child_state, _evaluator, _nodeDepth - 1, _playthroughDepth - 1, _c);
     }
     auto ret = _childNodes[key];
@@ -69,9 +71,9 @@ std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(std::shared_ptr
     return ret;
 }
 
-childNodeKey_t MonteCarloNode::GetChildKey(std::shared_ptr<MCMove> p1Move, std::shared_ptr<MCMove> p2Move)
+childNodeKey_t MonteCarloNode::GetChildKey(childNodeID_t id)
 {
-    return p1Move->GetCommand()->GetCommandString() + p2Move->GetCommand()->GetCommandString();
+    return  id.first->GetCommandString() + id.second->GetCommandString();
 }
 
 std::shared_ptr<Command> MonteCarloNode::GetBestMove(bool player1)
