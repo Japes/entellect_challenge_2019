@@ -192,8 +192,8 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         }
     }
 
-    float frac = evaluationAfter / evaluator->BestPossiblePerPly();
-    
+    float frac = evaluationAfter / evaluator->BestPossible();
+
     // clamp scorediff to 0.25 - 0.75
     return Utilities::NormaliseTo(frac, 0.25, 0.75);
 }

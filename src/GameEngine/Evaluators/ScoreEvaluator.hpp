@@ -10,7 +10,7 @@ class ScoreEvaluator: public EvaluatorBase
 
     ScoreEvaluator()
     {
-        _bestPossiblePerPly = 1000; //rough estimate...
+        _bestPossible = 1000; //rough estimate...
     }
 
     float Evaluate (bool player1, GameStatePtr state) const override

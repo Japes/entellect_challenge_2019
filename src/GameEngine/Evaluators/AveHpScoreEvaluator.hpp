@@ -9,7 +9,7 @@ class AveHpScoreEvaluator: public EvaluatorBase
 	public:
     AveHpScoreEvaluator()
     {
-        _bestPossiblePerPly = GameConfig::agentWorms.banana.damage*2; //rough estimate...he hits his own guy, i hit his guy as well
+        _bestPossible = 120 + 1000/10; //rough estimate...ave hp + score/10
     }
 
     float Evaluate (bool player1, GameStatePtr state) const override

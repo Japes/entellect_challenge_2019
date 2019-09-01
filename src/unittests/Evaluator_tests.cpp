@@ -28,18 +28,15 @@ TEST_CASE( "AveHpScoreEvaluator", "[AveHpScoreEvaluator][.debug]" ) {
 
         state.SetCellTypeAt({2, 1}, CellType::DIRT);
 
-        auto evaluationBefore = eval.Evaluate(player1, &state);
         GameEngine eng(&state);
         eng.AdvanceState(DigCommand({2,1}), DoNothingCommand());
         auto evaluationAfter = eval.Evaluate(player1, &state);
 
-        INFO("evaluationBefore: " << evaluationBefore << " evaluationAfter: " << evaluationAfter);
+        INFO(" evaluationAfter: " << evaluationAfter);
 
         WHEN("We work out the evaluation as done in the engine")
         {
-            int numPlies = 1;
-            float bestPossible = eval.BestPossiblePerPly()*numPlies;
-            float frac = (evaluationAfter - evaluationBefore) / bestPossible;
+            float frac = evaluationAfter / eval.BestPossible();
             // clamp scorediff to 0.25 - 0.75
             auto ret = Utilities::NormaliseTo(frac, 0.25, 0.75);
 

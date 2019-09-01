@@ -9,7 +9,7 @@ class AverageHealthEvaluator: public EvaluatorBase
 	public:
     AverageHealthEvaluator()
     {
-        _bestPossiblePerPly = GameConfig::agentWorms.banana.damage*2; //rough estimate...he hits his own guy, i hit his guy as well
+        _bestPossible = 470.0f/3.0f; //rough estimate...3 full health worms + 2 health packs
     }
 
     float Evaluate (bool player1, GameStatePtr state) const override
