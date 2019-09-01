@@ -10,7 +10,7 @@ class ScoreEvaluator: public EvaluatorBase
 
     ScoreEvaluator()
     {
-        _bestPossiblePerPly = GameConfig::agentWorms.banana.damage*2*2; //rough estimate...he hits his own guy, i hit his guy as well
+        _bestPossiblePerPly = 1000; //rough estimate...
     }
 
     float Evaluate (bool player1, GameStatePtr state) const override

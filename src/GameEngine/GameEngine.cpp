@@ -170,9 +170,6 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
     std::shared_ptr<Command> p1Command = player1_Command;
     std::shared_ptr<Command> p2Command = player2_Command;
 
-    //run the playthrough
-    auto evaluationBefore = evaluator->Evaluate(true, _state); //always in terms of player 1
-
     numPlies = 0;
     while(depth != 0 && _currentResult.result == ResultType::IN_PROGRESS) {
         AdvanceState(*p1Command.get(), *p2Command.get());
@@ -195,8 +192,8 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         }
     }
 
-    float bestPossible = evaluator->BestPossiblePerPly()*numPlies;
-    float frac = (evaluationAfter - evaluationBefore) / bestPossible;
+    float frac = evaluationAfter / evaluator->BestPossiblePerPly();
+    
     // clamp scorediff to 0.25 - 0.75
     return Utilities::NormaliseTo(frac, 0.25, 0.75);
 }
