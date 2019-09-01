@@ -18,13 +18,14 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         GameState stateAfterThrow = GameStateLoader::LoadGameState(round2JSON);
 
         int playThroughDepth{24};
+        int nodeDepth{1};
         int dirtsForBanana{10};
         int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
         HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         THEN("snowball counts are as we expect")
         {
@@ -74,13 +75,14 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         GameState stateAfterThrow = GameStateLoader::LoadGameState(round2JSON);
 
         int playThroughDepth{24};
+        int nodeDepth{1};
         int dirtsForBanana{10};
         int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
         HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         THEN("Banana counts are as we expect")
         {
@@ -129,13 +131,14 @@ TEST_CASE( "Basic sanity", "[.BotSanity]" ) {
         auto round2JSON = Utilities::ReadJsonFile("./Test_files/spellCounts/afterBanana.json");
 
         int playThroughDepth{12};
+        int nodeDepth{1};
         int dirtsForBanana{100};
         int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
         HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         WHEN("We request the next move")
         {

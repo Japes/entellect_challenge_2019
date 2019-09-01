@@ -6,9 +6,11 @@
 #include <thread>
 
 Bot::Bot(EvaluatorBase* evaluator,
-        int playthroughDepth, int dirtsForBanana, int distanceForLost, 
+        int playthroughDepth, int nodeDepth,
+        int dirtsForBanana, int distanceForLost, 
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
     _playthroughDepth{playthroughDepth},
+    _nodeDepth{nodeDepth},
     _dirtsForBanana{dirtsForBanana},
     _distanceForLost{distanceForLost},
     _mc_Time_ns{mcTime_ns},
@@ -43,7 +45,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     }
 
     //begin monte carlo----------------------------------------------------------------
-    auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, 1, _playthroughDepth, _mc_c);
+    auto mc = std::make_shared<MonteCarloNode>(state1, _evaluator, _nodeDepth, _playthroughDepth, _mc_c);
 
     _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, mc);

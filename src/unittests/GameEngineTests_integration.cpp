@@ -26,6 +26,7 @@ uint64_t Get_ns_since_epoch() {
 TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
 
     int playThroughDepth{24};
+    int nodeDepth{1};
     int dirtsForBanana{10};
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     //uint64_t mcTime_ns{3000000000000};
@@ -34,7 +35,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     int mc_runsBeforeClockCheck{50};
 
     HealthEvaluator evaluator;
-    Bot bot(&evaluator, playThroughDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+    Bot bot(&evaluator, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     std::vector<rapidjson::Document> files;
     files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"));
