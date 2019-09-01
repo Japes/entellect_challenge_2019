@@ -25,9 +25,9 @@ uint64_t Get_ns_since_epoch() {
 
 TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
 
-    int playThroughDepth{24};
+    int playThroughDepth{12};
     int nodeDepth{1};
-    int dirtsForBanana{10};
+    int dirtsForBanana{100};
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     //uint64_t mcTime_ns{3000000000000};
     uint64_t mcTime_ns{3000000000};

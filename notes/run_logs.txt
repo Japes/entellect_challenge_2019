@@ -376,3 +376,7 @@ Engine version: 2019.3.0 -- 2019_September_01__11_10_07 -- ParallelID: 1
 (wins/draws/losses):     jp30                     jp29                     
 jp30:                    0/0/0                    0/0/5                    (0/0/2)
 
+wasn't compiled properly with flto (always do a make clean) trying again===================================================================================================
+(still sucks)
+
+

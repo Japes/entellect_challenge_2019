@@ -20,7 +20,7 @@ class MonteCarloNode
 
     //for debug
     int NumChildren();
-    int NumBranches();
+    int MinNumBranches();
     void PrintState(bool player1);
 
     private:

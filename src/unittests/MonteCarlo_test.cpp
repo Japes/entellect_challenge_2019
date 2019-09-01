@@ -43,10 +43,21 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
     GIVEN("A monte carlo node")
     {
         auto state = std::make_shared<GameState>();
+
+        bool player1 = true;
+        place_worm(player1, 1, {1,1}, state);
+        place_worm(player1, 2, {1,4}, state);
+        place_worm(player1, 3, {1,7}, state);
+
+        place_worm(!player1, 1, {7,1}, state);
+        place_worm(!player1, 2, {7,4}, state);
+        place_worm(!player1, 3, {7,7}, state);
+
         HealthEvaluator eval;
         MonteCarloNode MCNode(state, &eval, 1, 6, 2);
 
         REQUIRE(MCNode.NumChildren() == 0);
+
 
         WHEN("We do a playthrough")
         {
@@ -59,25 +70,14 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
             }
         }
 
-        WHEN("We do a playthrough for every branch, we gain a kid each time")
+        WHEN("We do a playthrough for MinNumBranches, we gain a kid each time")
         {
             int dummy;
 
             int numkids = MCNode.NumChildren();
-            for(int i = 0; i < MCNode.NumBranches(); ++i ) {
+            for(int i = 0; i < MCNode.MinNumBranches(); ++i ) {
                 MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == ++numkids); //what the, this isn't always true!
-            }
-
-            AND_THEN("We do more, we don't gain any more") {
-                MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == MCNode.NumBranches());
-                MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == MCNode.NumBranches());
-                MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == MCNode.NumBranches());
-                MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == MCNode.NumBranches());
+                REQUIRE(MCNode.NumChildren() == ++numkids);
             }
         }
     }

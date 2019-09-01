@@ -94,9 +94,11 @@ std::shared_ptr<Command> MonteCarloNode::GetBestMove(bool player1)
     return pmc.GetBestMove();
 }
 
-int MonteCarloNode::NumBranches()
+int MonteCarloNode::MinNumBranches()
 {
-    return NextTurn::AllValidMovesForPlayer(true, _state.get(), true).size() + NextTurn::AllValidMovesForPlayer(false, _state.get(), true).size();
+    //max would be these 2 multiplied by each other
+    return  std::max(NextTurn::AllValidMovesForPlayer(true, _state.get(), true).size(), 
+                    NextTurn::AllValidMovesForPlayer(false, _state.get(), true).size());
 }
 
 int MonteCarloNode::NumChildren()
