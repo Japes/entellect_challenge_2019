@@ -22,6 +22,18 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     std::shared_ptr<MCMove> player2_next_move = _player2_mc.NextMove();
     _mtx.unlock();
 
+    /*
+    if(_nodeDepth == 0) {
+        std::cerr << "\t";
+    }
+    std::cerr << "(" << __FUNCTION__ << ") depth " << _nodeDepth << 
+            " doing playthrough for " << player1_next_move->GetCommand()->GetCommandString() << " " << player2_next_move->GetCommand()->GetCommandString() << std::endl;
+
+    if(_nodeDepth == 0) {
+        std::cerr << std::endl;
+    }
+    */
+
     numplies = 0;
     float thisScore;
     if (_nodeDepth > 0) {
