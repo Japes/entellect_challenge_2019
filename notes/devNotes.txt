@@ -1,5 +1,7 @@
 TODO
    
+   put max division thing inside the evaluators...
+
    prime based on patterns in opponents moves (anti-dance)
 
    resolve ties with random, not selecting first
