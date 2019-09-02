@@ -54,7 +54,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     }
 
     _pattern_p2.AddCommand(state_now->player2.previousCommand);
-    auto p2pat = _pattern_p1.Prediction();
+    auto p2pat = _pattern_p2.Prediction();
     if(p2pat != nullptr) {
         std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN FOR PLAYER 2 ------------" << std::endl;
     }

@@ -3,6 +3,7 @@ TODO
    should maybe be monitoring average N
 
    quick runs
+      need to check influence of nodedepth
       see how things change with select fix? set nodedepth to 0
 
    get it so it does ok against leon
