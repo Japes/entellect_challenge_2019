@@ -3,7 +3,7 @@
 #include <string>
 #include "Utilities.hpp"
 #include "Bot.hpp"
-#include "Evaluators/ScoreEvaluator.hpp"
+#include "Evaluators/MaxHpScoreEvaluator.hpp"
 
 std::string executeRound(Bot& bot, std::string& roundNumber)
 {
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
-    ScoreEvaluator eval;
+    MaxHpScoreEvaluator eval;
     Bot bot(&eval, 
             playThroughDepth, nodeDepth, 
             dirtsForBanana, clearSpaceForHeuristic, 
