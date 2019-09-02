@@ -194,7 +194,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     //std::vector<std::string> matches;
-    //matches.push_back("Test_files/matches/2019.08.19.13.54.04/");
+    //matches.push_back("Test_files/matches/2019.09.02.20.44.18/"); //this one fails because i didn't run to the end.  But has select from frozen, those shouldn't fail.
 
 
     for(auto & match: matches) {

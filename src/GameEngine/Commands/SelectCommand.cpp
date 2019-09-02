@@ -14,9 +14,6 @@ void SelectCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
-    if(worm->IsFrozen()) {
-        return;
-    }
 
     player->currentWormId = _wormIndex;
     --player->remainingWormSelections;
