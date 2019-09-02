@@ -10,10 +10,10 @@ TODO
          jp31 nodedepth 1 vs jp305
             if worse - try jp31 nodedepth 0 vs jp305
       PATTERN RECOG
-         jp32 vs jp31: pattern recognition vs not
       HEURISTIC IMPROVEMENT
          heuristic improvement: higher score weight
       SELECT AWAY FROM FROZEN WORMS
+      BUGFIXES FOR NEW ENGINE
 
    prime based on patterns in opponents moves (anti-dance)
       maybe i must add it to the playouts...
