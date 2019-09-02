@@ -29,13 +29,14 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     int nodeDepth{1};
     int dirtsForBanana{100};
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+    bool patternDetectEnable = false;
     //uint64_t mcTime_ns{3000000000000};
     uint64_t mcTime_ns{3000000000};
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
     HealthEvaluator evaluator;
-    Bot bot(&evaluator, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+    Bot bot(&evaluator, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     std::vector<rapidjson::Document> files;
     files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"));

@@ -1,16 +1,15 @@
 TODO
 
-   should maybe be monitoring average N
-
    runs
-      jp31 nodedepth 1 vs jp30
-         if worse - try jp31 nodedepth 0 vs jp30
-      pattern recognition vs not
+      jp31 nodedepth 1 vs jp305
+         if worse - try jp31 nodedepth 0 vs jp305
+      jp32 vs jp31: pattern recognition vs not
       heuristic improvement: higher score weight
-      pattern rec
 
       need to check influence of nodedepth
       see how things change with select fix? set nodedepth to 0
+
+   new starter pack!
 
    get it so it does ok against leon
       prime based on patterns in opponents moves (anti-dance)
@@ -24,8 +23,11 @@ TODO
    selects aint doing shit (for some reason)
       try selecting away from frozen dude
 
-   somehow prevent throwing bombs too early
-      kind of hacky what you've done now
+   bomb tweaking
+      when below 50 health...
+      don't snowball frozen guys
+      banana full dirts
+      banana health deny
 
    dont fight if you have points advantage
 

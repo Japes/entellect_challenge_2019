@@ -2,14 +2,24 @@
 #include "NextTurn.hpp"
 #include "GameEngine.hpp"
 
-MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c) :
+MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state, 
+                                const std::vector<std::shared_ptr<Command>>& p1_cmds, const std::vector<std::shared_ptr<Command>>& p2_cmds,
+                                const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c) :
     _state(state),
-    _player1_mc(NextTurn::AllValidMovesForPlayer(true, state.get(), true), c),
-    _player2_mc(NextTurn::AllValidMovesForPlayer(false, state.get(), true), c),
+    _player1_mc(p1_cmds, c),
+    _player2_mc(p2_cmds, c),
     _evaluator(eval),
     _nodeDepth(nodeDepth),
     _playthroughDepth(playthroughDepth),
     _c{c}
+{
+}
+
+MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c) :
+                                MonteCarloNode(state, 
+                                                NextTurn::AllValidMovesForPlayer(true, state.get(), true),
+                                                NextTurn::AllValidMovesForPlayer(false, state.get(), true),
+                                                eval, nodeDepth, playthroughDepth, c)
 {
 }
 

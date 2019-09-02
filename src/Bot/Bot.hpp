@@ -15,7 +15,7 @@ class Bot
 	public:
     Bot(EvaluatorBase* evaluator, 
         int playthroughDepth, int nodeDepth, 
-        int dirtsForBanana, int distanceForLost, 
+        int dirtsForBanana, int distanceForLost, bool patternDetectEnable,
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck);
 
     std::string runStrategy(rapidjson::Document& roundJSON);
@@ -28,13 +28,13 @@ class Bot
     std::shared_ptr<GameState> _last_round_state{nullptr};
     std::mutex _mtx;
 
-    PatternDetector _pattern_p1;
-    PatternDetector _pattern_p2;
+    PatternDetector _opponent_patterns;
 
     int _playthroughDepth;
     int _nodeDepth;
     int _dirtsForBanana;
     int _distanceForLost;
+    bool _patternDetectEnable;
     uint64_t _mc_Time_ns;
     float _mc_c;
     int _mc_runsBeforeClockCheck;

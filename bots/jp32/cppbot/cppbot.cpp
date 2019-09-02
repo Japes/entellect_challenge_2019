@@ -26,6 +26,7 @@ int main(int argc, char** argv)
 
     int dirtsForBanana{100}; //effectively turns this off
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+    bool patternDetectEnable{true};
 
     uint64_t mcTime_ns{880000000};
     float mc_c{std::sqrt(2)};
@@ -34,7 +35,7 @@ int main(int argc, char** argv)
     MaxHpScoreEvaluator eval;
     Bot bot(&eval, 
             playThroughDepth, nodeDepth, 
-            dirtsForBanana, clearSpaceForHeuristic, 
+            dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable,
             mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     for (std::string roundNumber; std::getline(std::cin, roundNumber);) 

@@ -7,14 +7,14 @@
 
 Bot::Bot(EvaluatorBase* evaluator,
         int playthroughDepth, int nodeDepth,
-        int dirtsForBanana, int distanceForLost, 
+        int dirtsForBanana, int distanceForLost, bool patternDetectEnable,
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
-    _pattern_p1(8),
-    _pattern_p2(8),
+    _opponent_patterns(8),
     _playthroughDepth{playthroughDepth},
     _nodeDepth{nodeDepth},
     _dirtsForBanana{dirtsForBanana},
     _distanceForLost{distanceForLost},
+    _patternDetectEnable{patternDetectEnable},
     _mc_Time_ns{mcTime_ns},
     _mc_c{mc_c},
     _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck},
@@ -47,21 +47,27 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     }
 
     //detect patterns
-    _pattern_p1.AddCommand(state_now->player1.previousCommand);
-    auto p1pat = _pattern_p1.Prediction();
-    if(p1pat != nullptr) {
-        std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN FOR PLAYER 1 ------------" << std::endl;
-    }
+    auto opponent_prev_cmd = ImPlayer1 ? state_now->player2.previousCommand : state_now->player1.previousCommand;
+    _opponent_patterns.AddCommand(opponent_prev_cmd);
+    auto pat = _opponent_patterns.Prediction();
+    if(_patternDetectEnable && pat != nullptr) {
 
-    _pattern_p2.AddCommand(state_now->player2.previousCommand);
-    auto p2pat = _pattern_p2.Prediction();
-    if(p2pat != nullptr) {
-        std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN FOR PLAYER 2 ------------" << std::endl;
+        std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN IN OPPONENTS PLAY ------------" << std::endl;
+
+        std::vector<std::shared_ptr<Command>> opponents_moves;
+        opponents_moves.push_back(pat);
+        std::vector<std::shared_ptr<Command>> my_moves = NextTurn::AllValidMovesForPlayer(ImPlayer1, state_now.get(), true);
+
+        std::vector<std::shared_ptr<Command>>& p1_moves = ImPlayer1 ? my_moves : opponents_moves;
+        std::vector<std::shared_ptr<Command>>& p2_moves = !ImPlayer1 ? my_moves : opponents_moves;
+        
+        _mc = std::make_shared<MonteCarloNode>(state_now, p1_moves, p2_moves, _evaluator, _nodeDepth, _playthroughDepth, _mc_c);
+
+    } else {
+        GetNextMC(state_now); //note this must happen AFTER any changes to state...
     }
 
     //begin monte carlo----------------------------------------------------------------
-    
-    GetNextMC(state_now); //note this must happen AFTER any changes to state...
 
     _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);

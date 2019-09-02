@@ -12,7 +12,13 @@ using childNodeKey_t = std::string; //key in format required for map
 class MonteCarloNode
 {
     public:
+    MonteCarloNode(std::shared_ptr<GameState> state, 
+                    const std::vector<std::shared_ptr<Command>>& p1_cmds, const std::vector<std::shared_ptr<Command>>& p2_cmds,
+                    const EvaluatorBase* eval, 
+                    int nodeDepth, int playthroughDepth, float c);
+
     MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c);
+
     void Promote();
     float AddPlaythrough(int& numplies);
     std::shared_ptr<Command> GetBestMove(bool player1);
