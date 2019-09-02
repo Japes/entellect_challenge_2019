@@ -11,8 +11,11 @@ TODO
 
    new starter pack!
 
+   prime based on patterns in opponents moves (anti-dance)
+      doesn't seem to be helping
+      maybe i must add it to the playouts...
+
    get it so it does ok against leon
-      prime based on patterns in opponents moves (anti-dance)
       up points factor in evaluation function
 
    put max division thing inside the evaluators...
