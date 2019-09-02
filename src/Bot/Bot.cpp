@@ -9,6 +9,8 @@ Bot::Bot(EvaluatorBase* evaluator,
         int playthroughDepth, int nodeDepth,
         int dirtsForBanana, int distanceForLost, 
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
+    _pattern_p1(8),
+    _pattern_p2(8),
     _playthroughDepth{playthroughDepth},
     _nodeDepth{nodeDepth},
     _dirtsForBanana{dirtsForBanana},
@@ -34,12 +36,9 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     AdjustOpponentSpellCount(ImPlayer1, state_now.get(), _last_round_state.get());
     _last_round_state = std::make_shared<GameState>(*state_now.get()); //no idea why it needs to be done this way
 
-    //Setup---------------------------------------------------------------------------
-    GetNextMC(state_now);
-
     //do some heuristics---------------------------------------------------------------
     //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get());
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get());    //note this modifies state
 
     //banana mine
     auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state_now.get(), _dirtsForBanana);
@@ -47,7 +46,23 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
         return selectPrefix + bananaMove->GetCommandString();
     }
 
+    //detect patterns
+    _pattern_p1.AddCommand(state_now->player1.previousCommand);
+    auto p1pat = _pattern_p1.Prediction();
+    if(p1pat != nullptr) {
+        std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN FOR PLAYER 1 ------------" << std::endl;
+    }
+
+    _pattern_p2.AddCommand(state_now->player2.previousCommand);
+    auto p2pat = _pattern_p1.Prediction();
+    if(p2pat != nullptr) {
+        std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN FOR PLAYER 2 ------------" << std::endl;
+    }
+
     //begin monte carlo----------------------------------------------------------------
+    
+    GetNextMC(state_now); //note this must happen AFTER any changes to state...
+
     _numplies = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);
     std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);

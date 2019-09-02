@@ -6,6 +6,7 @@
 #include "PlayersMonteCarlo.hpp"
 #include "Evaluators/EvaluatorBase.hpp"
 #include "MonteCarloNode.hpp"
+#include "../GameEngine/PatternDetector.hpp"
 
 #include <mutex>
 
@@ -26,6 +27,9 @@ class Bot
 
     std::shared_ptr<GameState> _last_round_state{nullptr};
     std::mutex _mtx;
+
+    PatternDetector _pattern_p1;
+    PatternDetector _pattern_p2;
 
     int _playthroughDepth;
     int _nodeDepth;
