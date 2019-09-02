@@ -2,7 +2,13 @@ TODO
 
    should maybe be monitoring average N
 
-   quick runs
+   runs
+      jp31 nodedepth 1 vs jp30
+         if worse - try jp31 nodedepth 0 vs jp30
+      pattern recognition vs not
+      heuristic improvement: higher score weight
+      pattern rec
+
       need to check influence of nodedepth
       see how things change with select fix? set nodedepth to 0
 
@@ -16,6 +22,7 @@ TODO
       in monte carlo nextnode as well as getbestmove
 
    selects aint doing shit (for some reason)
+      try selecting away from frozen dude
 
    somehow prevent throwing bombs too early
       kind of hacky what you've done now
@@ -47,7 +54,6 @@ TODO
 
 --not immediate---------------------------------------------------------------------------------------------
 
-   look at selects
 	select away from frozen dude
 	add select to mc?
 
