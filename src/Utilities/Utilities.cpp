@@ -1,5 +1,6 @@
 #include "Utilities.hpp"
 #include <chrono>
+#include <iostream>
 
 std::string Utilities::ReadFile(std::string path)
 {
@@ -7,7 +8,7 @@ std::string Utilities::ReadFile(std::string path)
     std::ifstream dataIn;
     dataIn.open(path, std::ifstream::in);
     if(!dataIn.is_open()) {
-        throw std::runtime_error("Problem loading command in unit test");
+        throw std::runtime_error("Problem loading file");
     }
 
     std::stringstream buffer;
@@ -23,7 +24,7 @@ rapidjson::Document Utilities::ReadJsonFile(std::string filePath)
     rapidjson::Document roundJSON;
     const bool parsed = !roundJSON.Parse(stateJson.c_str()).HasParseError();
     if(!parsed) {
-        throw std::runtime_error("Problem parsing state file in unit test");
+        throw std::runtime_error("Problem parsing state file");
     }
 
     return roundJSON;

@@ -1,22 +1,22 @@
 TODO
-   
 
-	dafuq is up with the timeouts the first time i play always
+   quick runs
+      nodedepth 0 see if it crashes
+
+
+   figure out timeout issue
+      check both sides
+      decide whether or not to leave it in
+      does it happen when nodedepth is 0?
+
+   get it so it does ok against leon
+      prime based on patterns in opponents moves (anti-dance)
+      up points factor in evaluation function
 
    put max division thing inside the evaluators...
 
-   prime based on patterns in opponents moves (anti-dance)
-
    resolve ties with random, not selecting first
       in monte carlo nextnode as well as getbestmove
-   
-   store MC results of first level
-
-   so if you make playthrough depth 1 it does what makes sense
-      i think it's the random playout that is assuming he will do something stupid that's the problem
-      i think it will eventually converge to the "right" answer but i can't get that much of a speedup
-
-   all heuristic behaviour must be controlled from top level!
 
    selects aint doing shit (for some reason)
 
@@ -24,18 +24,20 @@ TODO
       kind of hacky what you've done now
 
    dont fight if you have points advantage
-   no bananas first game??
+
+   would making playout depth variable help?
+      would be nice to have some long ones...
 
 	i want that sweet sweet playout till the end
-
-
-   store MC results of first level
 
    "Safe mode"
 		try taking out shooting directly - "safe mode"
 			only shoot at places opponent could move to
       explicit exclude of potential game ending move
       explicit exclude of all chances for opponent to shoot?
+
+   store MC results of first level
+      doesn't seem to be making a difference
 
    optimization
       precompute as much as possible e.g. can i shoot this guy

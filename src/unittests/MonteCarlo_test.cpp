@@ -192,15 +192,11 @@ TEST_CASE( "Debug monte carlo", "[.DebugMonteCarlo]" ) {
     {
 
         //    0   1   2   3   4   5   6   7   8
-        //0   S   .   S   S   S   S   S   .   5
-        //1   S   11  D   S   S   S   D   21  S
+        //0   S   S   S   S   S   S   S   S   5
+        //1   .   11  .   D   S   D   .   21  .
         //2   S   S   S   S   s   S   S   S   S
-        //3   S   .   S   S   S   S   S   .   S
-        //4   S   12  D   S   S   S   D   22  S
-        //5   S   S   S   S   S   S   S   S   S
-        //6   S   .   S   S   S   S   S   .   S
-        //7   S   13  D   S   S   S   D   23  S
-        //8   S   S   S   S   S   S   S   S   S
+        //3   S   S   S   S   S   S   S   S   S
+
         
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
@@ -228,17 +224,13 @@ TEST_CASE( "Debug monte carlo", "[.DebugMonteCarlo]" ) {
         state->player2.worms[2].health = -10;
 
         for(int x = 0; x <= 8; ++x) {
-            for(int y = 0; y <= 8; ++y) {
-
-                if(x == 2 || x == 6) {
-                    if(y == 1 || y == 4 || y == 7) {
+            for(int y = 0; y <= 3; ++y) {
+                if(y == 1) {
+                    if(x == 3 || x == 5) {
                         state->SetCellTypeAt({x, y}, CellType::DIRT);
                         continue;
                     }
-                }
-
-                if(x == 1 || x == 7) {
-                    if(y == 0 || y == 3 || y == 6 || y == 1 || y == 4 || y == 7) {
+                    if(x != 4) {
                         continue;
                     }
                 }
@@ -248,19 +240,20 @@ TEST_CASE( "Debug monte carlo", "[.DebugMonteCarlo]" ) {
         }
 
         ScoreEvaluator eval;
-        int nodeDepth = 1;
-        int playthroughDepth = 1;
+        int nodeDepth = 0;
+        int playthroughDepth = 2;
         float c = std::sqrt(2);
         MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, c);
 
         WHEN("We do playthroughs")
         {
             int dummy;
-            for(unsigned i = 0; i < 40; ++i) {
+            for(unsigned i = 0; i < 400; ++i) {
                 std::cerr << "(" << __FUNCTION__ << ") DOING A PLAYTHROUGH------------------------" << std::endl;
                 MCNode.AddPlaythrough(dummy);
                 MCNode.PrintState(player1);
                 std::cerr << "(" << __FUNCTION__ << ") FINISHED PLAYTHROUGH------------------------" << std::endl;
+                std::cerr << std::endl;
             }
         }
 

@@ -61,7 +61,7 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
         std::cerr << std::endl;
     }
     */
-    
+
 
     numplies = 0;
     float thisScore;
@@ -174,6 +174,7 @@ void MonteCarloNode::PrintState(bool player1)
     my_mc.PrintState();
 
 /*
+    std::cerr << std::endl;
     if(_nodeDepth > 0) {
         std::cerr << Command::latestBot << " KIDS------------:" << std::endl;
         for (auto& child: _childNodes) {
