@@ -1014,17 +1014,6 @@ TEST_CASE( "Heuristic to avoid getting lost - avoid deep space", "[GetNearestDir
     }
 }
 
-
-
-
-
-//TODO find out why it always does invalids at the end of the game
-
-
-
-
-
-//just made this to confirm that random moves are actually random
 TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
 {
     GIVEN("A semi realistic game state")
@@ -1098,6 +1087,48 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
             {
                 //worm 2's turn - he is in trouble already
                 REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
+            }
+        }
+    }
+}
+
+TEST_CASE( "TryApplySelect bug", "[TryApplySelectBug]" )
+{
+    GIVEN("A game state that reproduces our bug")
+    {
+
+        //    0   1   2   3   4
+        //0   .   .   .   .   .
+        //1   .   13  .   .   .
+        //2   .   .   .   .   .
+        //3   .   .   .   .   .
+        //4   .   .   .   .   .
+
+        GameState state;
+        bool player1 = GENERATE(true, false);
+        auto DUTworm = place_worm(player1, 1, {1,1}, state);
+
+        place_worm(player1, 2, {20,1}, state);
+        place_worm(player1, 3, {20,2}, state);
+
+        place_worm(!player1, 1, {30,5}, state);
+        place_worm(!player1, 2, {30,3}, state);
+        place_worm(!player1, 3, {30,4}, state);
+
+        //make it so player1 will die if he does nothing
+        DUTworm->health = 1;
+        GameState::AddLavaAt({1,1});
+
+        REQUIRE(state.player1.remainingWormSelections > 0);
+        REQUIRE(state.player2.remainingWormSelections > 0);
+
+        WHEN("we run the heuristic")
+        {
+            auto selectStatement = NextTurn::TryApplySelect(player1, &state);
+
+            THEN("It doesn't lock things up...")
+            {
+                REQUIRE( true );
             }
         }
     }

@@ -421,7 +421,6 @@ std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state)
     auto myState = std::make_shared<GameState>(*state); //no idea why it needs to be done this way
 
     Player* player = myState->GetPlayer(player1);
-    Worm* worm = player->GetCurrentWorm();
     if(player->remainingWormSelections <= 0) {
         return "";
     }
@@ -430,7 +429,7 @@ std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state)
     myEng.AdvanceState(DoNothingCommand(), DoNothingCommand());
     int numAdvancesApplied = 1;
 
-    while(player->GetCurrentWorm() != worm) {
+    for(int j = 0; j < 3; ++j) { //if you find yourself looping more than this, you got a problem...just return nothing
 
         if(!player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, myState.get(), true).any()) {
             //cool we have a candidate.  project the given state forward so the caller can use it
