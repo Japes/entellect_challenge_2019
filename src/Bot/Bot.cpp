@@ -38,7 +38,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
 
     //do some heuristics---------------------------------------------------------------
     //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get());    //note this modifies state
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get(), NextTurn::WormCanShoot);    //note this modifies state
 
     //banana mine
     auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state_now.get(), _dirtsForBanana);

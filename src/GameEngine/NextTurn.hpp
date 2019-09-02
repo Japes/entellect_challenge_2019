@@ -36,10 +36,12 @@ class NextTurn
     //purpose of this class: methods for getting next turn when progressing game states
     static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);    
     
-    //heuristic related stuff
+    //heuristic related stuff - should actually be in separate file
     static std::shared_ptr<Command> GetNearestDirtHeuristic(bool player1, GameStatePtr state, int distanceForLost);
     static std::shared_ptr<Command> GetBananaProspect(bool player1, GameStatePtr state, int thresh);
-    static std::string TryApplySelect(bool player1, GameStatePtr state);
+    static std::string TryApplySelect(bool player1, GameStatePtr state, std::function<bool(bool, GameStatePtr)> shouldSelectCurrentWorm);
+    static bool WormCanShoot(bool player1, GameStatePtr state);
+    static bool WormIsntFrozen(bool player1, GameStatePtr state);
 
     private:
     static std::shared_ptr<pcg32> _rng;

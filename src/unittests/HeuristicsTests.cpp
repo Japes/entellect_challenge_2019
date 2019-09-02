@@ -562,7 +562,7 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
 
         WHEN("our heuristic should kick in")
         {
-            auto selectStatement = NextTurn::TryApplySelect(true, &state);
+            auto selectStatement = NextTurn::TryApplySelect(true, &state, NextTurn::WormCanShoot);
 
             //worm 1's turn, we should select either worm 2 or 3
             THEN("It does")
@@ -583,7 +583,7 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
             state.player1.remainingWormSelections = 0;
             THEN("Heuristic should not kick in")
             {
-                REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
+                REQUIRE(NextTurn::TryApplySelect(true, &state, NextTurn::WormCanShoot) == "");
             }
         }
 
@@ -593,7 +593,7 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
             state.player1.worms[2].roundsUntilUnfrozen = 5;
             THEN("Heuristic should not kick in")
             {
-                REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
+                REQUIRE(NextTurn::TryApplySelect(true, &state, NextTurn::WormCanShoot) == "");
             }
         }
 
@@ -605,7 +605,60 @@ TEST_CASE( "TryApplySelect", "[TryApplySelect]" )
             THEN("It doesn't")
             {
                 //worm 2's turn - he is in trouble already
-                REQUIRE(NextTurn::TryApplySelect(true, &state) == "");
+                REQUIRE(NextTurn::TryApplySelect(true, &state, NextTurn::WormCanShoot) == "");
+            }
+        }
+    }
+}
+
+TEST_CASE( "TryApplySelect - frozen dudes", "[TryApplySelectFrozenDudes]" )
+{
+    GIVEN("A semi realistic game state")
+    {
+
+        //    0   1   2   3   4   5   5   6   7   
+        //0   .   .   .   .   .   .   .   .   .   
+        //1   .   11  21  .   .   .   .   .   .   
+        //2   .   .   .   .   .   .   .   .   .      
+        //3   .   .   .   .   .   .   .   13  .   
+        //4   .   .   .   .   .   .   .   .   .   
+        //5   .   .   .   .   .   .   .   .   .   
+        //6   .   .   .   .   .   .   .   .   .   
+        //7   .   .   .  .   .   .   .   22  .   
+        //8   .   12  .   .   .   .   .   .   .   
+        //9   .   .   .   .   .   .   .   .   .   
+
+        GameState state;
+        place_worm(true, 1, {1,1}, state);
+        place_worm(true, 2, {1,8}, state);
+        place_worm(true, 3, {6,3}, state);
+        place_worm(false, 1, {2,1}, state);
+        place_worm(false, 2, {6,7}, state);
+
+
+        REQUIRE(state.player1.remainingWormSelections > 0);
+        REQUIRE(state.player2.remainingWormSelections > 0);
+
+        WHEN("our heuristic should kick in")
+        {
+            state.player1.worms[0].roundsUntilUnfrozen = 5;
+            auto selectStatement = NextTurn::TryApplySelect(true, &state, NextTurn::WormIsntFrozen);
+
+            //worm 1's turn, we should select either worm 2 or 3
+            THEN("It does")
+            {
+                INFO(selectStatement);
+                REQUIRE( (selectStatement == "select 2;" || selectStatement == "select 3;") );
+            }
+        }
+
+        WHEN("our heuristic shouldn't kick in")
+        {
+            state.player1.worms[0].roundsUntilUnfrozen = 0;
+
+            THEN("It doesn't")
+            {
+                REQUIRE(NextTurn::TryApplySelect(true, &state, NextTurn::WormIsntFrozen) == "");
             }
         }
     }
@@ -643,7 +696,7 @@ TEST_CASE( "TryApplySelect bug", "[TryApplySelectBug]" )
 
         WHEN("we run the heuristic")
         {
-            auto selectStatement = NextTurn::TryApplySelect(player1, &state);
+            auto selectStatement = NextTurn::TryApplySelect(player1, &state, NextTurn::WormCanShoot);
 
             THEN("It doesn't lock things up...")
             {

@@ -410,11 +410,9 @@ std::vector<std::shared_ptr<Command>> NextTurn::AllValidMovesForPlayer(bool play
 
 //checks if a select should happen (based on a heuristic...)
 //if so, progresses gamestate until it's that worm's turn, and returns a non-empty string with the "select" command that should be applied.
-std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state)
+std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state, std::function<bool(bool, GameStatePtr)> shouldSelectCurrentWorm)
 {
-    Player* original_state_player = state->GetPlayer(player1);
-
-    if(!original_state_player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, state, true).any()) {
+    if(shouldSelectCurrentWorm(player1, state) ) {
         return "";
     }
 
@@ -431,7 +429,7 @@ std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state)
 
     for(int j = 0; j < 3; ++j) { //if you find yourself looping more than this, you got a problem...just return nothing
 
-        if(!player->GetCurrentWorm()->IsFrozen() && GetValidShoots(player1, myState.get(), true).any()) {
+        if(shouldSelectCurrentWorm(player1, myState.get())) {
             //cool we have a candidate.  project the given state forward so the caller can use it
             GameEngine eng(state);
             for(int i = 0; i < numAdvancesApplied; ++i) {
@@ -445,4 +443,17 @@ std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state)
     }
 
     return "";
+}
+
+//to be used with TryApplySelect
+bool NextTurn::WormCanShoot(bool player1, GameStatePtr state)
+{
+    Player* original_state_player = state->GetPlayer(player1);
+    return !original_state_player->GetCurrentWorm()->IsFrozen() && NextTurn::GetValidShoots(player1, state, true).any();
+}
+
+bool NextTurn::WormIsntFrozen(bool player1, GameStatePtr state)
+{
+    Player* original_state_player = state->GetPlayer(player1);
+    return !original_state_player->GetCurrentWorm()->IsFrozen();
 }
