@@ -6,18 +6,16 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
-      jp31 nodedepth 1 vs jp305
-         if worse - try jp31 nodedepth 0 vs jp305
-      jp32 vs jp31: pattern recognition vs not
-      heuristic improvement: higher score weight
-
-      need to check influence of nodedepth
-      see how things change with select fix? set nodedepth to 0
-
-   new starter pack!
+      NODEDEPTH UPDATE
+         jp31 nodedepth 1 vs jp305
+            if worse - try jp31 nodedepth 0 vs jp305
+      PATTERN RECOG
+         jp32 vs jp31: pattern recognition vs not
+      HEURISTIC IMPROVEMENT
+         heuristic improvement: higher score weight
+      SELECT AWAY FROM FROZEN WORMS
 
    prime based on patterns in opponents moves (anti-dance)
-      doesn't seem to be helping
       maybe i must add it to the playouts...
 
    get it so it does ok against leon
