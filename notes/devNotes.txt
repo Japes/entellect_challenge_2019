@@ -1,5 +1,10 @@
 TODO
 
+   basic trends im seeing
+      dance ftw
+      eventual kill because u have min health
+      3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
+
    runs
       jp31 nodedepth 1 vs jp305
          if worse - try jp31 nodedepth 0 vs jp305
@@ -203,6 +208,9 @@ notes for blog post---------------------------------------------------
    put stuff on github and link to it
    be scientific and record everything (comparison logs)
    spent a bit of time going through their source code for engine
+   downsides
+      long to run, hard to tune
+      sensitive to edge cases in game state
 
 ======================================================================================================
 
