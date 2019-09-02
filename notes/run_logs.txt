@@ -22,8 +22,24 @@ jp16 - optimization
 jp17 - added preemptive shooting
 jp18 - load previous move properly, counts opponent bombs correctly now
 jp19 - use n instead of w/n to determine best monte carlo move
-jp20 - do monte carlo formula for opponents next move as well
+jp20 - do monte carlo formula for opponents next move as well. playthrough depth 24, health evaluator  ---  last stable
 jp21 - refactoring and minor change to best possible evaluation range
+jp22 - pretty big refactor into MonteCarloNode class
+
+---leons bot gets added, all hell breaks loose
+
+jp23 - ????
+jp24 - refactor evaluators into classes, added avaHpScoreEvaluator, change search depth to 12
+jp25 - avaHpScoreEvaluator, playthroughDepth 12
+jp26 - bomb hack, only throw if < 50% health
+jp27 - maxHPScoreEvaluator
+jp28 - went back to score evaluator
+jp29 - undo bomb hack, put banana mine option in but don't use it
+jp30 - calculates child mc nodes but doesn't use them.  depth 12. score heuristic
+jp305 - same as jp30 but with maxHPScoreEvaluator
+jp31 - actually reuse the child nodes.  some bugfixes.  added pattern recoq but doesn't use it
+jp32 - uses pattern recog.  added frozenselect heuristic but doesn't use it
+
 
 results analysis --------------------------------------------------------------------
 increasing depth to 24 - no noticable improvement

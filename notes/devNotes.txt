@@ -6,8 +6,11 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
+      SANITY RUN
+         JP20 (stable), JP27 ("best"), jp305 ("attempt to get back to sanity")
+            binary search to try find when things got worse
+            compare with leons maybe
       NODEDEPTH UPDATE
-         jp31 nodedepth 1 vs jp305
             if worse - try jp31 nodedepth 0 vs jp305
       PATTERN RECOG
       HEURISTIC IMPROVEMENT
@@ -60,6 +63,8 @@ TODO
       might need to consider taking shortcuts and not simulating 100%
       make data structures smaller
 
+   can still get kill score on the turn that lava kills someone...
+   
 --not immediate---------------------------------------------------------------------------------------------
 
 	select away from frozen dude
