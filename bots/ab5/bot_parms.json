@@ -1,0 +1,20 @@
+{
+	"DEBUG": false,
+	"banana_scale": 60.75052172461206,
+	"banana_scale_end": 12.0,
+	"dirt_gradient_score_scale": 0.01,
+	"frost_scale": 31.480243293437926,
+	"frost_scale_end": 15.0,
+	"frozen_turn_scale": 2,
+	"lava_score_scale": 9,
+	"max_health_scale": 2.612187815971615,
+	"name": "Guided_alpha_beta_bot",
+	"score_scale": 0.21539790408603124,
+	"search_depth": 3,
+	"select_scale": 2.027298274914057,
+	"show_timings": false,
+	"total_health_scale": 1.13236971226552,
+	"worm_count_scale": -75.43263409420017,
+	"extra_lava_damage": 5
+
+}

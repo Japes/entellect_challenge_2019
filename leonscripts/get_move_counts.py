@@ -65,8 +65,8 @@ def Summarize_match(root):
                 bmvs = Count_moves(os.path.join(subdir, filename))
         for path in dirs:
             Count_selects(os.path.join(subdir, path), amvs, bmvs)
-
-    if game_result == None :
+    if not game_result:
+        print('skipping' + root)
         return
 
     Output_game_result(game_result)
