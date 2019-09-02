@@ -1,13 +1,7 @@
 TODO
 
    quick runs
-      nodedepth 0 see if it crashes
-
-
-   figure out timeout issue
-      check both sides
-      decide whether or not to leave it in
-      does it happen when nodedepth is 0?
+      see how things change with select fix?
 
    get it so it does ok against leon
       prime based on patterns in opponents moves (anti-dance)

@@ -62,7 +62,6 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     }
     */
 
-
     numplies = 0;
     float thisScore;
     if (_nodeDepth > 0) {

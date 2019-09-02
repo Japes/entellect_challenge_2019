@@ -31,9 +31,10 @@ class NextTurn
     static std::bitset<121> GetValidSnowballs(bool player1, GameStatePtr state, bool trimStupidMoves);
     static std::shared_ptr<Command> GetSnowball(Worm* worm, GameStatePtr state, unsigned index);
 
-
-    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);    
     static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);
+
+    //purpose of this class: methods for getting next turn when progressing game states
+    static std::shared_ptr<Command> GetRandomValidMoveForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);    
     
     //heuristic related stuff
     static std::shared_ptr<Command> GetNearestDirtHeuristic(bool player1, GameStatePtr state, int distanceForLost);
