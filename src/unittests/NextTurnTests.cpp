@@ -411,7 +411,7 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
                     CHECK(ret.test(16));
                     CHECK(!ret.test(36)); //dedguy
                     CHECK(!ret.test(56)); //returned this when i confused x with y
-                    CHECK(NextTurn::GetSnowball(worm12, &state, 16)->GetCommandString() == "snowball 31 11");          
+                    CHECK(NextTurn::GetSnowball(worm12, 16)->GetCommandString() == "snowball 31 11");          
                 }
             }
             AND_WHEN("He has no snowballs")
@@ -468,7 +468,7 @@ TEST_CASE( "Get sensible bananas", "[get_sensible_bananas]" )
                     REQUIRE(ret.test(16));
                     REQUIRE(!ret.test(36)); //dedguy
                     REQUIRE(!ret.test(56)); //returned this when i confused x with y
-                    REQUIRE(NextTurn::GetBanana(worm12, &state, 16)->GetCommandString() == "banana 31 11");          
+                    REQUIRE(NextTurn::GetBanana(worm12, 16)->GetCommandString() == "banana 31 11");          
                 }
             }
             AND_WHEN("He has no bananas")
@@ -540,7 +540,7 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
                 INFO("bananas: " << ret)
                 REQUIRE(ret.count() == 1);
                 REQUIRE(ret.test(57));
-                REQUIRE(NextTurn::GetBanana(thrower, &state, 57)->GetCommandString() == "banana 6 6");
+                REQUIRE(NextTurn::GetBanana(thrower, 57)->GetCommandString() == "banana 6 6");
 
             }
 
@@ -550,9 +550,9 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
                 INFO("bananas: " << ret)
                 REQUIRE(ret.count() == 2);
                 REQUIRE(ret.test(57));
-                REQUIRE(NextTurn::GetBanana(thrower, &state, 57)->GetCommandString() == "banana 6 6");
+                REQUIRE(NextTurn::GetBanana(thrower, 57)->GetCommandString() == "banana 6 6");
                 REQUIRE(ret.test(115));
-                REQUIRE(NextTurn::GetBanana(thrower, &state, 115)->GetCommandString() == "banana 9 11");            
+                REQUIRE(NextTurn::GetBanana(thrower, 115)->GetCommandString() == "banana 9 11");            
             }
 
             THEN("GetBananaMiningTargets returns correct")
@@ -560,7 +560,7 @@ TEST_CASE( "GetBananaMiningTargets", "[GetBananaMiningTargets]" )
                 auto ret = NextTurn::GetBananaMiningTargets(thrower, &state, 4);
                 INFO("bananas: " << ret)
                 REQUIRE(ret.test(28));
-                REQUIRE(NextTurn::GetBanana(thrower, &state, 28)->GetCommandString() == "banana 10 3");            
+                REQUIRE(NextTurn::GetBanana(thrower, 28)->GetCommandString() == "banana 10 3");            
                 REQUIRE(ret.count() > 6); //can see at LEAST 6 in that ascii picture
             }
 

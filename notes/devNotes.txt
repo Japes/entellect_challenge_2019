@@ -1,7 +1,9 @@
 TODO
 
+   should maybe be monitoring average N
+
    quick runs
-      see how things change with select fix?
+      see how things change with select fix? set nodedepth to 0
 
    get it so it does ok against leon
       prime based on patterns in opponents moves (anti-dance)

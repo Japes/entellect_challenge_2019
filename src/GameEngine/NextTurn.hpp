@@ -26,10 +26,10 @@ class NextTurn
     static std::bitset<121> GetBananaMiningTargets(Worm* worm, GameStatePtr state, int thresh);
     static std::bitset<121> GetValidBombThrow(bool player1, GameStatePtr state, bool trimStupidMoves);
     static std::bitset<121> GetValidBananas(bool player1, GameStatePtr state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetBanana(Worm* worm, GameStatePtr state, unsigned index);
+    static std::shared_ptr<Command> GetBanana(Worm* worm, unsigned index);
 
     static std::bitset<121> GetValidSnowballs(bool player1, GameStatePtr state, bool trimStupidMoves);
-    static std::shared_ptr<Command> GetSnowball(Worm* worm, GameStatePtr state, unsigned index);
+    static std::shared_ptr<Command> GetSnowball(Worm* worm, unsigned index);
 
     static std::vector<std::shared_ptr<Command>> AllValidMovesForPlayer(bool player1, GameStatePtr state, bool trimStupidMoves);
 
