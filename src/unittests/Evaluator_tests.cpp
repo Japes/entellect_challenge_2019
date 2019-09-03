@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "../GameEngine/GameEngine.hpp"
 #include "../GameEngine/Evaluators/AveHpScoreEvaluator.hpp"
+#include "../GameEngine/Evaluators/MaxHpScoreEvaluator.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "../Utilities/Utilities.hpp"
 
@@ -44,6 +45,63 @@ TEST_CASE( "AveHpScoreEvaluator", "[AveHpScoreEvaluator][.debug]" ) {
             {
                 INFO(ret);
                 REQUIRE(false);
+            }
+        }
+    }
+}
+
+TEST_CASE( "BananaBonus", "[BananaBonus]" ) {
+    GIVEN("an MaxHpScoreEvaluator and some states")
+    {
+        MaxHpScoreEvaluator eval;
+
+        WHEN("We get the banana bonus")
+        {
+
+            THEN("It makes sense")
+            {
+                float bonusBefore1 = 1000;
+                float bonusBefore2 = 1000;
+                float bonusBefore3 = 1000;
+
+                for(int round = 1; round <= 400; ++round) {
+
+                    INFO("round: " << round);
+
+                    float bon1 = eval.GetBananaBonus(1, round);
+                    float bon2 = eval.GetBananaBonus(2, round);
+                    float bon3 = eval.GetBananaBonus(3, round);
+
+                    REQUIRE(bon3 >= bon2);
+                    REQUIRE(bon2 >= bon1);
+
+                    REQUIRE(bon1 <= bonusBefore1);
+                    REQUIRE(bon2 <= bonusBefore2);
+                    REQUIRE(bon3 <= bonusBefore3);
+
+                    if(round == 100) {
+                        REQUIRE(bon1 > 0);
+                        REQUIRE(bon2 > 0);
+                        REQUIRE(bon3 > 0);
+                        REQUIRE(bon1 < 80);
+                        REQUIRE(bon2 < 80);
+                        REQUIRE(bon3 < 80);
+                    }
+
+                    if(round >= 350) {
+                        REQUIRE(bon1 == 0);
+                        REQUIRE(bon2 == 0);
+                        REQUIRE(bon3 == 0);
+                    } else {
+                        REQUIRE(bon1 > 0);
+                        REQUIRE(bon2 > 0);
+                        REQUIRE(bon3 > 0);
+                    }
+
+                    bonusBefore1 = bon1;
+                    bonusBefore2 = bon2;
+                    bonusBefore3 = bon3;
+                }
             }
         }
     }

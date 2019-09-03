@@ -9,7 +9,21 @@ class MaxHpScoreEvaluator: public EvaluatorBase
 	public:
     MaxHpScoreEvaluator()
     {
-        _bestPossible = 170 + 1000/10; //rough estimate
+        _bestPossible = 170 + 900/10; //rough estimate
+    }
+
+    //want this to be low if round is early and bombs are few
+    //max if roundnumber > 350
+    //max worth around 80 health
+    float GetBananaBonus(int numBananas, int roundNumber) const
+    {
+        float max = 80.0f;
+        if(roundNumber > 350) {
+            return 0;
+        }
+
+        float frac = ( numBananas * (350.0f - roundNumber) ) / (3.0f*350.0f);
+        return max*frac;
     }
 
     float Evaluate (bool player1, GameStatePtr state) const override
@@ -34,7 +48,10 @@ class MaxHpScoreEvaluator: public EvaluatorBase
         float healthdiff = maxHealthMe - maxHealthHim;
         float scorediff =  myPlayer->GetScore() - otherPlayer->GetScore();
 
-        return healthdiff + scorediff/10;
+        //want to encourage holding on to the banana
+        float bananaBonus = GetBananaBonus(myPlayer->worms[1].banana_bomb_count, state->roundNumber);
+
+        return healthdiff + scorediff/10 + bananaBonus;
     }
 };
 
