@@ -1,44 +1,39 @@
 TODO
 
+	print out total N calculated and total N in mc class
+
+	make a rubric of cost/benefit                                           EFFORT         PAYOFF
+      banana (only if awesome) /snowball (no re).  use if low health.      low            high
+      staged evaluation functions (master control alg) (see safe mode)     medium/high    high
+	   rework output messages for a graphical view                          medium         medium/high
+      select cleverness                                                    low            medium
+      optimization                                                         medium/low     medium
+      building actual tree:                                                high,          medium
+      adding pattern rec to playouts                                       medium         medium/low
+      fix engine edge cases                                                medium/high    low
+      play with evaluation function (score up)                             low            medium/low?
+      resolve ties with random (mc and nextmove)                           low            low?
+	
+
    basic trends im seeing
       dance ftw
       eventual kill because u have min health
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
-      SANITY RUN
-         JP20 (stable), JP27 ("best"), jp305 ("attempt to get back to sanity")
-            binary search to try find when things got worse
-            compare with leons maybe
-      NODEDEPTH UPDATE
-            if worse - try jp31 nodedepth 0 vs jp305
-      PATTERN RECOG
+      tonight
+         PATTERN RECOG (32 V 31)
+         SELECT AWAY FROM FROZEN WORMS
+      tomorrow morn
+         LEON vs 2 best
+
+      PLAY WITH NODE DEPTH
       HEURISTIC IMPROVEMENT
          heuristic improvement: higher score weight
-      SELECT AWAY FROM FROZEN WORMS
-      BUGFIXES FOR NEW ENGINE
-
-   prime based on patterns in opponents moves (anti-dance)
-      maybe i must add it to the playouts...
-
-   get it so it does ok against leon
-      up points factor in evaluation function
 
    put max division thing inside the evaluators...
 
-   resolve ties with random, not selecting first
-      in monte carlo nextnode as well as getbestmove
-
-   selects aint doing shit (for some reason)
-      try selecting away from frozen dude
-
-   bomb tweaking
-      when below 50 health...
-      don't snowball frozen guys
-      banana full dirts
-      banana health deny
-
-   dont fight if you have points advantage
+   banana health deny...
 
    would making playout depth variable help?
       would be nice to have some long ones...
@@ -50,9 +45,6 @@ TODO
 			only shoot at places opponent could move to
       explicit exclude of potential game ending move
       explicit exclude of all chances for opponent to shoot?
-
-   store MC results of first level
-      doesn't seem to be making a difference
 
    optimization
       precompute as much as possible e.g. can i shoot this guy
@@ -67,10 +59,7 @@ TODO
    
 --not immediate---------------------------------------------------------------------------------------------
 
-	select away from frozen dude
 	add select to mc?
-
-   rush for health pack?
 
    Tuning
       make bot tunable via config file
@@ -78,7 +67,6 @@ TODO
       upload after doing this if better
       TUNE:
          playthroughDepth
-            DOESN'T SEEM TO MAKE A DIFFERENCE? my monte carlo must not be doing anything valuable
          banana score threshold
          C value
          playthrough weights
@@ -214,6 +202,7 @@ notes for blog post---------------------------------------------------
    downsides
       long to run, hard to tune
       sensitive to edge cases in game state
+   devnotes file, constantly reprioritising
 
 ======================================================================================================
 
@@ -221,17 +210,3 @@ last time i checked it looks like we're spending about 50% of the time in GetRan
    when there are worms nearby GetValidShoots dominates because of the "consider movement" thing
    otherwise a noticable bottleneck is GameState::Worm_at in NextTurn::GetValidTeleportDigs
 
-
-
-
-#1  GameState::Worm_at(Position const&) (pos=<synthetic pointer>, this=0x7ffffe53fa60) at ../GameState/GameState.hpp:129
-#2  NextTurn::GetValidTeleportDigs(Worm*, GameState*, bool) (worm=worm@entry=0x7ffffe53fbe8, state=state@entry=0x7ffffe53fa60, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63
-#3  0x00000000004a4db6 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffe53fa60, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:338
-
-#1  GameState::Worm_at(Position const&) (pos=<synthetic pointer>, this=0x7ffffdd2fa60) at ../GameState/GameState.hpp:129
-#2  NextTurn::GetValidTeleportDigs(Worm*, GameState*, bool) (worm=worm@entry=0x7ffffdd2fa80, state=state@entry=0x7ffffdd2fa60, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63
-#3  0x00000000004a4bd5 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffdd2fa60, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:338
-
-#1  GameState::Worm_at(Position const&) (pos=<synthetic pointer>, this=0x7ffffe53fa60) at ../GameState/GameState.hpp:123
-#2  NextTurn::GetValidTeleportDigs(Worm*, GameState*, bool) (worm=worm@entry=0x7ffffe53fa80, state=state@entry=0x7ffffe53fa60, trimStupidMoves=trimStupidMoves@entry=true) at ../NextTurn.cpp:63
-#3  0x00000000004a4bd5 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffe53fa60, trimStupidMoves=<optimized out>) at ../NextTurn.cpp:338

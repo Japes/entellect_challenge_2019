@@ -13,7 +13,6 @@ SelectCommand::SelectCommand(int wormIndex, std::shared_ptr<Command> selectedCmd
 void SelectCommand::Execute(bool player1, GameStatePtr state) const
 {
     Player* player = state->GetPlayer(player1);
-    Worm* worm = player->GetCurrentWorm();
 
     player->currentWormId = _wormIndex;
     --player->remainingWormSelections;

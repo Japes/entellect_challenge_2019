@@ -193,9 +193,9 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
 
     //std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
-    //std::vector<std::string> matches;
-    //matches.push_back("Test_files/matches/2019.09.02.20.44.18/"); //this one fails because i didn't run to the end.  But has select from frozen, those shouldn't fail.
-    //matches.push_back("Test_files/matches/2019.09.02.21.06.42/"); //this one fails on turn 153 because i didn't run to the end.  Bot reproduces "next worm order" fix.
+    std::vector<std::string> matches;
+    matches.push_back("Test_files/matches/2019.09.02.20.44.18/"); //this one fails because i didn't run to the end.  But has select from frozen, those shouldn't fail.
+    matches.push_back("Test_files/matches/2019.09.02.21.06.42/"); //this one fails on turn 153 because i didn't run to the end.  Bot reproduces "next worm order" fix.
 
     for(auto & match: matches) {
         match = match + std::string("/");
