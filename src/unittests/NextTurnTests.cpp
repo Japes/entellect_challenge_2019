@@ -377,7 +377,7 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
         GameState state;
         GameEngine eng(&state);
         
-        Worm* worm12 = place_worm(true, 3, {31,15}, state); //technologist
+        Worm* worm13 = place_worm(true, 3, {31,15}, state); //technologist
         place_worm(true, 1, {30,15}, state); //friendly right next to us
         place_worm(true, 2, {0,0}, state); //friendly far away
 
@@ -403,15 +403,48 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
 
             AND_WHEN("He has snowballs")
             {
-                THEN("GetValidSnowballs returns correct")
+                AND_WHEN("The heuristic blocks him ")
                 {
-                    auto ret = NextTurn::GetValidSnowballs(true, &state, true);
-                    INFO("shoots: " << ret)
-                    CHECK(ret.count() == 1);
-                    CHECK(ret.test(16));
-                    CHECK(!ret.test(36)); //dedguy
-                    CHECK(!ret.test(56)); //returned this when i confused x with y
-                    CHECK(NextTurn::GetSnowball(worm12, 16)->GetCommandString() == "snowball 31 11");          
+                    worm13->health = 60;
+                    state.roundNumber = 300;
+                    THEN("GetValidSnowballs returns zero")
+                    {
+                        auto ret = NextTurn::GetValidSnowballs(true, &state, true);
+                        INFO("shoots: " << ret)
+                        REQUIRE(ret.count() == 0);
+                    }
+                }
+
+                AND_WHEN("The heuristic doesn't block him (health)")
+                {
+                    worm13->health = 49;
+                    state.roundNumber = 7;
+                    THEN("GetValidSnowballs returns correct")
+                    {
+                        auto ret = NextTurn::GetValidSnowballs(true, &state, true);
+                        INFO("shoots: " << ret)
+                        CHECK(ret.count() == 1);
+                        CHECK(ret.test(16));
+                        CHECK(!ret.test(36)); //dedguy
+                        CHECK(!ret.test(56)); //returned this when i confused x with y
+                        CHECK(NextTurn::GetSnowball(worm13, 16)->GetCommandString() == "snowball 31 11");          
+                    }
+                }
+
+                AND_WHEN("The heuristic doesn't block him (round)")
+                {
+                    worm13->health = 100;
+                    state.roundNumber = 390;
+                    THEN("GetValidSnowballs returns correct")
+                    {
+                        auto ret = NextTurn::GetValidSnowballs(true, &state, true);
+                        INFO("shoots: " << ret)
+                        CHECK(ret.count() == 1);
+                        CHECK(ret.test(16));
+                        CHECK(!ret.test(36)); //dedguy
+                        CHECK(!ret.test(56)); //returned this when i confused x with y
+                        CHECK(NextTurn::GetSnowball(worm13, 16)->GetCommandString() == "snowball 31 11");          
+                    }
                 }
             }
             AND_WHEN("He has no snowballs")
@@ -425,6 +458,11 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
                 }
             }
         }
+
+        //test heuristics here 
+        //bool shouldHoldOnToSnowBall = (worm->health > 50) && (state->roundNumber < GameConfig::maxRounds - 75);
+        //if(enemyWorm.roundsUntilUnfrozen > 1) {
+
     }
 }
 

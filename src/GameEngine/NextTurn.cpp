@@ -251,7 +251,7 @@ std::bitset<121> NextTurn::GetBananaMiningTargets(Worm* worm, GameStatePtr state
 
 //there are 3 bits in each corner that are out of range - they will always be 0
 //NB ASSUMES SAME RANGE FOR BANANA AND SNOWBALL
-std::bitset<121> NextTurn::GetValidBombThrow(bool player1, GameStatePtr state, bool trimStupidMoves)
+std::bitset<121> NextTurn::GetValidBombThrow(bool player1, GameStatePtr state, bool trimStupidMoves, bool snowball)
 {
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
@@ -284,7 +284,7 @@ std::bitset<121> NextTurn::GetValidBananas(bool player1, GameStatePtr state, boo
         return std::bitset<121>(0);
     }
 
-    return GetValidBombThrow(player1, state, trimStupidMoves);
+    return GetValidBombThrow(player1, state, trimStupidMoves, false);
 }
 
 std::bitset<121> NextTurn::GetValidSnowballs(bool player1, GameStatePtr state, bool trimStupidMoves)
@@ -292,11 +292,16 @@ std::bitset<121> NextTurn::GetValidSnowballs(bool player1, GameStatePtr state, b
     Player* player = state->GetPlayer(player1);
     Worm* worm = player->GetCurrentWorm();
 
-    if(worm->proffession != Worm::Proffession::TECHNOLOGIST || worm->snowball_count <= 0) {
+    //---heuristic-------
+    //try hold on to the snowball until late game
+    bool shouldHoldOnToSnowBall = (worm->health > 50) && (state->roundNumber < GameConfig::maxRounds - 75);
+    //-------------------
+
+    if(worm->proffession != Worm::Proffession::TECHNOLOGIST || worm->snowball_count <= 0 || shouldHoldOnToSnowBall) {
         return std::bitset<121>(0);
     }
 
-    return GetValidBombThrow(player1, state, trimStupidMoves);
+    return GetValidBombThrow(player1, state, trimStupidMoves, true);
 }
 
 std::shared_ptr<Command> NextTurn::GetTeleportDig(Worm* worm, GameStatePtr state, unsigned index)

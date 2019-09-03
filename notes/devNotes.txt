@@ -23,7 +23,7 @@ TODO
    runs
       tonight
          PATTERN RECOG (32 V 31)
-         SELECT AWAY FROM FROZEN WORMS
+         BOMB HEURISTICS / SELECT AWAY FROM FROZEN WORMS
       tomorrow morn
          LEON vs 2 best
 

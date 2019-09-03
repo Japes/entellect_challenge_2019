@@ -329,6 +329,15 @@ TEST_CASE( "Promotion", "[promotion]" ) {
     GIVEN("A monte carlo node with depth 0")
     {
         auto state = std::make_shared<GameState>();
+        bool player1 = true;
+        place_worm(player1, 1, {1,1}, state);
+        place_worm(player1, 2, {1,10}, state);
+        place_worm(player1, 3, {1,20}, state);
+
+        place_worm(!player1, 1, {20,1}, state);
+        place_worm(!player1, 2, {20,10}, state);
+        place_worm(!player1, 3, {20,20}, state);
+
         HealthEvaluator eval;
         MonteCarloNode MCNode(state, &eval, 0, 3, 2);
 
