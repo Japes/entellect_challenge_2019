@@ -89,12 +89,12 @@ void Bot::GetNextMC(std::shared_ptr<GameState> state_now)
         _mc = _mc->TryGetComputedState(state_now);
         if(_mc != nullptr) {
             _mc->Promote();
-            std::cerr << "(" << __FUNCTION__ << ") GOT A CHILD NODE TO REUSE!-----------------------------------------------------" << std::endl;
             _mc->PrintState(true);
             return;
         }
     }
 
+    std::cerr << "(" << __FUNCTION__ << ") NO CHILD NODE TO REUSE :( -----------------------------------------------------" << std::endl;
     _mc = std::make_shared<MonteCarloNode>(state_now, _evaluator, _nodeDepth, _playthroughDepth, _mc_c);
 }
 
