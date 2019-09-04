@@ -1,18 +1,20 @@
 TODO
 
-	print out total N properly... calculated and total N in mc class
-	clean up printouts a bit?
+	ITS NOT DOING THE "DONT FREEZE FROZEN GUYS" THING PROPERLY...
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
-      staged evaluation functions (master control alg) (see safe mode)     medium/high    high
-	   rework output messages for a graphical view                          medium         medium/high
-      select cleverness                                                    low            medium
-      optimization                                                         medium/low     medium
       building actual tree:                                                high,          medium
+
+      staged evaluation functions (master control alg) (see safe mode)     medium/high    high
+         explicit end thing of do i dance or do i shoot or WHAT
+         
+      optimization                                                         medium/low     medium
+      select cleverness                                                    low            medium
+      play with evaluation function (score up)                             low            medium/low?
       adding pattern rec to playouts                                       medium         medium/low
       fix engine edge cases                                                medium/high    low
-      play with evaluation function (score up)                             low            medium/low?
       resolve ties with random (mc and nextmove)                           low            low?
+	   rework output messages for a graphical view                          medium         medium/high
 	
       banana (only if awesome) /snowball (no re).  use if low health.      low            high
 
@@ -23,11 +25,14 @@ TODO
 
    runs
       tonight
-         SELECT AWAY FROM FROZEN WORMS
+         (jp34)
+            NODE DEPTH 2
+         jp33
+         ab4 (crazy horse)
       tomorrow morn
-         LEON vs 2 best
 
       PLAY WITH NODE DEPTH
+      BANANA ONLY FULL HOUSE (13)
       HEURISTIC IMPROVEMENT
          heuristic improvement: higher score weight
 
@@ -208,7 +213,7 @@ notes for blog post---------------------------------------------------
       dude who made visualizer
       LEON
       other colleagues
-      
+
 
 ======================================================================================================
 

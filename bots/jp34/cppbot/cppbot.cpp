@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 {
     //note total play depth is nodeDepth + playThroughDepth
     int playThroughDepth{11};
-    int nodeDepth{1};
+    int nodeDepth{2};
 
     int dirtsForBanana{12}; //only if super awesome
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
