@@ -429,3 +429,21 @@ Engine version: 2019.3.2 -- 2019_September_03__06_14_11 -- ParallelID:
 (wins/draws/losses):     jp305                    jp27                     
 jp31:                    31/0/26                  26/0/10
 jp305:                   0/0/0                    18/0/18
+
+
+checks teusday night======================================================================================================================================
+
+but 31 had the highest 
+Engine version: 2019.3.2 -- 2019_September_04__08_34_00 -- ParallelID: 
+(wins/draws/losses):     jp32                     jp33 (bomb cleverness + pattern rec)
+jp31:                    38/1/13                  17/0/23
+jp32:                    0/0/0                    23/0/17
+
+checks teusday night======================================================================================================================================
+took out pattern rec in bomb cleverness (33)
+
+Engine version: 2019.3.2 -- 2019_September_04__06_30_54 -- ParallelID: 1
+(wins/draws/losses):     jp31                     jp32                     BombCleverness                     
+ab5:                     1/0/11                   1/0/11                   11/0/21
+jp31:                    						        11/0/1                   10/0/22
+jp32:                                                                      8/0/24

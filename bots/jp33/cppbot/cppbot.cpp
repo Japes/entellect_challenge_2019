@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
     int dirtsForBanana{12}; //only if super awesome
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
-    bool patternDetectEnable{true};
+    bool patternDetectEnable{false};
 
     uint64_t mcTime_ns{880000000};
     float mc_c{std::sqrt(2)};

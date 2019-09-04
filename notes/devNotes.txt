@@ -1,6 +1,7 @@
 TODO
 
-	print out total N calculated and total N in mc class
+	print out total N properly... calculated and total N in mc class
+	clean up printouts a bit?
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
       banana (only if awesome) /snowball (no re).  use if low health.      low            high
