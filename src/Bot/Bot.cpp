@@ -20,6 +20,7 @@ Bot::Bot(EvaluatorBase* evaluator,
     _mc_c{mc_c},
     _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck},
     _numplies{0},
+    _numplayouts{0},
     _evaluator{evaluator},
     _mc{nullptr}
 {
@@ -53,7 +54,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     auto pat = _opponent_patterns.Prediction();
     if(_patternDetectEnable && pat != nullptr) {
 
-        std::cerr << "(" << __FUNCTION__ << ") FOUND A PATTERN IN OPPONENTS PLAY ------------" << std::endl;
+        std::cerr << "PATTERN IN OPPONENTS PLAY DETECTED------------" << std::endl;
 
         std::vector<std::shared_ptr<Command>> opponents_moves;
         opponents_moves.push_back(pat);
@@ -71,6 +72,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //begin monte carlo----------------------------------------------------------------
 
     _numplies = 0;
+    _numplayouts = 0;
     std::thread t1(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);
     std::thread t2(&Bot::runMC, this, start_time + _mc_Time_ns, _mc);
     t1.join();
@@ -79,6 +81,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //output result--------------------------------------------------------------------
     //choose the best move and do it
     auto best_move = _mc->GetBestMove(ImPlayer1);
+    std::cerr << "(" << __FUNCTION__ << ") Num playouts this turn: " << GetNumPlayouts() << std::endl;
     _mc->PrintState(ImPlayer1);
 
     return selectPrefix + best_move->GetCommandString();
@@ -90,6 +93,7 @@ void Bot::GetNextMC(std::shared_ptr<GameState> state_now)
         _mc = _mc->TryGetComputedState(state_now);
         if(_mc != nullptr) {
             _mc->Promote();
+            std::cerr << "(" << __FUNCTION__ << ") Found a child node to reuse: ";
             _mc->PrintState(true);
             return;
         }
@@ -104,14 +108,21 @@ uint64_t Bot::GetNumPlies()
     return _numplies;
 }
 
+uint64_t Bot::GetNumPlayouts()
+{
+    return _numplayouts;
+}
+
 void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc)
 {
     while(Utilities::Get_ns_since_epoch() < stopTime) {
 
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
             int numplies = 0;
-            mc->AddPlaythrough(numplies);
+            int numplayouts = 0;
+            mc->AddPlaythrough(numplies, numplayouts);
             _numplies += numplies;
+            _numplayouts += numplayouts;
         }
     }
 }

@@ -52,7 +52,7 @@ bool MonteCarloNode::StateEquals(std::shared_ptr<GameState> state)
 }
 
 //note this needs to be threadsafe
-float MonteCarloNode::AddPlaythrough(int& numplies)
+float MonteCarloNode::AddPlaythrough(int& numplies, int& numplayouts)
 {
     _mtx.lock();
     //choose next node
@@ -73,10 +73,12 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
     */
 
     numplies = 0;
+    numplayouts = 0;
     float thisScore;
     if (_nodeDepth > 0) {
         std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild({player1_next_move->GetCommand(), player2_next_move->GetCommand()});
-        thisScore = childNode->AddPlaythrough(numplies);
+        thisScore = childNode->AddPlaythrough(numplies, numplayouts);
+        ++numplies; //count the one that was precomputed in the child
     } else {
 
         //load the state
@@ -87,6 +89,7 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
 
         thisScore = eng.Playthrough(player1_next_move->GetCommand(), player2_next_move->GetCommand(),
                                         nextMoveFn, _evaluator, _playthroughDepth, numplies);
+        ++numplayouts;
     }
     
 
@@ -97,10 +100,6 @@ float MonteCarloNode::AddPlaythrough(int& numplies)
 
     player2_next_move->AddPlaythroughResult(1 - thisScore);
     _player2_mc.UpdateNumSamples();
-
-    //debug thing just to update UCT
-    _player1_mc.NextMove();
-    _player2_mc.NextMove();
 
     _mtx.unlock();
 
@@ -179,7 +178,7 @@ void MonteCarloNode::PrintState(bool player1)
     auto my_mc =     player1 ? _player1_mc : _player2_mc;
     auto enemy_mc = !player1 ? _player1_mc : _player2_mc;
 
-    std::cerr << Command::latestBot << ":" << std::endl;
+    std::cerr << Command::latestBot << ": mc node with " << NumChildren() << " children and max depth " << MaxTreeDepth() << std::endl;
     my_mc.PrintState();
 
 /*
@@ -194,7 +193,7 @@ void MonteCarloNode::PrintState(bool player1)
         }
         std::cerr << Command::latestBot << " FINISHED KIDS------------:" << std::endl;
     }
-*/
     std::cerr << Command::latestBot << " Opponent:" << std::endl;
     enemy_mc.PrintState();
+*/
 }

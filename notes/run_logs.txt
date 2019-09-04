@@ -445,5 +445,5 @@ took out pattern rec in bomb cleverness (33)
 Engine version: 2019.3.2 -- 2019_September_04__06_30_54 -- ParallelID: 1
 (wins/draws/losses):     jp31                     jp32                     BombCleverness                     
 ab5:                     1/0/11                   1/0/11                   11/0/21
-jp31:                    						        11/0/1                   10/0/22
+jp31:                                             11/0/1                   10/0/22
 jp32:                                                                      8/0/24

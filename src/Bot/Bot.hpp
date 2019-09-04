@@ -21,6 +21,7 @@ class Bot
     std::string runStrategy(rapidjson::Document& roundJSON);
     void GetNextMC(std::shared_ptr<GameState> state_now);
     uint64_t GetNumPlies();
+    uint64_t GetNumPlayouts();
     void AdjustOpponentSpellCount(bool player1, GameStatePtr current_state, GameStatePtr prev_state);
 
     private:
@@ -40,6 +41,7 @@ class Bot
     float _mc_c;
     int _mc_runsBeforeClockCheck;
     uint64_t _numplies;
+    uint64_t _numplayouts;
 
     EvaluatorBase* _evaluator;
 

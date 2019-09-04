@@ -18,6 +18,7 @@ std::shared_ptr<MCMove> PlayersMonteCarlo::NextMove()
         move->UpdateUCT(_N, _c);
     }
 
+    //TODO should resolve ties with a random pick here
     auto next_node = std::max_element(std::begin(_moves), std::end(_moves), 
             [] (std::shared_ptr<MCMove> const lhs, std::shared_ptr<MCMove> const rhs) -> bool { 
                 return lhs->GetUCT() < rhs->GetUCT(); });
