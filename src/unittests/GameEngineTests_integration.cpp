@@ -36,7 +36,9 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     int mc_runsBeforeClockCheck{50};
 
     HealthEvaluator evaluator;
-    Bot bot(&evaluator, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+    Bot bot(&evaluator, playThroughDepth, nodeDepth, 
+            dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+            mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     std::vector<rapidjson::Document> files;
     files.push_back(Utilities::ReadJsonFile("./Test_files/JsonMapV3.json"));

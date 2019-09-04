@@ -7,7 +7,7 @@
 
 Bot::Bot(EvaluatorBase* evaluator,
         int playthroughDepth, int nodeDepth,
-        int dirtsForBanana, int distanceForLost, bool patternDetectEnable,
+        int dirtsForBanana, int distanceForLost, bool patternDetectEnable, std::function<bool(bool, GameStatePtr)> selectCurrentWormFn,
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
     _opponent_patterns(8),
     _playthroughDepth{playthroughDepth},
@@ -15,6 +15,7 @@ Bot::Bot(EvaluatorBase* evaluator,
     _dirtsForBanana{dirtsForBanana},
     _distanceForLost{distanceForLost},
     _patternDetectEnable{patternDetectEnable},
+    _selectCurrentWormFn{selectCurrentWormFn},
     _mc_Time_ns{mcTime_ns},
     _mc_c{mc_c},
     _mc_runsBeforeClockCheck{mc_runsBeforeClockCheck},
@@ -38,7 +39,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
 
     //do some heuristics---------------------------------------------------------------
     //select
-    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get(), NextTurn::WormCanShoot);    //note this modifies state
+    std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get(), _selectCurrentWormFn);    //note this modifies state
 
     //banana mine
     auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state_now.get(), _dirtsForBanana);

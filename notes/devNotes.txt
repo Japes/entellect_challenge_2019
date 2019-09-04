@@ -4,7 +4,6 @@ TODO
 	clean up printouts a bit?
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
-      banana (only if awesome) /snowball (no re).  use if low health.      low            high
       staged evaluation functions (master control alg) (see safe mode)     medium/high    high
 	   rework output messages for a graphical view                          medium         medium/high
       select cleverness                                                    low            medium
@@ -15,6 +14,7 @@ TODO
       play with evaluation function (score up)                             low            medium/low?
       resolve ties with random (mc and nextmove)                           low            low?
 	
+      banana (only if awesome) /snowball (no re).  use if low health.      low            high
 
    basic trends im seeing
       dance ftw
@@ -23,8 +23,7 @@ TODO
 
    runs
       tonight
-         PATTERN RECOG (32 V 31)
-         BOMB HEURISTICS / SELECT AWAY FROM FROZEN WORMS
+         SELECT AWAY FROM FROZEN WORMS
       tomorrow morn
          LEON vs 2 best
 
@@ -204,6 +203,12 @@ notes for blog post---------------------------------------------------
       long to run, hard to tune
       sensitive to edge cases in game state
    devnotes file, constantly reprioritising
+   special thanks to
+      WSL ubuntu
+      dude who made visualizer
+      LEON
+      other colleagues
+      
 
 ======================================================================================================
 

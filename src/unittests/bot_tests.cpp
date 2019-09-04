@@ -7,6 +7,7 @@
 #include "../GameState/GameStateLoader.hpp"
 #include "Evaluators/HealthEvaluator.hpp"
 #include "../../Bot/Bot.hpp"
+#include "../GameEngine/NextTurn.hpp"
 
 TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
     GIVEN("game states before/after throwing a snowball and a Bot")
@@ -26,7 +27,9 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
         HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        Bot bot(&eval, playThroughDepth, nodeDepth, 
+                    dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot, 
+                    mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         THEN("snowball counts are as we expect")
         {
@@ -84,7 +87,10 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
         HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        Bot bot(&eval, playThroughDepth, nodeDepth, 
+                    dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                    mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        
 
         THEN("Banana counts are as we expect")
         {
@@ -141,7 +147,9 @@ TEST_CASE( "Basic sanity", "[.BotSanity]" ) {
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
         HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, nodeDepth, dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+        Bot bot(&eval, playThroughDepth, nodeDepth, 
+                dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
         WHEN("We request the next move")
         {
