@@ -87,10 +87,10 @@ float MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
 
     _mtx.lock();
     //remember Playthrough always returns score in terms of player 1
-    player1_next_move->AddPlaythroughResult(thisScore);
+    player1_next_move->AddPlaythroughResult(1 - thisScore);
     _player1_mc.UpdateNumSamples();
 
-    player2_next_move->AddPlaythroughResult(1 - thisScore);
+    player2_next_move->AddPlaythroughResult(thisScore);
     _player2_mc.UpdateNumSamples();
 
     _mtx.unlock();

@@ -152,10 +152,10 @@ void GameEngine::ApplyPowerups()
 }
 
 //do a random playthrough to the end and return:
-//1 if player 1 wins
-//0 if player 1 loses
+//1 if player 2 wins
+//0 if player 2 loses
 //
-// so returned scores are always in terms of player 1
+// so returned scores are always in terms of player 2
 //
 //depth is how far to go before applying heuristic, -1 means play to end
 //TODO pass in strategies for each player
@@ -179,13 +179,13 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         ++numPlies;
     }
 
-    auto evaluationAfter = evaluator->Evaluate(true, _state); //always in terms of player 1
+    auto evaluationAfter = evaluator->Evaluate(false, _state); //always in terms of player 2
 
     //evaluate the playthrough
 
     //first, best/worst possible outcome
     if(_currentResult.result != ResultType::IN_PROGRESS) {
-        if(_currentResult.winningPlayer == &_state->player1) {
+        if(_currentResult.winningPlayer == &_state->player2) {
             return 1;
         } else {
             return 0;
