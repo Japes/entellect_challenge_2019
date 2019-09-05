@@ -461,4 +461,19 @@ jp33:                                                                      19/0/
 
 wednesday afternoon============================================================================================================================================
 taking jp35 back to search depth 1
+jp36 incentivizes keeping his worms alive
 ab4 still the same
+
+P1 bias?	P1		P2
+JP36  		18/4	7/16	vs jp35
+			12/10	7/16	vs ab4
+JP35		17/6	4/18	vs JP36
+			10/12	9/14	va ab4
+
+Engine version: 2019.3.2 -- 2019_September_05__06_14_41 -- ParallelID: 1
+(wins/draws/losses):     jp35                     ab4                      
+jp36:                    24/0/21                  17/0/28		(41/47)	looks like 36 is mearginally better?
+jp35:                                             19/0/26		(40/50)
+
+
+

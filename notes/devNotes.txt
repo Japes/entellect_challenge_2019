@@ -1,5 +1,6 @@
 TODO
 
+
 	ITS NOT DOING THE "DONT FREEZE FROZEN GUYS" THING PROPERLY...
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
@@ -24,10 +25,16 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
+      seems like i do better when im player1?  why could that be??
+         maybe do a run tonight with a worm against itself
+         swap the player it's in terms of in the playthroughs.
+            if bias still player1 - its a thing, not to do with that
+            if bias player 2 - its a thing, to do with that
+            if no bias....then it's still unknown
 
       BANANA ONLY FULL HOUSE (13)
-      HEURISTIC IMPROVEMENT
-         heuristic improvement: higher score weight
+      HEURISTIC IMPROVEMENT?
+
 
    put max division thing inside the evaluators...
 
