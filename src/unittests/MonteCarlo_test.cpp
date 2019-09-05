@@ -120,14 +120,14 @@ TEST_CASE( "Childnode generation works as I expect - max depth", "[BestNode][bra
 TEST_CASE( "Childnode generation works as I expect - build tree", "[tree]" ) {
     GIVEN("A monte carlo node with depth < 0")
     {
-        bool player1 = GENERATE(true, false);
-        auto state = std::make_shared<GameState>();
-        place_worm(player1, 1, {1,1}, state);
-        place_worm(player1, 2, {1,4}, state);
-        place_worm(player1, 3, {1,7}, state);
-        place_worm(!player1, 1, {7,1}, state);
-        place_worm(!player1, 2, {7,4}, state);
-        place_worm(!player1, 3, {7,7}, state);
+        //bool player1 = GENERATE(true, false);
+        //auto state = std::make_shared<GameState>();
+        //place_worm(player1, 1, {1,1}, state);
+        //place_worm(player1, 2, {1,4}, state);
+        //place_worm(player1, 3, {1,7}, state);
+        //place_worm(!player1, 1, {7,1}, state);
+        //place_worm(!player1, 2, {7,4}, state);
+        //place_worm(!player1, 3, {7,7}, state);
 
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapFight.json");
         auto state = GameStateLoader::LoadGameStatePtr(roundJSON);
