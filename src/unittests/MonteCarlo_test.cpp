@@ -3,6 +3,9 @@
 #include "../GameConfig.hpp"
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
+#include "GameStateLoader.hpp"
+#include "Utilities.hpp"
+#include "../NextTurn.hpp"
 #include "../MonteCarlo/MCMove.hpp"
 #include "../MonteCarlo/PlayersMonteCarlo.hpp"
 #include "../MonteCarlo/MonteCarloNode.hpp"
@@ -39,7 +42,7 @@ TEST_CASE( "Best move", "[BestNode]" ) {
     }
 }
 
-TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
+TEST_CASE( "Childnode generation works as I expect - max depth", "[BestNode][branches]" ) {
     GIVEN("A monte carlo node")
     {
         auto state = std::make_shared<GameState>();
@@ -54,9 +57,11 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
         place_worm(!player1, 3, {7,7}, state);
 
         HealthEvaluator eval;
-        MonteCarloNode MCNode(state, &eval, 1, 6, 2);
+        int nodeDepth = GENERATE(1, 2, 3, 54, 450, 161653);
+        int playthroughDepth = GENERATE(1, 2, 5, 10, 100);
+        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, 2);
 
-        REQUIRE(MCNode.NumChildren() == 0);
+        REQUIRE(MCNode.NumImmediateChildren() == 0);
 
         WHEN("We do a playthrough")
         {
@@ -65,7 +70,7 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
 
             THEN("We have gained a child")
             {
-                REQUIRE(MCNode.NumChildren() == 1);
+                REQUIRE(MCNode.NumImmediateChildren() == 1);
             }
         }
 
@@ -73,10 +78,10 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
         {
             int dummy;
 
-            int numkids = MCNode.NumChildren();
+            int numkids = MCNode.NumImmediateChildren();
             for(int i = 0; i < MCNode.MinNumBranches(); ++i ) {
                 MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == ++numkids);
+                REQUIRE(MCNode.NumImmediateChildren() == ++numkids);
             }
         }
     }
@@ -95,21 +100,78 @@ TEST_CASE( "Childnode generation works as I expect", "[BestNode][branches]" ) {
         place_worm(!player1, 3, {7,7}, state);
 
         HealthEvaluator eval;
-        MonteCarloNode MCNode(state, &eval, 0, 6, 2);
+        int nodeDepth = 0;
+        int playthroughDepth = GENERATE(1, 2, 5, 10, 100);
+        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, 2);
 
-        REQUIRE(MCNode.NumChildren() == 0);
+        REQUIRE(MCNode.NumImmediateChildren() == 0);
 
         WHEN("We do playthroughs, we never get kids")
         {
             for(int i = 0; i < 100; ++i) {
                 int dummy;
                 MCNode.AddPlaythrough(dummy);
-                REQUIRE(MCNode.NumChildren() == 0);
+                REQUIRE(MCNode.NumImmediateChildren() == 0);
             }
         }
     }
-
 }
+
+TEST_CASE( "Childnode generation works as I expect - build tree", "[tree]" ) {
+    GIVEN("A monte carlo node with depth < 0")
+    {
+        bool player1 = GENERATE(true, false);
+        auto state = std::make_shared<GameState>();
+        place_worm(player1, 1, {1,1}, state);
+        place_worm(player1, 2, {1,4}, state);
+        place_worm(player1, 3, {1,7}, state);
+        place_worm(!player1, 1, {7,1}, state);
+        place_worm(!player1, 2, {7,4}, state);
+        place_worm(!player1, 3, {7,7}, state);
+
+        auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapFight.json");
+        auto state = GameStateLoader::LoadGameStatePtr(roundJSON);
+
+
+        HealthEvaluator eval;
+        int nodeDepth = GENERATE(-1);//, -2, -3, -54161653);
+        int playthroughDepth = GENERATE(10);//, 2, 5, 10, 100);
+        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, 1.4f);
+
+        REQUIRE(MCNode.NumImmediateChildren() == 0);
+
+        WHEN("We do playthroughs")
+        {
+            int dummy;
+
+            THEN("We create a new node each time")
+            {
+                int numkids = MCNode.TotalNumChildren();
+                int depth = MCNode.MaxTreeDepth();
+
+                for(int i = 0; i < 100; ++i ) {
+                    MCNode.AddPlaythrough(dummy);
+                    REQUIRE( ( (MCNode.TotalNumChildren() > numkids) && (MCNode.MaxTreeDepth() >= depth) ) );
+                    numkids = MCNode.TotalNumChildren();
+                    depth = MCNode.MaxTreeDepth();
+
+                    /*
+                    if(numkids % 1000 == 0) {
+                        std::cerr << "(" << __FUNCTION__ << ") depth: " << depth << " numkids: " << numkids << std::endl;
+                        MCNode.PrintState(true);
+                    }
+                    */
+                }
+
+                REQUIRE( MCNode.MaxTreeDepth() > 0 );
+            }
+        }
+    }
+}
+
+
+//check that terminal states behave properly
+
 
 TEST_CASE( "Childnode keys work as I expect", "[BestNode]" ) {
     GIVEN("A map of type childNodeKey_t") {
@@ -342,7 +404,7 @@ TEST_CASE( "Promotion", "[promotion]" ) {
         MonteCarloNode MCNode(state, &eval, 0, 3, 2);
 
         REQUIRE(MCNode.MaxTreeDepth() == 1);
-        REQUIRE(MCNode.NumChildren() == 0);
+        REQUIRE(MCNode.NumImmediateChildren() == 0);
 
         WHEN("We promote it")
         {
@@ -355,7 +417,7 @@ TEST_CASE( "Promotion", "[promotion]" ) {
                 }
 
                 REQUIRE(MCNode.MaxTreeDepth() == 2);
-                REQUIRE(MCNode.NumChildren() > 0);
+                REQUIRE(MCNode.NumImmediateChildren() > 0);
             }
 
             WHEN("We promote it again")
@@ -369,7 +431,7 @@ TEST_CASE( "Promotion", "[promotion]" ) {
                     }
 
                     REQUIRE(MCNode.MaxTreeDepth() == 3);
-                    REQUIRE(MCNode.NumChildren() > 0);
+                    REQUIRE(MCNode.NumImmediateChildren() > 0);
                 }
             }
         }

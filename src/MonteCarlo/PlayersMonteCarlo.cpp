@@ -23,6 +23,10 @@ std::shared_ptr<MCMove> PlayersMonteCarlo::NextMove()
             [] (std::shared_ptr<MCMove> const lhs, std::shared_ptr<MCMove> const rhs) -> bool { 
                 return lhs->GetUCT() < rhs->GetUCT(); });
 
+    if(next_node == std::end(_moves)) {
+         std::cerr << "(" << __FUNCTION__ << ") I have no moves!" << std::endl;
+         return nullptr;
+    }
     return (*next_node);
 }
 

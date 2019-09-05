@@ -30,7 +30,8 @@ class MonteCarloNode
     static childNodeKey_t GetChildKey(childNodeID_t id);
 
     //for debug
-    int NumChildren();
+    int NumImmediateChildren();
+    int TotalNumChildren();
     int MaxTreeDepth();
     int MinNumBranches();
     void PrintState(bool player1);

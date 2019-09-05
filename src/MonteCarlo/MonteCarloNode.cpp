@@ -196,9 +196,19 @@ int MonteCarloNode::MinNumBranches()
                     NextTurn::AllValidMovesForPlayer(false, _state.get(), true).size());
 }
 
-int MonteCarloNode::NumChildren()
+int MonteCarloNode::NumImmediateChildren()
 {
     return _childNodes.size();
+}
+
+int MonteCarloNode::TotalNumChildren()
+{
+    int ret = 0;
+    for(auto const child : _childNodes) {
+        ++ret;
+        ret += child.second->TotalNumChildren();
+    }
+    return ret;
 }
 
 int MonteCarloNode::MaxTreeDepth()
@@ -219,7 +229,7 @@ void MonteCarloNode::PrintState(bool player1)
     auto my_mc =     player1 ? _player1_mc : _player2_mc;
     auto enemy_mc = !player1 ? _player1_mc : _player2_mc;
 
-    std::cerr << Command::latestBot << ": mc node with " << NumChildren() << " children and max depth " << MaxTreeDepth() << std::endl;
+    std::cerr << Command::latestBot << ": mc node with " << NumImmediateChildren() << " children and max depth " << MaxTreeDepth() << std::endl;
     my_mc.PrintState();
 
 /*
