@@ -119,10 +119,9 @@ void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc)
 
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
             int numplies = 0;
-            int numplayouts = 0;
-            mc->AddPlaythrough(numplies, numplayouts);
+            mc->AddPlaythrough(numplies);
             _numplies += numplies;
-            _numplayouts += numplayouts;
+            ++_numplayouts;
         }
     }
 }

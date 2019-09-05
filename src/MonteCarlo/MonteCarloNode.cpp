@@ -11,8 +11,19 @@ MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state,
     _evaluator(eval),
     _nodeDepth(nodeDepth),
     _playthroughDepth(playthroughDepth),
-    _c{c}
+    _c{c},
+    _terminalNodeEvaluation(-1)
 {
+    //check if we're a terminal node
+    auto res = GameEngine::GetResult(_state.get());
+
+    if(res.result != GameEngine::ResultType::IN_PROGRESS) {
+        if(res.winningPlayer == &_state->player1) {
+            _terminalNodeEvaluation = 1;
+        } else {
+            _terminalNodeEvaluation = 0;
+        }
+    }
 }
 
 MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c) :
@@ -52,7 +63,7 @@ bool MonteCarloNode::StateEquals(std::shared_ptr<GameState> state)
 }
 
 //note this needs to be threadsafe
-float MonteCarloNode::AddPlaythrough(int& numplies, int& numplayouts)
+float MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
 {
     _mtx.lock();
     //choose next node
@@ -72,26 +83,7 @@ float MonteCarloNode::AddPlaythrough(int& numplies, int& numplayouts)
     }
     */
 
-    numplies = 0;
-    numplayouts = 0;
-    float thisScore;
-    if (_nodeDepth > 0) {
-        std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild({player1_next_move->GetCommand(), player2_next_move->GetCommand()});
-        thisScore = childNode->AddPlaythrough(numplies, numplayouts);
-        ++numplies; //count the one that was precomputed in the child
-    } else {
-
-        //load the state
-        GameState state = *(_state.get()); //make a copy :/
-        GameEngine eng(&state);
-
-        auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
-
-        thisScore = eng.Playthrough(player1_next_move->GetCommand(), player2_next_move->GetCommand(),
-                                        nextMoveFn, _evaluator, _playthroughDepth, numplies);
-        ++numplayouts;
-    }
-    
+    float thisScore = GetScore(player1_next_move->GetCommand(), player2_next_move->GetCommand(), numplies, canMakeChild);
 
     _mtx.lock();
     //remember Playthrough always returns score in terms of player 1
@@ -106,6 +98,53 @@ float MonteCarloNode::AddPlaythrough(int& numplies, int& numplayouts)
     return thisScore;
 }
 
+float MonteCarloNode::GetScore(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies, bool canMakeChild)
+{
+    if(_terminalNodeEvaluation >= 0) {
+        return _terminalNodeEvaluation; //the game is over
+    }
+
+    if (_nodeDepth < 0) { //implies we're building the whole tree
+        
+        if(!canMakeChild) {
+            return DoAPlayout(p1Cmd, p2Cmd, numplies);
+        } else {
+            bool createdOne{false};
+            std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild({p1Cmd, p2Cmd}, createdOne);
+            if(createdOne) {
+                return childNode->AddPlaythrough(numplies, false);
+            } else {
+                ++numplies; //count the one that was precomputed in the child
+                return childNode->AddPlaythrough(numplies);
+            }
+        }
+
+    } else { //we're building up to a max depth
+         if (_nodeDepth > 0) {
+
+            bool createdOne{false};
+            std::shared_ptr<MonteCarloNode> childNode = GetOrCreateChild({p1Cmd, p2Cmd}, createdOne);
+            ++numplies; //count the one that was precomputed in the child
+            return childNode->AddPlaythrough(numplies);
+
+        } else {
+
+            return DoAPlayout(p1Cmd, p2Cmd, numplies);
+        }
+    }
+}
+
+float MonteCarloNode::DoAPlayout(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies)
+{
+    //load the state
+    GameState state = *(_state.get()); //make a copy :/
+    GameEngine eng(&state);
+
+    auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
+
+    return eng.Playthrough(p1Cmd, p2Cmd, nextMoveFn, _evaluator, _playthroughDepth, numplies);
+}
+
 std::shared_ptr<MonteCarloNode> MonteCarloNode::GetChild(childNodeID_t id)
 {
     childNodeKey_t key = GetChildKey(id);
@@ -116,11 +155,12 @@ std::shared_ptr<MonteCarloNode> MonteCarloNode::GetChild(childNodeID_t id)
     return _childNodes[key];
 }
 
-std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(childNodeID_t id)
+std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(childNodeID_t id, bool& createdNewOne)
 {
     childNodeKey_t key = GetChildKey(id);
     auto p1Cmd = id.first;
     auto p2Cmd = id.second;
+    createdNewOne = false;
 
     _mtx.lock();
     if (_childNodes.find(key) == _childNodes.end()) {
@@ -128,6 +168,7 @@ std::shared_ptr<MonteCarloNode> MonteCarloNode::GetOrCreateChild(childNodeID_t i
         GameEngine eng(child_state.get());
         eng.AdvanceState(*p1Cmd.get(), *p2Cmd.get());
         _childNodes[key] = std::make_shared<MonteCarloNode>(child_state, _evaluator, _nodeDepth - 1, _playthroughDepth, _c);
+        createdNewOne = true;
     }
     auto ret = _childNodes[key];
     _mtx.unlock();

@@ -20,7 +20,8 @@ class MonteCarloNode
     MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c);
 
     void Promote();
-    float AddPlaythrough(int& numplies, int& numplayouts);
+    float AddPlaythrough(int& numplies, bool canMakeChild = true);
+
     std::shared_ptr<Command> GetBestMove(bool player1);
     std::shared_ptr<MonteCarloNode> GetChild(childNodeID_t id);
     std::shared_ptr<MonteCarloNode> TryGetComputedState(std::shared_ptr<GameState> state);
@@ -43,10 +44,13 @@ class MonteCarloNode
     int _nodeDepth;
     int _playthroughDepth;
     float _c;
+    float _terminalNodeEvaluation;
 
     std::unordered_map<childNodeKey_t, std::shared_ptr<MonteCarloNode>> _childNodes;
 
-    std::shared_ptr<MonteCarloNode> GetOrCreateChild(childNodeID_t id);
+    std::shared_ptr<MonteCarloNode> GetOrCreateChild(childNodeID_t id, bool& createdNewOne);
+    float DoAPlayout(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies);
+    float GetScore(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies, bool canMakeChild);
 
 };
 
