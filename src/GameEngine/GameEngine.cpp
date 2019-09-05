@@ -47,10 +47,10 @@ void GameEngine::AdvanceState(const Command& player1_command, const Command& pla
     Worm* p2worm = _state->player2.GetCurrentWorm();
     if(!movesValid) {
         if(!player1Good) {
-            std::cerr << "Invalid move by worm 1" << p1worm->id << ": " << player1_command.GetCommandString() << std::endl;
+            std::cerr << "Invalid move by worm 1" << static_cast<int>(p1worm->id) << ": " << player1_command.GetCommandString() << std::endl;
         }
         if(!player2Good) {
-            std::cerr << "Invalid move by worm 2" << p2worm->id << ": " << player2_command.GetCommandString() << std::endl;
+            std::cerr << "Invalid move by worm 2" << static_cast<int>(p2worm->id) << ": " << player2_command.GetCommandString() << std::endl;
         }
     }
 

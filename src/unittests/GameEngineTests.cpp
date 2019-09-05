@@ -586,18 +586,14 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
     {
         auto state = std::make_shared<GameState>();
         GameEngine eng(state);
-        place_worm(true, 1, {1,1}, state);
-        place_worm(true, 2, {1,10}, state);
-        place_worm(true, 3, {1,20}, state);
-        place_worm(false, 1, {20,5}, state);
+        place_worm(true, 1, {14,15}, state); //away from lava
+        place_worm(true, 2, {2,11}, state);
+        place_worm(true, 3, {2,21}, state);
+        place_worm(false, 1, {16,15}, state); //away from lava
         place_worm(false, 2, {21,10}, state);
         place_worm(false, 3, {22,20}, state);
 
-        state->player1.worms[0].health = 999999; //so lava doesn't kill him
-        state->player2.worms[0].health = 999999; //so lava doesn't kill him
-
-        TeleportCommand player1move({0,0});
-        TeleportCommand player2move({0,0});
+        DoNothingCommand nothing;
 
         using resType = GameEngine::ResultType;
 
@@ -605,18 +601,11 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
 
         WHEN("game goes until maxturns - 1")
         {
-            bool flipflop = false;
             for(unsigned i = 1; i < GameConfig::maxRounds; i++) {
-                //make sure moves are valid
-                if(flipflop) {
-                    player1move = TeleportCommand( (state->player1.GetCurrentWorm()->position + Position{1,1}) );
-                    player2move = TeleportCommand( (state->player2.GetCurrentWorm()->position + Position{1,1}) );
-                } else {
-                    player1move = TeleportCommand( (state->player1.GetCurrentWorm()->position + Position{-1,-1}) );
-                    player2move = TeleportCommand( (state->player2.GetCurrentWorm()->position + Position{-1,-1}) );
-                }
-                eng.AdvanceState(player1move, player2move);
-                flipflop = !flipflop;
+
+                eng.AdvanceState(nothing, nothing);
+                state->player1.consecutiveDoNothingCount = 0;
+                state->player2.consecutiveDoNothingCount = 0;
             }
 
             THEN("Game is still in progress") {
@@ -625,7 +614,7 @@ TEST_CASE( "Game ends when max rounds is reached", "[max_rounds]" ) {
             }
 
             AND_THEN("Game goes for one more turn") {
-                eng.AdvanceState(player1move, player2move);
+                eng.AdvanceState(nothing, nothing);
                 THEN("Game is finished, and went to score") {
                     REQUIRE(eng.GetResult().result == resType::FINISHED_POINTS);
                 }

@@ -20,23 +20,23 @@ struct Worm
     };
 
     GameState* state;
-    unsigned playerId;
-    unsigned id;
-    int health;
+    uint8_t playerId;
+    uint8_t id;
+    int16_t health;
     Position position;
     Position previous_position; //for pushback logic
     Weapon weapon;
     BananaBomb banana_bomb;
     SnowBall snowball;
-    unsigned banana_bomb_count;
-    unsigned snowball_count;
-    int diggingRange;
-    int movementRange;
+    uint8_t banana_bomb_count;
+    uint8_t snowball_count;
+    int8_t diggingRange;
+    int8_t movementRange;
     Proffession proffession;
     bool movedThisRound;
     bool diedByLavaThisRound;
     bool frozenThisRound;
-    int roundsUntilUnfrozen;
+    int8_t roundsUntilUnfrozen;
     std::vector<Worm*> lastAttackedBy;
 
     Worm(GameState* _state, Worm::Proffession _proffession = Worm::Proffession::COMMANDO);

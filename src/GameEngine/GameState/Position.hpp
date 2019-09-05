@@ -6,8 +6,8 @@
 
 struct Position
 {
-    int x;
-    int y;
+    int16_t x;
+    int16_t y;
 
     Position();
     Position(int x, int y);

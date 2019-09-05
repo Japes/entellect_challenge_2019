@@ -455,9 +455,9 @@ checks wednesday night==========================================================
 jp35 here was a tree builder jp34 is node depth 2, jp33 is depth 1
 Engine version: 2019.3.2 -- 2019_September_05__07_56_35 -- ParallelID: 1
 (wins/draws/losses):     jp34                     jp33                     ab4                      
-jp35:                    2/0/8                    3/0/7                    12/0/27
-jp34:                                             6/0/4                    18/0/21
-jp33:                                                                      19/0/20
+jp35:                    2/0/8                    3/0/7                    12/0/27		(17/42)
+jp34:                                             6/0/4                    18/0/21		(24/25)
+jp33:                                                                      19/0/20		(19/20)
 
 wednesday afternoon============================================================================================================================================
 taking jp35 back to search depth 1

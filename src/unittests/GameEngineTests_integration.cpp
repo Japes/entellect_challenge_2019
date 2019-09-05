@@ -31,7 +31,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     bool patternDetectEnable = false;
     //uint64_t mcTime_ns{3000000000000};
-    uint64_t mcTime_ns{3000000000};
+    uint64_t mcTime_ns{1000000000};
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 

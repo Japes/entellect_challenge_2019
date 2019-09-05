@@ -79,8 +79,8 @@ TEST_CASE( "snowball range", "[snowball][snowball_range]" ) {
         place_worm(false, 2, {29,29}, state); //put him somewhere sensible
 
         state->player1.worms[0].SetProffession(Worm::Proffession::TECHNOLOGIST);
-        state->player1.worms[0].health = 1000; //so he doesn't kill himself during this test
-        state->player1.worms[0].snowball_count = 1000; //its just a test
+        state->player1.worms[0].health = 250; //so he doesn't kill himself during this test
+        state->player1.worms[0].snowball_count = 250; //its just a test
 
 
         auto wormpos = state->player1.GetCurrentWorm()->position;

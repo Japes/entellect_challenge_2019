@@ -98,8 +98,8 @@ TEST_CASE( "Banana range", "[banana][banana_range]" ) {
         place_worm(false, 3, {29,29}, state); //put him somewhere sensible
 
         SetupAgent(state, eng);
-        state.player1.worms[2].health = 1000; //so he doesn't kill himself during this test
-        state.player1.worms[2].banana_bomb_count = 1000; //its just a test
+        state.player1.worms[2].health = 250; //so he doesn't kill himself during this test
+        state.player1.worms[2].banana_bomb_count = 250; //its just a test
 
         auto wormpos = state.player1.GetCurrentWorm()->position;
 
