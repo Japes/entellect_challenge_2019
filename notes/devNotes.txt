@@ -24,14 +24,7 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
-      tonight
-         (jp34)
-            NODE DEPTH 2
-         jp33
-         ab4 (crazy horse)
-      tomorrow morn
 
-      PLAY WITH NODE DEPTH
       BANANA ONLY FULL HOUSE (13)
       HEURISTIC IMPROVEMENT
          heuristic improvement: higher score weight

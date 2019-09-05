@@ -39,6 +39,9 @@ jp30 - calculates child mc nodes but doesn't use them.  depth 12. score heuristi
 jp305 - same as jp30 but with maxHPScoreEvaluator
 jp31 - actually reuse the child nodes.  some bugfixes.  added pattern recoq but doesn't use it
 jp32 - uses pattern recog.  added frozenselect heuristic but doesn't use it
+jp33 - turn pattern recog off, added some bomb cleverness
+jp34 - try with node depth 2
+jp35 - try to build the actual monte carlo tree
 
 
 results analysis --------------------------------------------------------------------
@@ -439,7 +442,7 @@ Engine version: 2019.3.2 -- 2019_September_04__08_34_00 -- ParallelID:
 jp31:                    38/1/13                  17/0/23
 jp32:                    0/0/0                    23/0/17
 
-checks teusday night======================================================================================================================================
+checks teusday afternoon======================================================================================================================================
 took out pattern rec in bomb cleverness (33)
 
 Engine version: 2019.3.2 -- 2019_September_04__06_30_54 -- ParallelID: 1
@@ -447,3 +450,15 @@ Engine version: 2019.3.2 -- 2019_September_04__06_30_54 -- ParallelID: 1
 ab5:                     1/0/11                   1/0/11                   11/0/21
 jp31:                                             11/0/1                   10/0/22
 jp32:                                                                      8/0/24
+
+checks wednesday night========================================================================================================================================
+jp35 here was a tree builder jp34 is node depth 2, jp33 is depth 1
+Engine version: 2019.3.2 -- 2019_September_05__07_56_35 -- ParallelID: 1
+(wins/draws/losses):     jp34                     jp33                     ab4                      
+jp35:                    2/0/8                    3/0/7                    12/0/27
+jp34:                                             6/0/4                    18/0/21
+jp33:                                                                      19/0/20
+
+wednesday afternoon============================================================================================================================================
+taking jp35 back to search depth 1
+ab4 still the same
