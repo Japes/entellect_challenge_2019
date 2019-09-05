@@ -44,7 +44,7 @@ class NextTurn
     static bool WormIsntFrozen(bool player1, GameStatePtr state);
 
     private:
-    static std::shared_ptr<pcg32> _rng;
+    static std::unique_ptr<pcg32> _rng;
 
     static std::vector<Position> _surroundingWormSpaces;
 

@@ -67,8 +67,8 @@ float MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
 {
     _mtx.lock();
     //choose next node
-    std::shared_ptr<MCMove> player1_next_move = _player1_mc.NextMove();
-    std::shared_ptr<MCMove> player2_next_move = _player2_mc.NextMove();
+    MCMove* player1_next_move = _player1_mc.NextMove();
+    MCMove* player2_next_move = _player2_mc.NextMove();
     _mtx.unlock();
 
     /*

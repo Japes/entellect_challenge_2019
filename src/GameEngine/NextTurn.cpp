@@ -2,7 +2,7 @@
 #include "GameEngine.hpp"
 #include <algorithm>
 
-std::shared_ptr<pcg32> NextTurn::_rng;
+std::unique_ptr<pcg32> NextTurn::_rng;
 std::vector<std::shared_ptr<Command>> NextTurn::_playerShoots;
 std::vector<Position> NextTurn::_surroundingWormSpaces;
 std::vector<Position> NextTurn::_relativeBombTargets;
@@ -13,7 +13,7 @@ void NextTurn::Initialise()
         // Seed with a real random value, if available
         pcg_extras::seed_seq_from<std::random_device> seed_source;
         // Make a random number engine 
-        _rng = std::make_shared<pcg32>(seed_source);
+        _rng = std::make_unique<pcg32>(seed_source);
 
         //the order of these guys is important (see GetValidShoots)
         _playerShoots.push_back(std::make_shared<ShootCommand>(ShootCommand::ShootDirection::NW));
@@ -421,20 +421,20 @@ std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state, std::func
         return "";
     }
 
-    auto myState = std::make_shared<GameState>(*state); //no idea why it needs to be done this way
+    GameState myState = *state; //make a copy :/
 
-    Player* player = myState->GetPlayer(player1);
+    Player* player = myState.GetPlayer(player1);
     if(player->remainingWormSelections <= 0) {
         return "";
     }
 
-    GameEngine myEng(myState);
+    GameEngine myEng(&myState);
     myEng.AdvanceState(DoNothingCommand(), DoNothingCommand());
     int numAdvancesApplied = 1;
 
     for(int j = 0; j < 3; ++j) { //if you find yourself looping more than this, you got a problem...just return nothing
 
-        if(shouldSelectCurrentWorm(player1, myState.get())) {
+        if(shouldSelectCurrentWorm(player1, &myState)) {
             //cool we have a candidate.  project the given state forward so the caller can use it
             GameEngine eng(state);
             for(int i = 0; i < numAdvancesApplied; ++i) {

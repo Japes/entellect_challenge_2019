@@ -16,23 +16,21 @@
 TEST_CASE( "Best move", "[BestNode]" ) {
     GIVEN("A bunch of moves passed to a monte carlo")
     {
-        std::vector<std::shared_ptr<MCMove>> moves;
-        auto node1 = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(1,1)));
-        auto node2 = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(2,2)));
-        auto node3 = std::make_shared<MCMove>(std::make_shared<TeleportCommand>(Position(3,3)));
-        moves.push_back(node1);
-        moves.push_back(node2);
-        moves.push_back(node3);
+        std::vector<std::shared_ptr<Command>> moves;
+        moves.push_back(std::make_shared<TeleportCommand>(Position(1,1)));
+        moves.push_back(std::make_shared<TeleportCommand>(Position(2,2)));
+        moves.push_back(std::make_shared<TeleportCommand>(Position(3,3)));
 
         PlayersMonteCarlo mc(moves, 1);
+        auto nodeRef = mc.GetNodes();
 
         WHEN("We add some playthroughs to the nodes")
         {
-            node1->AddPlaythroughResult(1);
-            node2->AddPlaythroughResult(0.1);
-            node2->AddPlaythroughResult(0.1);
-            node2->AddPlaythroughResult(0.1);
-            node3->AddPlaythroughResult(1);
+            nodeRef[0]->AddPlaythroughResult(1);
+            nodeRef[1]->AddPlaythroughResult(0.1);
+            nodeRef[1]->AddPlaythroughResult(0.1);
+            nodeRef[1]->AddPlaythroughResult(0.1);
+            nodeRef[2]->AddPlaythroughResult(1);
 
             THEN("The one with the most playthroughs is the best (not the one with highest win rate")
             {
