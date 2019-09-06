@@ -19,9 +19,9 @@ MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state,
 
     if(res.result != GameEngine::ResultType::IN_PROGRESS) {
         if(res.winningPlayer == &_state->player1) {
-            _terminalNodeEvaluation = 1;
-        } else {
             _terminalNodeEvaluation = 0;
+        } else {
+            _terminalNodeEvaluation = 1;
         }
     }
 }
