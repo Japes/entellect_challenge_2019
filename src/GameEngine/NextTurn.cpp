@@ -266,6 +266,13 @@ std::bitset<121> NextTurn::GetValidBombThrow(bool player1, GameStatePtr state, b
 
     state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
         if(worm->position.BananaSnowballCanReach(enemyWorm.position)) {
+
+            if(snowball) {
+                if(enemyWorm.roundsUntilUnfrozen > 0) {
+                    return;
+                }
+            }
+
             Position posDiff = enemyWorm.position - worm->position;
             int index = 60 + posDiff.x + (posDiff.y*11); //see ascii art at top of this function
             ret.set(index);

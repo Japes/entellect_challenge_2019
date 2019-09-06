@@ -381,7 +381,7 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
         place_worm(true, 1, {30,15}, state); //friendly right next to us
         place_worm(true, 2, {0,0}, state); //friendly far away
 
-        place_worm(false, 1, {31,11}, state); //enemy in range to the north
+        auto target = place_worm(false, 1, {31,11}, state); //enemy in range to the north
         auto dedguy = place_worm(false, 2, {29,13}, state); //enemy in range NW
         dedguy->health = -1;
         place_worm(false, 3, {15,31}, state); //enemy out of range
@@ -412,6 +412,34 @@ TEST_CASE( "Get sensible snowballs", "[get_sensible_snowballs]" )
                         auto ret = NextTurn::GetValidSnowballs(true, &state, true);
                         INFO("shoots: " << ret)
                         REQUIRE(ret.count() == 0);
+                    }
+                }
+
+                AND_WHEN("The heuristic doesn't block him (health)")
+                {
+                    worm13->health = 49;
+                    state.roundNumber = 7;
+                    AND_WHEN("The dude is frozen")
+                    {
+                        target->roundsUntilUnfrozen = 2;
+                        THEN("GetValidSnowballs returns correct")
+                        {
+                            auto ret = NextTurn::GetValidSnowballs(true, &state, true);
+                            REQUIRE(ret.count() == 0);
+                        }
+                    }
+                    AND_WHEN("The dude isnt frozen")
+                    {
+                        THEN("GetValidSnowballs returns correct")
+                        {
+                            auto ret = NextTurn::GetValidSnowballs(true, &state, true);
+                            INFO("shoots: " << ret)
+                            CHECK(ret.count() == 1);
+                            CHECK(ret.test(16));
+                            CHECK(!ret.test(36)); //dedguy
+                            CHECK(!ret.test(56)); //returned this when i confused x with y
+                            CHECK(NextTurn::GetSnowball(worm13, 16)->GetCommandString() == "snowball 31 11"); 
+                        }
                     }
                 }
 
