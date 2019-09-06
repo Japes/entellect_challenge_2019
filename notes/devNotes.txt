@@ -25,12 +25,15 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
+      35 33 35_p2
       seems like i do better when im player1?  why could that be??
          maybe do a run tonight with a worm against itself
          swap the player it's in terms of in the playthroughs.
             if bias still player1 - its a thing, not to do with that
             if bias player 2 - its a thing, to do with that
             if no bias....then it's still unknown
+      i think i need to check 35 and 33 again
+      lowering c should help!
 
       BANANA ONLY FULL HOUSE (13)
       HEURISTIC IMPROVEMENT?
@@ -221,3 +224,141 @@ last time i checked it looks like we're spending about 50% of the time in GetRan
    when there are worms nearby GetValidShoots dominates because of the "consider movement" thing
    otherwise a noticable bottleneck is GameState::Worm_at in NextTurn::GetValidTeleportDigs
 
+
+nodedepth 1======================================================================================================
+
+Thread 3 (Thread 0x7ffffdd30700 (LWP 22588)):
+#0  0x000000000042cae0 in _ZN9GameState7Worm_atER4WormRK8Position.isra.12 (pos=..., w=...) at ../GameEngine/GameState/GameState.hpp:114
+#1  GameState::Worm_at(Position const&) (this=0x7ffffdd2f710, pos=...) at ../GameEngine/GameState/GameState.hpp:124
+#2  0x000000000049d4d2 in NextTurn::GetTeleportDig(Worm*, GameState*, unsigned int) (worm=worm@entry=0x7ffffdd2f820, state=state@entry=0x7ffffdd2f710, index=<optimized out>) at ../GameEngine/NextTurn.cpp:311
+#3  0x00000000004a0f90 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffdd2f710, trimStupidMoves=<optimized out>) at ../GameEngine/NextTurn.cpp:361
+#4  0x00000000004efde9 in std::_Bind<std::shared_ptr<Command> (*(std::_Placeholder<1>, std::_Placeholder<2>, bool))(bool, GameState*, bool)>::__call<std::shared_ptr<Command>, bool&&, GameState*&&, 0ul, 1ul, 2ul>(std::tuple<bool&&, GameState*&&>&&, std::_Index_tuple<0ul, 1ul, 2ul>) () at /usr/include/c++/5/functional:1074
+#5  std::_Bind<std::shared_ptr<Command> (*(std::_Placeholder<1>, std::_Placeholder<2>, bool))(bool, GameState*, bool)>::operator()<bool, GameState*, std::shared_ptr<Command> >(bool&&, GameState*&&) ()
+    at /usr/include/c++/5/functional:1133
+#6  std::_Function_handler<std::shared_ptr<Command> (bool, GameState*), std::_Bind<std::shared_ptr<Command> (*(std::_Placeholder<1>, std::_Placeholder<2>, bool))(bool, GameState*, bool)> >::_M_invoke(std::_Any_data const&, bool&&, GameState*&&) (__functor=..., __args#0=<optimized out>, __args#1=<optimized out>) at /usr/include/c++/5/functional:1857
+#7  0x00000000004fc576 in std::function<std::shared_ptr<Command> (bool, GameState*)>::operator()(bool, GameState*) const () at /usr/include/c++/5/functional:2267
+#8  GameEngine::Playthrough(std::shared_ptr<Command>, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, GameState*)>, EvaluatorBase const*, int, int&) [clone .constprop.576] (
+    this=0x7ffffdd2f6d0, player1_Command=..., player2_Command=..., nextMoveFn=..., evaluator=0x7ffffffecae0, depth=8, numPlies=@0x7ffffdd2feac: 4) at ../GameEngine/GameEngine.cpp:176
+
+
+Thread 3 (Thread 0x7ffffdd30700 (LWP 22588)):
+#0  0x00007fffff0b41c3 in __GI___libc_malloc (bytes=40) at malloc.c:2926
+#1  0x00007ffffed2de78 in operator new(unsigned long) () from /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+#2  0x000000000049d5ec in __gnu_cxx::new_allocator<std::_Sp_counted_ptr_inplace<DigCommand, std::allocator<DigCommand>, (__gnu_cxx::_Lock_policy)2> >::allocate(unsigned long, void const*) ()
+    at /usr/include/c++/5/ext/new_allocator.h:104
+#3  std::allocator_traits<std::allocator<std::_Sp_counted_ptr_inplace<DigCommand, std::allocator<DigCommand>, (__gnu_cxx::_Lock_policy)2> > >::allocate(std::allocator<std::_Sp_counted_ptr_inplace<DigCommand, std::allocator<DigCommand>, (__gnu_cxx::_Lock_policy)2> >&, unsigned long) () at /usr/include/c++/5/bits/alloc_traits.h:491
+#4  std::__allocate_guarded<std::allocator<std::_Sp_counted_ptr_inplace<DigCommand, std::allocator<DigCommand>, (__gnu_cxx::_Lock_policy)2> > >(std::allocator<std::_Sp_counted_ptr_inplace<DigCommand, std::allocator<DigCommand>, (__gnu_cxx::_Lock_policy)2> >&) () at /usr/include/c++/5/bits/allocated_ptr.h:102
+#5  __base_ctor  (__a=..., __args#0=<unknown type in /mnt/c/Users/jpdac/dev/entellect_challenge_2019/src/unittests/bin/unit_tests, CU 0x282334, DIE 0x28983a>, this=<optimized out>)
+    at /usr/include/c++/5/bits/shared_ptr_base.h:615
+#6  __base_ctor  (__args#0=<unknown type in /mnt/c/Users/jpdac/dev/entellect_challenge_2019/src/unittests/bin/unit_tests, CU 0x282334, DIE 0x291eea>, __a=..., __tag=..., this=<optimized out>)
+    at /usr/include/c++/5/bits/shared_ptr_base.h:1097
+#7  std::shared_ptr<DigCommand>::shared_ptr<std::allocator<DigCommand>, Position&>(std::_Sp_make_shared_tag, std::allocator<DigCommand> const&, Position&) () at /usr/include/c++/5/bits/shared_ptr.h:319
+#8  std::allocate_shared<DigCommand, std::allocator<DigCommand>, Position&>(std::allocator<DigCommand> const&, Position&) () at /usr/include/c++/5/bits/shared_ptr.h:620
+#9  std::make_shared<DigCommand, Position&>(Position&) () at /usr/include/c++/5/bits/shared_ptr.h:636
+#10 NextTurn::GetTeleportDig(Worm*, GameState*, unsigned int) (worm=worm@entry=0x7ffffdd2f9d0, state=state@entry=0x7ffffdd2f710, index=<optimized out>) at ../GameEngine/NextTurn.cpp:316
+#11 0x00000000004a0f90 in NextTurn::GetRandomValidMoveForPlayer(bool, GameState*, bool) (player1=<optimized out>, state=0x7ffffdd2f710, trimStupidMoves=<optimized out>) at ../GameEngine/NextTurn.cpp:361
+#12 0x00000000004efde9 in std::_Bind<std::shared_ptr<Command> (*(std::_Placeholder<1>, std::_Placeholder<2>, bool))(bool, GameState*, bool)>::__call<std::shared_ptr<Command>, bool&&, GameState*&&, 0ul, 1ul, 2ul>(std::tuple<bool&&, GameState*&&>&&, std::_Index_tuple<0ul, 1ul, 2ul>) () at /usr/include/c++/5/functional:1074
+#13 std::_Bind<std::shared_ptr<Command> (*(std::_Placeholder<1>, std::_Placeholder<2>, bool))(bool, GameState*, bool)>::operator()<bool, GameState*, std::shared_ptr<Command> >(bool&&, GameState*&&) ()
+    at /usr/include/c++/5/functional:1133
+#14 std::_Function_handler<std::shared_ptr<Command> (bool, GameState*), std::_Bind<std::shared_ptr<Command> (*(std::_Placeholder<1>, std::_Placeholder<2>, bool))(bool, GameState*, bool)> >::_M_invoke(std::_Any_data const&, bool&&, GameState*&&) (__functor=..., __args#0=<optimized out>, __args#1=<optimized out>) at /usr/include/c++/5/functional:1857
+#15 0x00000000004fc4c1 in std::function<std::shared_ptr<Command> (bool, GameState*)>::operator()(bool, GameState*) const () at /usr/include/c++/5/functional:2267
+#16 GameEngine::Playthrough(std::shared_ptr<Command>, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, GameState*)>, EvaluatorBase const*, int, int&) [clone .constprop.576] (
+    this=0x7ffffdd2f6d0, player1_Command=..., player2_Command=..., nextMoveFn=..., evaluator=0x7ffffffecae0, depth=5, numPlies=@0x7ffffdd2feac: 7) at ../GameEngine/GameEngine.cpp:177
+
+
+
+
+
+Thread 3 (Thread 0x7ffffdd30700 (LWP 22588)):
+#0  std::__find_if<Worm*, __gnu_cxx::__ops::_Iter_pred<GameEngine::GetResult(GameState*)::{lambda(Worm&)#1}> >(__gnu_cxx::__ops::_Iter_pred<GameEngine::GetResult(GameState*)::{lambda(Worm&)#1}>, __gnu_cxx::__ops::_Iter_pred<GameEngine::GetResult(GameState*)::{lambda(Worm&)#1}>, __gnu_cxx::__ops::_Iter_pred<GameEngine::GetResult(GameState*)::{lambda(Worm&)#1}>, std::random_access_iterator_tag) [clone .isra.10] [clone .lto_priv.1319] (__first=__first@entry=0x7ffffdd2f730, __last=__last@entry=0x7ffffdd2f898) at /usr/include/c++/5/bits/stl_algo.h:140
+#1  0x000000000049e094 in __find_if () at /usr/include/c++/5/bits/stl_algo.h:162
+#2  find_if () at /usr/include/c++/5/bits/stl_algo.h:3816
+#3  none_of () at /usr/include/c++/5/bits/stl_algo.h:526
+#4  any_of () at /usr/include/c++/5/bits/stl_algo.h:544
+#5  GameEngine::GetResult(GameState*) (state=state@entry=0x7ffffdd2f710) at ../GameEngine/GameEngine.cpp:210
+#6  0x00000000004bfd3c in UpdateWinCondition (this=0x7ffffdd2f6d0) at ../GameEngine/GameEngine.cpp:137
+#7  GameEngine::AdvanceState(Command const&, Command const&) (this=this@entry=0x7ffffdd2f6d0, player1_command=..., player2_command=...) at ../GameEngine/GameEngine.cpp:77
+#8  0x00000000004fc548 in GameEngine::Playthrough(std::shared_ptr<Command>, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, GameState*)>, EvaluatorBase const*, int, int&) [clone .constprop.576] (this=0x7ffffdd2f6d0, player1_Command=..., player2_Command=..., nextMoveFn=..., evaluator=0x7ffffffecae0, depth=11, numPlies=@0x7ffffdd2feac: 1) at ../GameEngine/GameEngine.cpp:175
+
+Thread 2 (Thread 0x7ffffe540700 (LWP 22587)):
+#0  GameEngine::GetResult(GameState*) (state=state@entry=0x7ffffe53f710) at ../GameEngine/GameEngine.cpp:207
+#1  0x00000000004bfd3c in UpdateWinCondition (this=0x7ffffe53f6d0) at ../GameEngine/GameEngine.cpp:137
+#2  GameEngine::AdvanceState(Command const&, Command const&) (this=this@entry=0x7ffffe53f6d0, player1_command=..., player2_command=...) at ../GameEngine/GameEngine.cpp:77
+#3  0x00000000004fc548 in GameEngine::Playthrough(std::shared_ptr<Command>, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, GameState*)>, EvaluatorBase const*, int, int&) [clone .constprop.576] (this=0x7ffffe53f6d0, player1_Command=..., player2_Command=..., nextMoveFn=..., evaluator=0x7ffffffecae0, depth=5, numPlies=@0x7ffffe53feac: 7) at ../GameEngine/GameEngine.cpp:175
+
+Thread 3 (Thread 0x7ffffdd30700 (LWP 22588)):
+#0  operator() () at ../GameEngine/GameState/Player.cpp:81
+#1  for_each (__f=..., __last=0x7ffffdd2f898, __first=0x7ffffdd2f730) at /usr/include/c++/5/bits/stl_algo.h:3767
+#2  Player::RecalculateHealth() (this=0x7ffffdd2f710) at ../GameEngine/GameState/Player.cpp:81
+#3  0x00000000004bf7b8 in ApplyLava (this=0x7ffffdd2f6d0) at ../GameEngine/GameEngine.cpp:116
+#4  GameEngine::AdvanceState(Command const&, Command const&) (this=this@entry=0x7ffffdd2f6d0, player1_command=..., player2_command=...) at ../GameEngine/GameEngine.cpp:31
+#5  0x00000000004fc548 in GameEngine::Playthrough(std::shared_ptr<Command>, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, GameState*)>, EvaluatorBase const*, int, int&) [clone .constprop.576] (this=0x7ffffdd2f6d0, player1_Command=..., player2_Command=..., nextMoveFn=..., evaluator=0x7ffffffecae0, depth=11, numPlies=@0x7ffffdd2feac: 1) at ../GameEngine/GameEngine.cpp:175
+
+
+Thread 2 (Thread 0x7ffffe540700 (LWP 22587)):
+#0  GameState::LavaAt(Position) (this=0x7ffffe53f710, pos=...) at ../GameEngine/GameState/GameState.hpp:98
+#1  0x00000000004bf71f in operator() (worm=..., __closure=<optimized out>) at ../GameEngine/GameEngine.cpp:108
+#2  ForAllLiveWorms (wormFn=<optimized out>, this=0x7ffffe53f710) at ../GameEngine/GameState/GameState.hpp:164
+#3  ApplyLava (this=0x7ffffe53f6d0) at ../GameEngine/GameEngine.cpp:114
+#4  GameEngine::AdvanceState(Command const&, Command const&) (this=this@entry=0x7ffffe53f6d0, player1_command=..., player2_command=...) at ../GameEngine/GameEngine.cpp:31
+#5  0x00000000004fc548 in GameEngine::Playthrough(std::shared_ptr<Command>, std::shared_ptr<Command>, std::function<std::shared_ptr<Command> (bool, GameState*)>, EvaluatorBase const*, int, int&) [clone .constprop.576] (this=0x7ffffe53f6d0, player1_Command=..., player2_Command=..., nextMoveFn=..., evaluator=0x7ffffffecae0, depth=6, numPlies=@0x7ffffe53feac: 6) at ../GameEngine/GameEngine.cpp:175
+
+
+
+
+
+
+
+
+Thread 2 (Thread 0x7ffffe540700 (LWP 22587)):
+#0  AddPlaythroughResult (w=0.411702156, this=0x7ffff802c0b0) at ../MonteCarlo/MCMove.cpp:22
+#1  MonteCarloNode::AddPlaythrough(int&, bool) [clone .constprop.534] (this=0x7ffff802b830, numplies=@0x7ffffe53feac: 12, canMakeChild=true) at ../MonteCarlo/MonteCarloNode.cpp:93
+
+
+
+
+    Thread 3 (Thread 0x7ffffdd30700 (LWP 22588)):
+#0  __lll_lock_wait () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:135
+#1  0x00007ffffe559dbd in __GI___pthread_mutex_lock (mutex=0x7ffff802b880) at ../nptl/pthread_mutex_lock.c:80
+#2  0x00000000004c9c3a in __gthread_mutex_lock () at /usr/include/x86_64-linux-gnu/c++/5/bits/gthr-default.h:748
+#3  lock (this=0x7ffff802b880) at /usr/include/c++/5/mutex:135
+#4  MonteCarloNode::AddPlaythrough(int&, bool) [clone .constprop.534] (this=0x7ffff802b830, numplies=@0x7ffffdd2feac: 12, canMakeChild=true) at ../MonteCarlo/MonteCarloNode.cpp:88
+
+Thread 2 (Thread 0x7ffffe540700 (LWP 22587)):
+#0  __lll_unlock_wake () at ../sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:371
+#1  0x00007ffffe55b4ff in __pthread_mutex_unlock_usercnt (decr=1, mutex=0x792c90) at pthread_mutex_unlock.c:55
+#2  __GI___pthread_mutex_unlock (mutex=0x792c90) at pthread_mutex_unlock.c:314
+#3  0x00000000004c9ca6 in __gthread_mutex_unlock () at /usr/include/x86_64-linux-gnu/c++/5/bits/gthr-default.h:778
+#4  std::mutex::unlock() () at /usr/include/c++/5/mutex:153
+#5  MonteCarloNode::AddPlaythrough(int&, bool) [clone .constprop.534] (this=0x792c40, numplies=@0x7ffffe53feac: 12, canMakeChild=true) at ../MonteCarlo/MonteCarloNode.cpp:96
+
+
+
+
+Thread 2 (Thread 0x7ffffe540700 (LWP 22587)):
+#0  0x00000000004fb0a3 in std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release() [clone .constprop.639] (this=0x7ffff80280f0) at /usr/include/c++/5/bits/shared_ptr_base.h:147
+#1  0x00000000004c9cc4 in std::__shared_count<(__gnu_cxx::_Lock_policy)2>::~__shared_count() () at /usr/include/c++/5/bits/shared_ptr_base.h:659
+#2  std::__shared_ptr<MCMove, (__gnu_cxx::_Lock_policy)2>::~__shared_ptr() () at /usr/include/c++/5/bits/shared_ptr_base.h:925
+#3  std::shared_ptr<MCMove>::~shared_ptr() () at /usr/include/c++/5/bits/shared_ptr.h:93
+#4  MonteCarloNode::AddPlaythrough(int&, bool) [clone .constprop.534] (this=0x7ffff8027b10, numplies=@0x7ffffe53feac: 12, canMakeChild=true) at ../MonteCarlo/MonteCarloNode.cpp:70
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+building tree======================================================================================================
