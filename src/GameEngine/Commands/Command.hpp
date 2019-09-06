@@ -5,9 +5,6 @@
 #include <memory>
 #include <string>
 
-//using GameStatePtr = std::shared_ptr<GameState>;
-using GameStatePtr = GameState*;
-
 class Command
 {
 	public:

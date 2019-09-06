@@ -2,7 +2,7 @@
 #define MCNODE_H
 
 #include "PlayersMonteCarlo.hpp"
-#include "Evaluators/EvaluatorBase.hpp"
+#include "Evaluators.hpp"
 #include <mutex>
 #include <unordered_map>
 
@@ -14,10 +14,10 @@ class MonteCarloNode
     public:
     MonteCarloNode(std::shared_ptr<GameState> state, 
                     const std::vector<std::shared_ptr<Command>>& p1_cmds, const std::vector<std::shared_ptr<Command>>& p2_cmds,
-                    const EvaluatorBase* eval, 
+                    EvaluationFn_t eval, 
                     int nodeDepth, int playthroughDepth, float c);
 
-    MonteCarloNode(std::shared_ptr<GameState> state, const EvaluatorBase* eval, int nodeDepth, int playthroughDepth, float c);
+    MonteCarloNode(std::shared_ptr<GameState> state, EvaluationFn_t eval, int nodeDepth, int playthroughDepth, float c);
 
     void Promote();
     float AddPlaythrough(int& numplies, bool canMakeChild = true);
@@ -41,7 +41,7 @@ class MonteCarloNode
     PlayersMonteCarlo _player1_mc;
     PlayersMonteCarlo _player2_mc;
     std::mutex _mtx;
-    const EvaluatorBase* _evaluator;
+    EvaluationFn_t _evaluator;
     int _nodeDepth;
     int _playthroughDepth;
     float _c;

@@ -10,6 +10,8 @@
 
 #define first_bit_set (0x8000000000000000)
 
+using GameStatePtr = GameState*;
+
 //current state of the game
 class GameState
 {
@@ -47,6 +49,8 @@ class GameState
     void MarkLavaRemovedThisRound(Position pos);
     bool LavaWasRemovedThisRound(Position pos);
     void ClearLavasRemovedThisRound();
+
+    std::vector<Position> GetHealthPackPos();
 
     bool operator==(const GameState &other) const;
 

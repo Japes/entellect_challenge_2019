@@ -9,9 +9,7 @@
 #include "../MonteCarlo/MCMove.hpp"
 #include "../MonteCarlo/PlayersMonteCarlo.hpp"
 #include "../MonteCarlo/MonteCarloNode.hpp"
-#include "../GameEngine/Evaluators/HealthEvaluator.hpp"
-#include "../GameEngine/Evaluators/ScoreEvaluator.hpp"
-
+#include "../GameEngine/Evaluators.hpp"
 
 TEST_CASE( "Best move", "[BestNode]" ) {
     GIVEN("A bunch of moves passed to a monte carlo")
@@ -54,10 +52,9 @@ TEST_CASE( "Childnode generation works as I expect - max depth", "[BestNode][bra
         place_worm(!player1, 2, {7,4}, state);
         place_worm(!player1, 3, {7,7}, state);
 
-        HealthEvaluator eval;
         int nodeDepth = GENERATE(1, 2, 3, 54, 450, 161653);
         int playthroughDepth = GENERATE(1, 2, 5, 10, 100);
-        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, 2);
+        MonteCarloNode MCNode(state, Evaluators::Health, nodeDepth, playthroughDepth, 2);
 
         REQUIRE(MCNode.NumImmediateChildren() == 0);
 
@@ -97,10 +94,9 @@ TEST_CASE( "Childnode generation works as I expect - max depth", "[BestNode][bra
         place_worm(!player1, 2, {7,4}, state);
         place_worm(!player1, 3, {7,7}, state);
 
-        HealthEvaluator eval;
         int nodeDepth = 0;
         int playthroughDepth = GENERATE(1, 2, 5, 10, 100);
-        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, 2);
+        MonteCarloNode MCNode(state, Evaluators::Health, nodeDepth, playthroughDepth, 2);
 
         REQUIRE(MCNode.NumImmediateChildren() == 0);
 
@@ -130,11 +126,9 @@ TEST_CASE( "Childnode generation works as I expect - build tree", "[tree]" ) {
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapFight.json");
         auto state = GameStateLoader::LoadGameStatePtr(roundJSON);
 
-
-        HealthEvaluator eval;
         int nodeDepth = GENERATE(-1);//, -2, -3, -54161653);
         int playthroughDepth = GENERATE(10);//, 2, 5, 10, 100);
-        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, 1.4f);
+        MonteCarloNode MCNode(state, Evaluators::Health, nodeDepth, playthroughDepth, 1.4f);
 
         REQUIRE(MCNode.NumImmediateChildren() == 0);
 
@@ -226,10 +220,9 @@ TEST_CASE( "Child nodes don't break calculations", "[ChildNodeCalc]" ) {
         auto state1 = std::make_shared<GameState>(*state.get());
         auto state2 = std::make_shared<GameState>(*state.get());
 
-        HealthEvaluator eval;
-        MonteCarloNode MCNode0(state0, &eval, 0, 3, 2);
-        MonteCarloNode MCNode1(state1, &eval, 1, 3, 2);
-        MonteCarloNode MCNode2(state2, &eval, 2, 1, 2);
+        MonteCarloNode MCNode0(state0, Evaluators::Health, 0, 3, 2);
+        MonteCarloNode MCNode1(state1, Evaluators::Health, 1, 3, 2);
+        MonteCarloNode MCNode2(state2, Evaluators::Health, 2, 1, 2);
 
         WHEN("We do a playthroughs")
         {
@@ -299,11 +292,10 @@ TEST_CASE( "Debug monte carlo", "[.DebugMonteCarlo]" ) {
             }
         }
 
-        ScoreEvaluator eval;
         int nodeDepth = 0;
         int playthroughDepth = 2;
         float c = std::sqrt(2);
-        MonteCarloNode MCNode(state, &eval, nodeDepth, playthroughDepth, c);
+        MonteCarloNode MCNode(state, Evaluators::Score, nodeDepth, playthroughDepth, c);
 
         WHEN("We do playthroughs")
         {
@@ -334,8 +326,7 @@ TEST_CASE( "TryGetComputedState", "[TryGetComputedState]" ) {
         place_worm(!player1, 2, {20,10}, state);
         place_worm(!player1, 3, {20,20}, state);
 
-        HealthEvaluator eval;
-        MonteCarloNode MCNode(state, &eval, 1, 3, 2);
+        MonteCarloNode MCNode(state, Evaluators::Health, 1, 3, 2);
 
         //after this, should have 8 children with each players 8 moves
         int dummy;
@@ -398,8 +389,7 @@ TEST_CASE( "Promotion", "[promotion]" ) {
         place_worm(!player1, 2, {20,10}, state);
         place_worm(!player1, 3, {20,20}, state);
 
-        HealthEvaluator eval;
-        MonteCarloNode MCNode(state, &eval, 0, 3, 2);
+        MonteCarloNode MCNode(state, Evaluators::Health, 0, 3, 2);
 
         REQUIRE(MCNode.MaxTreeDepth() == 1);
         REQUIRE(MCNode.NumImmediateChildren() == 0);

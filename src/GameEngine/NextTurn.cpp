@@ -460,12 +460,12 @@ std::string NextTurn::TryApplySelect(bool player1, GameStatePtr state, std::func
 //to be used with TryApplySelect
 bool NextTurn::WormCanShoot(bool player1, GameStatePtr state)
 {
-    Player* original_state_player = state->GetPlayer(player1);
-    return !original_state_player->GetCurrentWorm()->IsFrozen() && NextTurn::GetValidShoots(player1, state, true).any();
+    Player* player = state->GetPlayer(player1);
+    return !player->GetCurrentWorm()->IsFrozen() && NextTurn::GetValidShoots(player1, state, true).any();
 }
 
 bool NextTurn::WormIsntFrozen(bool player1, GameStatePtr state)
 {
-    Player* original_state_player = state->GetPlayer(player1);
-    return !original_state_player->GetCurrentWorm()->IsFrozen();
+    Player* player = state->GetPlayer(player1);
+    return !player->GetCurrentWorm()->IsFrozen();
 }

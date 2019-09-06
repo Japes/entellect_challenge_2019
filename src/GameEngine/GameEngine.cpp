@@ -163,7 +163,7 @@ void GameEngine::ApplyPowerups()
 float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command, 
                             std::shared_ptr<Command> player2_Command, 
                             std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn,
-                            const EvaluatorBase* evaluator,
+                            EvaluationFn_t evaluator,
                             int depth,
                             int& numPlies)
 {
@@ -179,8 +179,6 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         ++numPlies;
     }
 
-    auto evaluationAfter = evaluator->Evaluate(true, _state); //always in terms of player 1
-
     //evaluate the playthrough
 
     //first, best/worst possible outcome
@@ -192,10 +190,10 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         }
     }
 
-    float frac = evaluationAfter / evaluator->BestPossible();
+    auto evaluation = evaluator(true, _state); //always in terms of player 1
 
-    // clamp scorediff to 0.25 - 0.75
-    return Utilities::NormaliseTo(frac, 0.25, 0.75);
+    // clamp scorediff so that proper wins are always awesome
+    return Utilities::NormaliseTo(evaluation, 0.2, 0.8);
 }
 
 GameEngine::GameResult GameEngine::GetResult()

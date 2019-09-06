@@ -5,9 +5,9 @@
 #include "GameEngineTestUtils.hpp"
 #include "Utilities.hpp"
 #include "../GameState/GameStateLoader.hpp"
-#include "Evaluators/HealthEvaluator.hpp"
 #include "../../Bot/Bot.hpp"
 #include "../GameEngine/NextTurn.hpp"
+#include "Evaluators.hpp"
 
 TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
     GIVEN("game states before/after throwing a snowball and a Bot")
@@ -26,8 +26,7 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
-        HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, nodeDepth, 
+        Bot bot(playThroughDepth, nodeDepth, 
                     dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot, 
                     mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
@@ -86,8 +85,7 @@ TEST_CASE( "AdjustOpponentSpellCount", "[AdjustOpponentSpellCount]" ) {
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
-        HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, nodeDepth, 
+        Bot bot(playThroughDepth, nodeDepth, 
                     dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                     mcTime_ns, mc_c, mc_runsBeforeClockCheck);
         
@@ -146,8 +144,7 @@ TEST_CASE( "Basic sanity", "[.BotSanity]" ) {
         uint64_t mcTime_ns{880000000};
         float mc_c{std::sqrt(2)};
         int mc_runsBeforeClockCheck{50};
-        HealthEvaluator eval;
-        Bot bot(&eval, playThroughDepth, nodeDepth, 
+        Bot bot(playThroughDepth, nodeDepth, 
                 dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                 mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 

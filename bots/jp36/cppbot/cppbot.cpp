@@ -3,7 +3,7 @@
 #include <string>
 #include "Utilities.hpp"
 #include "Bot.hpp"
-#include "Evaluators/MaxHpScoreEvaluator.hpp"
+#include "Evaluators.hpp"
 #include "NextTurn.hpp"
 
 std::string executeRound(Bot& bot, std::string& roundNumber)
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     int playThroughDepth{11};
     int nodeDepth{1};
 
-    int dirtsForBanana{12}; //only if super awesome
+    int dirtsForBanana{13}; //only if super awesome
     int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
     bool patternDetectEnable{false};
 
@@ -33,10 +33,8 @@ int main(int argc, char** argv)
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
-    MaxHpScoreEvaluator eval;
-    Bot bot(&eval, 
-            playThroughDepth, nodeDepth, 
-            dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+    Bot bot(playThroughDepth, nodeDepth, 
+            dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormIsntFrozen,
             mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
     for (std::string roundNumber; std::getline(std::cin, roundNumber);) 

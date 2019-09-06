@@ -1,15 +1,12 @@
 #include "catch.hpp"
 #include "../GameEngine/GameEngine.hpp"
-#include "../GameEngine/Evaluators/AveHpScoreEvaluator.hpp"
-#include "../GameEngine/Evaluators/MaxHpScoreEvaluator.hpp"
+#include "Evaluators.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "../Utilities/Utilities.hpp"
 
 TEST_CASE( "AveHpScoreEvaluator", "[AveHpScoreEvaluator][.debug]" ) {
     GIVEN("an AveHpScoreEvaluator and some states")
     {
-        AveHpScoreEvaluator eval;
-
         GameState state;
         /*
             0   1   2   
@@ -31,13 +28,13 @@ TEST_CASE( "AveHpScoreEvaluator", "[AveHpScoreEvaluator][.debug]" ) {
 
         GameEngine eng(&state);
         eng.AdvanceState(DigCommand({2,1}), DoNothingCommand());
-        auto evaluationAfter = eval.Evaluate(player1, &state);
+        auto evaluationAfter = Evaluators::AveHpScore(player1, &state);
 
         INFO(" evaluationAfter: " << evaluationAfter);
 
         WHEN("We work out the evaluation as done in the engine")
         {
-            float frac = evaluationAfter / eval.BestPossible();
+            float frac = evaluationAfter;
             // clamp scorediff to 0.25 - 0.75
             auto ret = Utilities::NormaliseTo(frac, 0.25, 0.75);
 
@@ -53,8 +50,6 @@ TEST_CASE( "AveHpScoreEvaluator", "[AveHpScoreEvaluator][.debug]" ) {
 TEST_CASE( "BananaBonus", "[BananaBonus]" ) {
     GIVEN("an MaxHpScoreEvaluator and some states")
     {
-        MaxHpScoreEvaluator eval;
-
         WHEN("We get the banana bonus")
         {
 
@@ -68,9 +63,9 @@ TEST_CASE( "BananaBonus", "[BananaBonus]" ) {
 
                     INFO("round: " << round);
 
-                    float bon1 = eval.GetBananaBonus(1, round);
-                    float bon2 = eval.GetBananaBonus(2, round);
-                    float bon3 = eval.GetBananaBonus(3, round);
+                    float bon1 = Evaluators::GetBananaBonus(1, round);
+                    float bon2 = Evaluators::GetBananaBonus(2, round);
+                    float bon3 = Evaluators::GetBananaBonus(3, round);
 
                     REQUIRE(bon3 >= bon2);
                     REQUIRE(bon2 >= bon1);

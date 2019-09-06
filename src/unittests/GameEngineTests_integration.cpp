@@ -5,7 +5,6 @@
 #include "AllCommands.hpp"
 #include "GameEngineTestUtils.hpp"
 #include "NextTurn.hpp"
-#include "../Evaluators/ScoreEvaluator.hpp"
 #include "../../Bot/Bot.hpp"
 #include <sstream>
 #include <chrono>
@@ -14,7 +13,7 @@
 #include <dirent.h>
 #include "Utilities.hpp"
 #include "PlayersMonteCarlo.hpp"
-#include "Evaluators/HealthEvaluator.hpp"
+#include "Evaluators.hpp"
 #include <thread>
 #include <mutex>
 #include <cmath>
@@ -35,8 +34,7 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
-    HealthEvaluator evaluator;
-    Bot bot(&evaluator, playThroughDepth, nodeDepth, 
+    Bot bot(playThroughDepth, nodeDepth, 
             dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
             mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
@@ -196,7 +194,7 @@ TEST_CASE( "Comparison with java engine", "[.comparison]" ) {
     //std::vector<std::string> matches = GetFoldersInFolder("Test_files/matches");
 
     std::vector<std::string> matches;
-    matches.push_back("Test_files/matches/2019.09.02.20.44.18/"); //this one fails because i didn't run to the end.  But has select from frozen, those shouldn't fail.
+    matches.push_back("Test_files/matches/2019.09.02.20.44.18/"); //this one fails on turn 183 because i didn't run to the end.  But has select from frozen, those shouldn't fail.
     matches.push_back("Test_files/matches/2019.09.02.21.06.42/"); //this one fails on turn 153 because i didn't run to the end.  Bot reproduces "next worm order" fix.
 
     for(auto & match: matches) {
@@ -311,15 +309,14 @@ TEST_CASE( "Playthroughs from map", "[playthrough_map]" )
         auto roundJSON = Utilities::ReadJsonFile("./Test_files/JsonMapV3.json");
         auto state = GameStateLoader::LoadGameStatePtr(roundJSON);
         GameEngine eng(state);
-        auto evaluator = ScoreEvaluator();
-        
+
         WHEN("We do a playthrough to a depth -1")
         {
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, false);
             int depth = -1;
             int plies = 0;
 
-            eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), nextMoveFn, &evaluator, depth, plies);
+            eng.Playthrough(std::make_shared<DoNothingCommand>(), std::make_shared<DoNothingCommand>(), nextMoveFn, Evaluators::Score, depth, plies);
         }
     }
 }
@@ -335,12 +332,11 @@ TEST_CASE( "Debugging aid...", "[.debug]" )
             auto state1 = GameStateLoader::LoadGameStatePtr(roundJSON);
             auto state = std::make_shared<GameState>(*state1); //no idea why it needs to be done this way
             GameEngine eng(state);
-            auto evaluator = ScoreEvaluator();
 
             auto nextMoveFn = std::bind(NextTurn::GetRandomValidMoveForPlayer, std::placeholders::_1, std::placeholders::_2, true);
             int depth = 20;
             int plies = 0;
-            eng.Playthrough(nextMoveFn(true, state.get()), nextMoveFn(false, state.get()), nextMoveFn, &evaluator, depth, plies);
+            eng.Playthrough(nextMoveFn(true, state.get()), nextMoveFn(false, state.get()), nextMoveFn, Evaluators::Score, depth, plies);
         }
     }
 }

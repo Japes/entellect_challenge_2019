@@ -306,6 +306,11 @@ void GameState::ClearLavasRemovedThisRound()
     lavasRemovedThisRound.clear();
 }
 
+std::vector<Position> GameState::GetHealthPackPos()
+{
+    return healthPackPos;
+}
+
 bool GameState::operator==(const GameState &other) const
 {
     /*
