@@ -1,10 +1,11 @@
 TODO
 
-
+   THERE IS A PLAYER1 BIAS!
+      player 1 tends to get the health packs slightly more...
+      
 	ITS NOT DOING THE "DONT FREEZE FROZEN GUYS" THING PROPERLY...
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
-      building actual tree:                                                high,          medium
 
       staged evaluation functions (master control alg) (see safe mode)     medium/high    high
          explicit end thing of do i dance or do i shoot or WHAT
@@ -17,6 +18,7 @@ TODO
       resolve ties with random (mc and nextmove)                           low            low?
 	   rework output messages for a graphical view                          medium         medium/high
 	
+      building actual tree:                                                high,          medium
       banana (only if awesome) /snowball (no re).  use if low health.      low            high
 
    basic trends im seeing
@@ -25,16 +27,8 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
-      35 33 35_p2
-      seems like i do better when im player1?  why could that be??
-         maybe do a run tonight with a worm against itself
-         swap the player it's in terms of in the playthroughs.
-            if bias still player1 - its a thing, not to do with that
-            if bias player 2 - its a thing, to do with that
-            if no bias....then it's still unknown
-      i think i need to check 35 and 33 again
+      tonight - latest and greatest vs jp33
       lowering c should help!
-
       BANANA ONLY FULL HOUSE (13)
       HEURISTIC IMPROVEMENT?
 
@@ -146,6 +140,10 @@ to scan match logs for No Commands:
 
 to count number of moves of a certain type (note this isn't a true count, but its ok for relative comparisons)
    find . -wholename "*UltraSnob/PlayerCommand*" -exec grep -A 1 "Command: move" {} + | wc -l
+
+to delete big folders
+   go into folder then     DEL /F/Q/S *.* > NUL
+   go out of folder then   RMDIR /Q/S foldername
 
 BRAINSTORMING---------------------------------------------------------------------------------------
 

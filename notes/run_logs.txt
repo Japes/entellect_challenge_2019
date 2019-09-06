@@ -481,7 +481,7 @@ jp35_p2 has a known bug :(
 Engine version: 2019.3.2 -- 2019_September_06__08_13_01 -- ParallelID: 1
 (wins/draws/losses):     p35                     jp33                     
 jp35_p2:                 8/0/24                  7/0/26
-jp35:                                            13/1/18
+jp35:                                            32/1/32
 
 ------
 
@@ -499,3 +499,21 @@ jp35:                    5/1/10                   0/0/0                    14/0/
 jp35_p2:                 3/0/13                   2/0/14                   0/0/0                    (5/0/27)
 
 thursday afternoon, take out issue in jp35_p2...==============================================================================================================
+
+Engine version: 2019.3.2 -- 2019_September_06__06_29_53 -- ParallelID: 
+(wins/draws/losses):     jp35                     jp35_p2                  
+jp33:                    14/0/19                  18/0/16
+jp35:                    						  16/0/18                  
+
+
+Engine version: 2019.3.2 -- 2019_September_06__06_29_53 -- ParallelID: 
+(wins/draws/losses):     jp33                     jp35                     jp35_p2                  
+jp33:                    0/0/0                    11/0/6                   10/0/7                   (21/0/13)
+jp35:                    6/0/11                   0/0/0                    7/0/10                   (13/0/21)
+jp35_p2:                 7/0/10                   10/0/7                   0/0/0                    (17/0/17)
+
+Engine version: 2019.3.2 -- 2019_September_06__06_25_14 -- ParallelID: 1
+(wins/draws/losses):     jp35_p2                  jp35                     jp33                     
+jp35_p2:                 0/0/0                    8/0/9                    9/0/8                    (17/0/17)
+jp35:                    9/0/8                    0/0/0                    13/0/4                   (22/0/12)
+jp33:                    8/0/9                    4/0/13                   0/0/0                    (12/0/22)
