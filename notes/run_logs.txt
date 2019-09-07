@@ -538,3 +538,18 @@ Engine version: 2019.3.2 -- 2019_September_07__07_46_25 -- ParallelID:
 jp36:                    0/0/0                    21/0/17                  (21/0/17)
 jp35:                    17/0/21                  0/0/0                    (17/0/21)
 
+
+JP37 WAS SUPPOSED TO BE BETTER, MADE THINGS SYMMETRIC=========================================================================================================
+Engine version: 2019.3.2 -- 2019_September_07__03_34_28 -- ParallelID: 
+(wins/draws/losses):     jp36                     
+jp37:                    9/0/17
+
+Engine version: 2019.3.2 -- 2019_September_07__03_34_28 -- ParallelID: 
+(wins/draws/losses):     jp37                     jp36                     
+jp37:                    0/0/0                    4/0/9                    (4/0/9)
+jp36:                    9/0/4                    0/0/0                    (9/0/4)
+Engine version: 2019.3.2 -- 2019_September_07__03_39_59 -- ParallelID: 1
+(wins/draws/losses):     jp36                     jp37                     
+jp36:                    0/0/0                    8/0/5                    (8/0/5)
+jp37:                    5/0/8                    0/0/0                    (5/0/8)
+

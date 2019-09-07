@@ -5,6 +5,7 @@ import json
 #import plotly.express as px
 import matplotlib.pyplot as plt
 import numpy as np
+import fnmatch
 
 #script scrapes match logs for interesting metrics, and draws graphs
 
@@ -54,7 +55,7 @@ class PlayerData :
         axes.grid()
         axes.legend()
 
-    def PlotMovesPie(self, axes, playerA):
+    def PlotMovesPie(self, axes, playerA, matchWinner):
         numSelects = len(self.selects)
         numBananas = len(self.bananas)
         numSnowballs = len(self.snowballs)
@@ -79,7 +80,13 @@ class PlayerData :
 
         axes.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
         
-        axes.set(title=self.name)
+        plotTitle = self.name
+        if playerA and matchWinner == 'A':
+            plotTitle += " (winner)"
+        if not playerA and matchWinner == 'B':
+            plotTitle += " (winner)"
+			
+        axes.set(title=plotTitle)
         axes.legend()
 
 
@@ -134,6 +141,23 @@ def getRoundData(roundFolder) :
 
     return playerA, playerB, playerAData, playerBData
 
+def getMatchWinner(matchFolder) :
+    for dir_name in os.listdir(matchFolder):
+        dir = matchFolder + "/" + dir_name
+        if os.path.isdir(dir):
+            for file_name in os.listdir(dir):
+                if fnmatch.fnmatch(file_name, 'endGameState.txt'):
+                    resultFile = dir + "/" + file_name
+                    file = open(resultFile, "r")
+                    result = file.readlines()
+                    for line in result:
+                        if line.startswith("The winner is:") :
+                            winner = line[15]
+                            file.close()
+                            return winner
+                    file.close()
+                    return 'X'
+					
 ############################################################################
 
 if len(sys.argv) < 2:
@@ -162,7 +186,11 @@ while os.path.exists(roundFolder):
     roundNumber += 1
     roundFolder = _matchFolder + "/" + getRoundFolder(roundNumber)
 
-print("playerA: ", playerA.name, ", playerB: ", playerB.name)
+
+matchWinner = getMatchWinner(_matchFolder).strip()
+
+print("playerA: ", playerA.name, ", playerB: ", playerB.name, ", winner was ", matchWinner)
+
 
 fig, ax = plt.subplots()
 
@@ -170,8 +198,8 @@ playerA.PlotData(ax, rounds, True)
 playerB.PlotData(ax, rounds, False)
 
 fig2, [pieAxA, pieAxB] = plt.subplots(1,2)
-playerA.PlotMovesPie(pieAxA, True)
-playerB.PlotMovesPie(pieAxB, False)
+playerA.PlotMovesPie(pieAxA, True, matchWinner)
+playerB.PlotMovesPie(pieAxB, False, matchWinner)
 
 #fig.savefig("test.png")
 plt.show()
