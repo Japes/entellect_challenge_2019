@@ -1,10 +1,13 @@
 TODO
 
    THERE IS A PLAYER1 BIAS!
-      player 1 tends to get the health packs slightly more...
-	  if there's a tie, go towards centre
+      see if its the healthpacks - make a healthpack rusher
+         then go shower
+      try reverse the random bias to get end rather - see if bias goes to 2
+	      if there's a tie, go towards centre?
+
+   did I dance last night?
       
-	ITS NOT DOING THE "DONT FREEZE FROZEN GUYS" THING PROPERLY...
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
 

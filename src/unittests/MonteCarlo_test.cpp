@@ -220,8 +220,8 @@ TEST_CASE( "Child nodes don't break calculations", "[ChildNodeCalc]" ) {
         auto state1 = std::make_shared<GameState>(*state.get());
         auto state2 = std::make_shared<GameState>(*state.get());
 
-        MonteCarloNode MCNode0(state0, Evaluators::Health, 0, 3, 2);
-        MonteCarloNode MCNode1(state1, Evaluators::Health, 1, 3, 2);
+        MonteCarloNode MCNode0(state0, Evaluators::Health, 0, 3, 2); //nodeDepth, playthroughDepth, c
+        MonteCarloNode MCNode1(state1, Evaluators::Health, 1, 2, 2);
         MonteCarloNode MCNode2(state2, Evaluators::Health, 2, 1, 2);
 
         WHEN("We do a playthroughs")

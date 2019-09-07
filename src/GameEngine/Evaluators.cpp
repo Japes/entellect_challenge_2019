@@ -100,7 +100,18 @@ float Evaluators::MaxHpScore (bool player1, GameStatePtr state)
 float Evaluators::RushHealth (bool player1, GameStatePtr state)
 {
     Player* myPlayer = state->GetPlayer(player1);
-    Worm* worm = myPlayer->GetCurrentWorm();
+
+    
+    //NOTE: be careful evaluating things in terms of myPlayer->GetCurrentWorm().
+    // this will use whichever worm is current at the tip of the playout, NOT the actuall current worm!
+    //    Worm* worm = myPlayer->GetCurrentWorm();
+
+
+    Worm* worm = myPlayer->GetWormById(1);
+
+    if(worm == nullptr) {
+        return 0;
+    }
 
     float magic = 1000000;
     float minDist = magic;
