@@ -27,7 +27,7 @@ EvaluationFn_t GetEvaluator(bool player1, GameStatePtr state)
     //int numLiveWormsMe = 0;
     //state->ForAllLiveWorms(player1, [&](Worm& worm) { ++numLiveWormsMe; });
 
-    if(state->GetHealthPackPos().size()) {// > 0 && me->GetCurrentWorm()->id == 1) {
+    if(state->GetHealthPackPos().size() > 0 && me->GetCurrentWorm()->id == 1) {
         std::cerr << "(" << __FUNCTION__ << ") WORM RUSHING-------------" << std::endl;
         return Evaluators::RushHealth;
     }

@@ -65,7 +65,8 @@ TEST_CASE( "Observe mc results", "[.integration]" ) {
     float mc_c{std::sqrt(2)};
     int mc_runsBeforeClockCheck{50};
 
-    rapidjson::Document file = Utilities::ReadJsonFile("./Test_files/round1.json");
+    rapidjson::Document fileP1 = Utilities::ReadJsonFile("./Test_files/round1P1.json");
+    rapidjson::Document fileP2 = Utilities::ReadJsonFile("./Test_files/round1P2.json");
 
     GetEvaluatorFn_t eval = [&](bool, GameStatePtr){ return Evaluators::RushHealth; };
 
@@ -76,7 +77,8 @@ TEST_CASE( "Observe mc results", "[.integration]" ) {
                 dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                 mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-        bot.runStrategy(file);
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
         CHECK(false);
     }
 
@@ -87,7 +89,8 @@ TEST_CASE( "Observe mc results", "[.integration]" ) {
                 dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                 mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-        bot.runStrategy(file);
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
         CHECK(false);
     }
 
@@ -98,7 +101,8 @@ TEST_CASE( "Observe mc results", "[.integration]" ) {
                 dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                 mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-        bot.runStrategy(file);
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
         CHECK(false);
     }
 
@@ -109,7 +113,8 @@ TEST_CASE( "Observe mc results", "[.integration]" ) {
                 dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                 mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-        bot.runStrategy(file);
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
         CHECK(false);
     }
 
@@ -120,7 +125,8 @@ TEST_CASE( "Observe mc results", "[.integration]" ) {
                 dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
                 mcTime_ns, mc_c, mc_runsBeforeClockCheck);
 
-        bot.runStrategy(file);
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
         CHECK(false);
     }
 }

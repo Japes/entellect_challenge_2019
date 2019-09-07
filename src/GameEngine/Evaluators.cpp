@@ -1,5 +1,13 @@
 #include "Evaluators.hpp"
 
+
+    //NOTE: be careful evaluating things in terms of myPlayer->GetCurrentWorm().
+    // this will use whichever worm is current at the tip of the playout, NOT the actuall current worm!
+    //    Worm* worm = myPlayer->GetCurrentWorm();
+
+    //NOTE: evaulators are not always zero-sum.
+    //Calling classes need to call this separately for each player if they want both results.
+
 float Evaluators::AveHpScore (bool player1, GameStatePtr state)
 {
     float bestPossible = 120 + 1000/10; //rough estimate...ave hp + score/10
@@ -100,12 +108,6 @@ float Evaluators::MaxHpScore (bool player1, GameStatePtr state)
 float Evaluators::RushHealth (bool player1, GameStatePtr state)
 {
     Player* myPlayer = state->GetPlayer(player1);
-
-    
-    //NOTE: be careful evaluating things in terms of myPlayer->GetCurrentWorm().
-    // this will use whichever worm is current at the tip of the playout, NOT the actuall current worm!
-    //    Worm* worm = myPlayer->GetCurrentWorm();
-
 
     Worm* worm = myPlayer->GetWormById(1);
 

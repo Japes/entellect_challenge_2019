@@ -119,6 +119,7 @@ uint64_t Bot::GetNumPlayouts()
 
 void Bot::runMC(uint64_t stopTime, std::shared_ptr<MonteCarloNode> mc)
 {
+    //for(unsigned jp = 0; jp < 600; ++jp) {        //useful for debugging
     while(Utilities::Get_ns_since_epoch() < stopTime) {        
         for(int i = 0; i < _mc_runsBeforeClockCheck; ++i) {
             int numplies = 0;
