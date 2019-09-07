@@ -38,6 +38,10 @@ def checkBuild(outputFolder):
 
     os.chdir(outputFolder)
 
+    if(os.system("make clean") != 0):
+        print("build cleanup failed...")
+        exit()
+
     if(os.system("make -j8") != 0):
         print("build failed...")
         exit()
@@ -54,7 +58,7 @@ def checkBuild(outputFolder):
 if len(sys.argv) < 2:
     print("Give me a bot name: \"deployBot.py [BOTNAME]\"")
 
-botFolder = "./bots/" + sys.argv[1]
+botFolder = "../bots/" + sys.argv[1]
 outputFolder = "./" + sys.argv[1] + "_deployment/"
 print("Packaging ", botFolder, " into ", outputFolder)
 
@@ -62,7 +66,7 @@ if os.path.exists(outputFolder):
     shutil.rmtree(outputFolder)
 
 copy(botFolder, outputFolder, 'rounds')
-copy("./src", outputFolder + "/src", 'unittests')
+copy("../src", outputFolder + "/src", 'unittests')
 
 updateMakefile(outputFolder)
 

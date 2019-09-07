@@ -7,6 +7,8 @@
 #include "SnowBall.hpp"
 #include "GameConfig.hpp"
 
+#include <vector>
+
 class GameState; //forward declaration
 
 //current state of a worm
