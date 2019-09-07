@@ -29,29 +29,23 @@ class MaxHpScoreEvaluator: public EvaluatorBase
     float Evaluate (bool player1, GameStatePtr state) const override
     {
         Player* myPlayer = state->GetPlayer(player1);
-        Player* otherPlayer = state->GetPlayer(!player1);
+        Worm* worm = myPlayer->GetCurrentWorm();
 
-        int maxHealthMe = 0;
-        state->ForAllLiveWorms(player1, [&](Worm& worm) {
-            if(worm.health > maxHealthMe) {
-                maxHealthMe = worm.health;
+        float magic = 1000000;
+        float minDist = magic;
+        for(auto const& pos : state->GetHealthPackPos()) {
+            int dist = worm->position.MovementDistanceTo(pos);
+            if(dist < minDist) {
+                minDist = dist;
             }
-        });
+        }
 
-        int maxHealthHim = 0;
-        state->ForAllLiveWorms(!player1, [&](Worm& worm) {
-            if(worm.health > maxHealthHim) {
-                maxHealthHim = worm.health;
-            }
-        });
+        if(minDist == magic) {
+            return 0;
+        }
 
-        float healthdiff = maxHealthMe - maxHealthHim;
-        float scorediff =  myPlayer->GetScore() - otherPlayer->GetScore();
-
-        //want to encourage holding on to the banana
-        float bananaBonus = GetBananaBonus(myPlayer->worms[1].banana_bomb_count, state->roundNumber);
-
-        return healthdiff + scorediff/10 + bananaBonus;
+        float worstDist = 17.0f;
+        return (worstDist - minDist)/17.0f;
     }
 };
 

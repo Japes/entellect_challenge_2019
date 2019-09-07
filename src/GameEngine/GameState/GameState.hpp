@@ -48,6 +48,8 @@ class GameState
     bool LavaWasRemovedThisRound(Position pos);
     void ClearLavasRemovedThisRound();
 
+    std::vector<Position> GetHealthPackPos();
+
     bool operator==(const GameState &other) const;
 
     private:
