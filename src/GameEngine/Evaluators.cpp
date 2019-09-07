@@ -64,7 +64,7 @@ float Evaluators::Health (bool player1, GameStatePtr state)
 //max worth around 80 health
 float Evaluators::GetBananaBonus(int numBananas, int roundNumber)
 {
-    float max = 160.0f;
+    float max = 80.0f;
     if(roundNumber > 350) {
         return 0;
     }
