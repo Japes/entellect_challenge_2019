@@ -15,6 +15,7 @@
 #include "Utilities.hpp"
 #include "PlayersMonteCarlo.hpp"
 #include "Evaluators/HealthEvaluator.hpp"
+#include "Evaluators/RushHealthEvaluator.hpp"
 #include <thread>
 #include <mutex>
 #include <cmath>
@@ -50,6 +51,84 @@ TEST_CASE( "Performance tests - realistic loop", "[.performance]" ) {
         bot.runStrategy(file);
         auto mps = (bot.GetNumPlies()*1000000000)/mcTime_ns;
         INFO("Moves per second: " << mps << " m/s (so N should be " << (mps * 0.88 / playThroughDepth) << ")");
+        CHECK(false);
+    }
+}
+
+TEST_CASE( "Observe mc results", "[.integration]" ) {
+
+    int playThroughDepth{6};
+    int dirtsForBanana{100};
+    int clearSpaceForHeuristic{-1}; //if everything is clear for this distance, use heuristic
+    bool patternDetectEnable = false;
+    //uint64_t mcTime_ns{3000000000000};
+    uint64_t mcTime_ns{1000000000};
+    float mc_c{std::sqrt(2)};
+    int mc_runsBeforeClockCheck{50};
+
+//    rapidjson::Document file = Utilities::ReadJsonFile("./Test_files/round1.json");
+    rapidjson::Document fileP1 = Utilities::ReadJsonFile("./Test_files/round1P1.json");
+    rapidjson::Document fileP2 = Utilities::ReadJsonFile("./Test_files/round1P2.json");
+
+    RushHealthEvaluator eval;
+
+    GIVEN("A bot with nodedepth 4") {
+        int nodeDepth{4};
+        Bot bot(&eval,
+                playThroughDepth, nodeDepth, 
+                dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
+        CHECK(false);
+    }
+
+    GIVEN("A bot with nodedepth 3") {
+        int nodeDepth{3};
+        Bot bot(&eval,
+                playThroughDepth, nodeDepth, 
+                dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
+        CHECK(false);
+    }
+
+    GIVEN("A bot with nodedepth 2") {
+        int nodeDepth{2};
+        Bot bot(&eval,
+                playThroughDepth, nodeDepth, 
+                dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
+        CHECK(false);
+    }
+
+    GIVEN("A bot with nodedepth 1") {
+        int nodeDepth{1};
+        Bot bot(&eval,
+                playThroughDepth, nodeDepth, 
+                dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
+        CHECK(false);
+    }
+
+    GIVEN("A bot with nodedepth 0") {
+        int nodeDepth{0};
+        Bot bot(&eval,
+                playThroughDepth, nodeDepth, 
+                dirtsForBanana, clearSpaceForHeuristic, patternDetectEnable, NextTurn::WormCanShoot,
+                mcTime_ns, mc_c, mc_runsBeforeClockCheck);
+
+        bot.runStrategy(fileP1);
+        bot.runStrategy(fileP2);
         CHECK(false);
     }
 }
