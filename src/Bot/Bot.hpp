@@ -10,10 +10,13 @@
 
 #include <mutex>
 
+using GetEvaluatorFn_t = std::function<EvaluationFn_t(bool, GameStatePtr)>;
+
 class Bot
 {
 	public:
-    Bot(int playthroughDepth, int nodeDepth, 
+    Bot(GetEvaluatorFn_t getEval,
+        int playthroughDepth, int nodeDepth, 
         int dirtsForBanana, int distanceForLost, bool patternDetectEnable, std::function<bool(bool, GameStatePtr)> selectCurrentWormFn,
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck);
 
@@ -31,6 +34,7 @@ class Bot
 
     PatternDetector _opponent_patterns;
 
+    GetEvaluatorFn_t _getEval;
     int _playthroughDepth;
     int _nodeDepth;
     int _dirtsForBanana;

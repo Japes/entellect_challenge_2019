@@ -6,10 +6,12 @@
 #include "Evaluators.hpp"
 #include <thread>
 
-Bot::Bot(int playthroughDepth, int nodeDepth,
+Bot::Bot(GetEvaluatorFn_t getEval,
+        int playthroughDepth, int nodeDepth,
         int dirtsForBanana, int distanceForLost, bool patternDetectEnable, std::function<bool(bool, GameStatePtr)> selectCurrentWormFn,
         uint64_t mcTime_ns, float mc_c, int mc_runsBeforeClockCheck) :
     _opponent_patterns(8),
+    _getEval{getEval},
     _playthroughDepth{playthroughDepth},
     _nodeDepth{nodeDepth},
     _dirtsForBanana{dirtsForBanana},
@@ -42,7 +44,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get(), _selectCurrentWormFn);    //note this modifies state
 
     //choose evaluator---------------
-    EvaluationFn_t eval = GetEvaluator(ImPlayer1, state_now);
+    EvaluationFn_t eval = _getEval(ImPlayer1, state_now.get());
 
     //banana mine
     auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state_now.get(), _dirtsForBanana);
@@ -103,23 +105,6 @@ void Bot::GetNextMC(std::shared_ptr<GameState> state_now, EvaluationFn_t eval)
 
     std::cerr << "(" << __FUNCTION__ << ") NO CHILD NODE TO REUSE :( -----------------------------------------------------" << std::endl;
     _mc = std::make_shared<MonteCarloNode>(state_now, eval, _nodeDepth, _playthroughDepth, _mc_c);
-}
-
-EvaluationFn_t Bot::GetEvaluator(bool player1, std::shared_ptr<GameState> state)
-{
-    Player* me = state->GetPlayer(player1);
-    Player* opponent = state->GetPlayer(!player1);
-
-    //int numLiveWormsMe = 0;
-    //state->ForAllLiveWorms(player1, [&](Worm& worm) { ++numLiveWormsMe; });
-
-    if( state->roundNumber > 260 && (me->GetScore() > opponent->GetScore()) ) {
-        std::cerr << "(" << __FUNCTION__ << ") DANCE MODE-------------" << std::endl;
-        return Evaluators::Dance;
-    }
-
-    std::cerr << "(" << __FUNCTION__ << ") MaxHpScore MODE-------------" << std::endl;
-    return Evaluators::MaxHpScore;
 }
 
 uint64_t Bot::GetNumPlies()
