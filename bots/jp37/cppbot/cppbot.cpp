@@ -27,11 +27,6 @@ EvaluationFn_t GetEvaluator(bool player1, GameStatePtr state)
     //int numLiveWormsMe = 0;
     //state->ForAllLiveWorms(player1, [&](Worm& worm) { ++numLiveWormsMe; });
 
-    if(state->GetHealthPackPos().size() > 0 && me->GetCurrentWorm()->id == 1) {
-        std::cerr << "(" << __FUNCTION__ << ") WORM RUSHING-------------" << std::endl;
-        return Evaluators::RushHealth;
-    }
-
     if( state->roundNumber > 260 && (me->GetScore() > opponent->GetScore()) ) {
         std::cerr << "(" << __FUNCTION__ << ") DANCE MODE-------------" << std::endl;
         return Evaluators::Dance;
