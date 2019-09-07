@@ -19,7 +19,7 @@ class Bot
 
     std::string runStrategy(rapidjson::Document& roundJSON);
     void GetNextMC(std::shared_ptr<GameState> state_now, EvaluationFn_t eval);
-    EvaluationFn_t GetEvaluator(std::shared_ptr<GameState> state_now);
+    EvaluationFn_t GetEvaluator(bool player1, std::shared_ptr<GameState> state_now);
     uint64_t GetNumPlies();
     uint64_t GetNumPlayouts();
     void AdjustOpponentSpellCount(bool player1, GameStatePtr current_state, GameStatePtr prev_state);

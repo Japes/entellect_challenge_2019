@@ -498,11 +498,11 @@ jp33:                    0/0/0                    10/1/5                   13/0/
 jp35:                    5/1/10                   0/0/0                    14/0/2                   (19/1/12)
 jp35_p2:                 3/0/13                   2/0/14                   0/0/0                    (5/0/27)
 
-thursday afternoon, take out issue in jp35_p2...==============================================================================================================
+friday afternoon, take out issue in jp35_p2...==============================================================================================================
 
 Engine version: 2019.3.2 -- 2019_September_06__06_29_53 -- ParallelID: 
 (wins/draws/losses):     jp35                     jp35_p2                  
-jp33:                    14/0/19                  18/0/16
+jp33:                    15/0/19                  18/0/16
 jp35:                    						  16/0/18                  
 
 
@@ -517,3 +517,24 @@ Engine version: 2019.3.2 -- 2019_September_06__06_25_14 -- ParallelID: 1
 jp35_p2:                 0/0/0                    8/0/9                    9/0/8                    (17/0/17)
 jp35:                    9/0/8                    0/0/0                    13/0/4                   (22/0/12)
 jp33:                    8/0/9                    4/0/13                   0/0/0                    (12/0/22)
+
+friday night, jp36 has a bunch of little fixes and has MULTI-HEURISTIC=========================================================================================
+There is still a player 1 bias!
+
+Engine version: 2019.3.2 -- 2019_September_07__07_40_21 -- ParallelID: 1
+(wins/draws/losses):     jp36                     
+jp35:                    40/0/37                  
+jp36:                    0/0/0                    
+
+
+
+Engine version: 2019.3.2 -- 2019_September_07__07_40_21 -- ParallelID: 1
+(wins/draws/losses):     jp35                     jp36                     
+jp35:                    0/0/0                    23/0/15                  (23/0/15)
+jp36:                    15/0/23                  0/0/0                    (15/0/23)
+
+Engine version: 2019.3.2 -- 2019_September_07__07_46_25 -- ParallelID: 
+(wins/draws/losses):     jp36                     jp35                     
+jp36:                    0/0/0                    21/0/17                  (21/0/17)
+jp35:                    17/0/21                  0/0/0                    (17/0/21)
+

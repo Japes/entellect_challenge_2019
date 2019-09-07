@@ -18,6 +18,7 @@ class Evaluators
     static float MaxHpScore (bool player1, GameStatePtr state);
     static float RushHealth (bool player1, GameStatePtr state);
     static float Score (bool player1, GameStatePtr state);
+    static float Dance (bool player1, GameStatePtr state);
 
     static float GetBananaBonus(int numBananas, int roundNumber); //not an evaluator
 

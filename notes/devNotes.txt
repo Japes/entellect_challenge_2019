@@ -2,22 +2,24 @@ TODO
 
    THERE IS A PLAYER1 BIAS!
       player 1 tends to get the health packs slightly more...
+	  if there's a tie, go towards centre
       
 	ITS NOT DOING THE "DONT FREEZE FROZEN GUYS" THING PROPERLY...
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
 
-      staged evaluation functions (master control alg) (see safe mode)     medium/high    high
-         explicit end thing of do i dance or do i shoot or WHAT
-         
-      optimization                                                         medium/low     medium
-      select cleverness                                                    low            medium
-      play with evaluation function (score up)                             low            medium/low?
-      adding pattern rec to playouts                                       medium         medium/low
+
       fix engine edge cases                                                medium/high    low
+      
+      select cleverness                                                    low            medium
+      play with evaluation functions                                       low            medium/low?
+      adding pattern rec to playouts                                       medium         medium/low
       resolve ties with random (mc and nextmove)                           low            low?
-	   rework output messages for a graphical view                          medium         medium/high
+	  optimization                                                         medium/low     medium
+	  rework output messages for a graphical view                          medium         medium/high
 	
+	  staged evaluation functions (master control alg) (see safe mode)     medium/high    high
+         explicit end thing of do i dance or do i shoot or WHAT
       building actual tree:                                                high,          medium
       banana (only if awesome) /snowball (no re).  use if low health.      low            high
 

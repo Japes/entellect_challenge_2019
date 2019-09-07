@@ -42,7 +42,7 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     std::string selectPrefix = NextTurn::TryApplySelect(ImPlayer1, state_now.get(), _selectCurrentWormFn);    //note this modifies state
 
     //choose evaluator---------------
-    EvaluationFn_t eval = GetEvaluator(state_now);
+    EvaluationFn_t eval = GetEvaluator(ImPlayer1, state_now);
 
     //banana mine
     auto bananaMove = NextTurn::GetBananaProspect(ImPlayer1, state_now.get(), _dirtsForBanana);
@@ -105,11 +105,20 @@ void Bot::GetNextMC(std::shared_ptr<GameState> state_now, EvaluationFn_t eval)
     _mc = std::make_shared<MonteCarloNode>(state_now, eval, _nodeDepth, _playthroughDepth, _mc_c);
 }
 
-EvaluationFn_t Bot::GetEvaluator(std::shared_ptr<GameState> state_now)
+EvaluationFn_t Bot::GetEvaluator(bool player1, std::shared_ptr<GameState> state)
 {
-    if(state_now->roundNumber < 50) {
-        return Evaluators::RushHealth;
+    Player* me = state->GetPlayer(player1);
+    Player* opponent = state->GetPlayer(!player1);
+
+    //int numLiveWormsMe = 0;
+    //state->ForAllLiveWorms(player1, [&](Worm& worm) { ++numLiveWormsMe; });
+
+    if( state->roundNumber > 260 && (me->GetScore() > opponent->GetScore()) ) {
+        std::cerr << "(" << __FUNCTION__ << ") DANCE MODE-------------" << std::endl;
+        return Evaluators::Dance;
     }
+
+    std::cerr << "(" << __FUNCTION__ << ") MaxHpScore MODE-------------" << std::endl;
     return Evaluators::MaxHpScore;
 }
 

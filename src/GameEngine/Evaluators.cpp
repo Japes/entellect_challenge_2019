@@ -56,7 +56,7 @@ float Evaluators::Health (bool player1, GameStatePtr state)
 //max worth around 80 health
 float Evaluators::GetBananaBonus(int numBananas, int roundNumber)
 {
-    float max = 80.0f;
+    float max = 160.0f;
     if(roundNumber > 350) {
         return 0;
     }
@@ -67,7 +67,7 @@ float Evaluators::GetBananaBonus(int numBananas, int roundNumber)
 
 float Evaluators::MaxHpScore (bool player1, GameStatePtr state)
 {
-    float bestPossible = (170*3) + (900/10); //rough estimate
+    float bestPossible = (170*3) + (900/5); //rough estimate
 
     Player* myPlayer = state->GetPlayer(player1);
     Player* otherPlayer = state->GetPlayer(!player1);
@@ -94,7 +94,7 @@ float Evaluators::MaxHpScore (bool player1, GameStatePtr state)
     //want to encourage holding on to the banana
     float bananaBonus = GetBananaBonus(myPlayer->worms[1].banana_bomb_count, state->roundNumber);
 
-    return ((healthdiff*numWormsHim) + (scorediff/10) + bananaBonus) / bestPossible;
+    return ((healthdiff*numWormsHim) + (scorediff/5) + bananaBonus) / bestPossible;
 }
 
 float Evaluators::RushHealth (bool player1, GameStatePtr state)
@@ -126,4 +126,16 @@ float Evaluators::Score(bool player1, GameStatePtr state)
     Player* otherPlayer = state->GetPlayer(!player1);
 
     return (myPlayer->GetScore() - otherPlayer->GetScore()) / 1000.0f;
+}
+
+//dance around without shooting the opponent
+float Evaluators::Dance(bool player1, GameStatePtr state)
+{
+    Player* myPlayer = state->GetPlayer(player1);
+    Player* otherPlayer = state->GetPlayer(!player1);
+
+    float maxhealth = (100.0f*2 + 150.0f)*2;
+    float scoreDiff = (myPlayer->GetScore() - otherPlayer->GetScore()) / 100.0f;
+
+    return (myPlayer->health + otherPlayer->health + scoreDiff) / maxhealth;
 }
