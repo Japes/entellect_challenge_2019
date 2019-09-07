@@ -81,8 +81,8 @@ std::string Bot::runStrategy(rapidjson::Document& roundJSON)
     //output result--------------------------------------------------------------------
     //choose the best move and do it
     auto best_move = _mc->GetBestMove(ImPlayer1);
-    std::cerr << "(" << __FUNCTION__ << ") Num playouts this turn: " << GetNumPlayouts() << std::endl;
-    _mc->PrintState(ImPlayer1);
+//    std::cerr << "(" << __FUNCTION__ << ") Num playouts this turn: " << GetNumPlayouts() << std::endl;
+//    _mc->PrintState(ImPlayer1);
 
     return selectPrefix + best_move->GetCommandString();
 }
@@ -93,13 +93,13 @@ void Bot::GetNextMC(std::shared_ptr<GameState> state_now)
         _mc = _mc->TryGetComputedState(state_now);
         if(_mc != nullptr) {
             _mc->Promote();
-            std::cerr << "(" << __FUNCTION__ << ") Found a child node to reuse: ";
-            _mc->PrintState(true);
+//            std::cerr << "(" << __FUNCTION__ << ") Found a child node to reuse: ";
+//            _mc->PrintState(true);
             return;
         }
     }
 
-    std::cerr << "(" << __FUNCTION__ << ") NO CHILD NODE TO REUSE :( -----------------------------------------------------" << std::endl;
+    //std::cerr << "(" << __FUNCTION__ << ") NO CHILD NODE TO REUSE :( -----------------------------------------------------" << std::endl;
     _mc = std::make_shared<MonteCarloNode>(state_now, _evaluator, _nodeDepth, _playthroughDepth, _mc_c);
 }
 
