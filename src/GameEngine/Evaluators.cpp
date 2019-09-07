@@ -99,10 +99,23 @@ float Evaluators::MaxHpScore (bool player1, GameStatePtr state)
     float healthdiff = maxHealthMe - maxHealthHim;
     float scorediff =  myPlayer->GetScore() - otherPlayer->GetScore();
 
-    //want to encourage holding on to the banana
-    float bananaBonus = GetBananaBonus(myPlayer->worms[1].banana_bomb_count, state->roundNumber);
+    float healthdiff_Score = (healthdiff/150.0f);
+    float enemyWorms_Score = numWormsHim/3.0f;
+    float scorediff_Score = scorediff / 500;
 
-    return ((healthdiff*numWormsHim) + (scorediff/5) + bananaBonus) / bestPossible;
+    float healthdiff_Factor = 1.0f;
+    float enemyWorms_Factor = 1.0f;
+    float scorediff_Factor = 0.5f;
+
+    healthdiff_Score *= healthdiff_Factor;
+    enemyWorms_Score *= enemyWorms_Factor;
+    scorediff_Score *= scorediff_Factor;
+
+    float total_score = healthdiff_Score + enemyWorms_Score + scorediff_Score;
+    float denom = healthdiff_Factor + enemyWorms_Factor + scorediff_Factor;
+
+    return total_score / denom;
+
 }
 
 float Evaluators::RushHealth (bool player1, GameStatePtr state)

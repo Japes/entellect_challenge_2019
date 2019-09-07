@@ -267,6 +267,7 @@ std::bitset<121> NextTurn::GetValidBombThrow(bool player1, GameStatePtr state, b
     state->ForAllLiveWorms(!player1, [&](Worm& enemyWorm) {
         if(worm->position.BananaSnowballCanReach(enemyWorm.position)) {
 
+            //don't freeze frozen guys
             if(snowball) {
                 if(enemyWorm.roundsUntilUnfrozen > 0) {
                     return;
