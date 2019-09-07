@@ -90,8 +90,10 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
                 THEN("We get something greater than 0.5")
                 {
-                    REQUIRE(ret > 0.5);
-                    REQUIRE(ret < 1);
+                    REQUIRE(ret.first > 0.5);
+                    REQUIRE(ret.first < 1);
+                    REQUIRE(ret.second < 0.5);
+                    REQUIRE(ret.second > 0);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player1);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player2);
                 }
@@ -104,7 +106,8 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
                 THEN("We get 1")
                 {
-                    REQUIRE(ret == 1);
+                    REQUIRE(ret.first == 1);
+                    REQUIRE(ret.second == 0);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player1);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player2);
                 }
@@ -132,8 +135,10 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
                 THEN("We get something less than 0.5")
                 {
-                    REQUIRE(ret < 0.5);
-                    REQUIRE(ret > 0);
+                    REQUIRE(ret.second > 0.5);
+                    REQUIRE(ret.second < 1);
+                    REQUIRE(ret.first < 0.5);
+                    REQUIRE(ret.first > 0);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player2);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player1);
                 }
@@ -146,7 +151,8 @@ TEST_CASE( "Playthroughs - evaluation", "[playthrough][playthrough_evaluation]" 
 
                 THEN("We get 0")
                 {
-                    REQUIRE(ret == 0);
+                    REQUIRE(ret.second == 1);
+                    REQUIRE(ret.first == 0);
                     REQUIRE(eng.GetResult().winningPlayer == &state->player2);
                     REQUIRE(eng.GetResult().losingPlayer == &state->player1);
                 }

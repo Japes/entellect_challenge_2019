@@ -12,16 +12,16 @@ MonteCarloNode::MonteCarloNode(std::shared_ptr<GameState> state,
     _nodeDepth(nodeDepth),
     _playthroughDepth(playthroughDepth),
     _c{c},
-    _terminalNodeEvaluation(-1)
+    _terminalNodeEvaluation{-1,-1}
 {
     //check if we're a terminal node
     auto res = GameEngine::GetResult(_state.get());
 
     if(res.result != GameEngine::ResultType::IN_PROGRESS) {
         if(res.winningPlayer == &_state->player1) {
-            _terminalNodeEvaluation = 1;
+            _terminalNodeEvaluation = {1, 0};
         } else {
-            _terminalNodeEvaluation = 0;
+            _terminalNodeEvaluation = {0, 1};
         }
     }
 }
@@ -63,7 +63,7 @@ bool MonteCarloNode::StateEquals(std::shared_ptr<GameState> state)
 }
 
 //note this needs to be threadsafe
-float MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
+std::pair<float, float> MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
 {
     _mtx.lock();
     //choose next node
@@ -83,14 +83,14 @@ float MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
     }
     */
 
-    float thisScore = GetScore(player1_next_move->GetCommand(), player2_next_move->GetCommand(), numplies, canMakeChild);
+    auto thisScore = GetScore(player1_next_move->GetCommand(), player2_next_move->GetCommand(), numplies, canMakeChild);
 
     _mtx.lock();
     //remember Playthrough always returns score in terms of player 1
-    player1_next_move->AddPlaythroughResult(thisScore);
+    player1_next_move->AddPlaythroughResult(thisScore.first);
     _player1_mc.UpdateNumSamples();
 
-    player2_next_move->AddPlaythroughResult(1 - thisScore);
+    player2_next_move->AddPlaythroughResult(thisScore.second);
     _player2_mc.UpdateNumSamples();
 
     _mtx.unlock();
@@ -98,9 +98,9 @@ float MonteCarloNode::AddPlaythrough(int& numplies, bool canMakeChild)
     return thisScore;
 }
 
-float MonteCarloNode::GetScore(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies, bool canMakeChild)
+std::pair<float, float> MonteCarloNode::GetScore(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies, bool canMakeChild)
 {
-    if(_terminalNodeEvaluation >= 0) {
+    if(_terminalNodeEvaluation.first >= 0 || _terminalNodeEvaluation.second >= 0) {
         return _terminalNodeEvaluation; //the game is over
     }
 
@@ -134,7 +134,7 @@ float MonteCarloNode::GetScore(std::shared_ptr<Command> p1Cmd, std::shared_ptr<C
     }
 }
 
-float MonteCarloNode::DoAPlayout(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies)
+std::pair<float, float> MonteCarloNode::DoAPlayout(std::shared_ptr<Command> p1Cmd, std::shared_ptr<Command> p2Cmd, int& numplies)
 {
     //load the state
     GameState state = *(_state.get()); //make a copy :/

@@ -151,16 +151,16 @@ void GameEngine::ApplyPowerups()
     _state->player2.RecalculateHealth();
 }
 
-//do a random playthrough to the end and return:
-//1 if player 1 wins
-//0 if player 1 loses
+//do a random playthrough to the end and return evaluations
+//1 if player wins
+//0 if player loses
 //
-// so returned scores are always in terms of player 1
+// returned pair is <p1score, p2score>
 //
 //depth is how far to go before applying heuristic, -1 means play to end
 //TODO pass in strategies for each player
 //TODO pass in whether or not it should return binary or weights
-float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command, 
+std::pair<float, float> GameEngine::Playthrough(std::shared_ptr<Command> player1_Command, 
                             std::shared_ptr<Command> player2_Command, 
                             std::function<std::shared_ptr<Command>(bool, GameStatePtr)> nextMoveFn,
                             const EvaluatorBase* evaluator,
@@ -179,23 +179,28 @@ float GameEngine::Playthrough(std::shared_ptr<Command> player1_Command,
         ++numPlies;
     }
 
-    auto evaluationAfter = evaluator->Evaluate(true, _state); //always in terms of player 1
+    auto evaluationAfter1 = evaluator->Evaluate(true, _state);
+    auto evaluationAfter2 = evaluator->Evaluate(false, _state);
 
     //evaluate the playthrough
 
     //first, best/worst possible outcome
     if(_currentResult.result != ResultType::IN_PROGRESS) {
         if(_currentResult.winningPlayer == &_state->player1) {
-            return 1;
+            return {1, 0};
         } else {
-            return 0;
+            return {0, 1};
         }
     }
 
-    float frac = evaluationAfter / evaluator->BestPossible();
+    float fracP1 = evaluationAfter1 / evaluator->BestPossible();
+    float fracP2 = evaluationAfter2 / evaluator->BestPossible();
 
-    // clamp scorediff to 0.25 - 0.75
-    return Utilities::NormaliseTo(frac, 0.25, 0.75);
+    // clamp so that proper wins are always awesome
+    auto evaluation1 = Utilities::NormaliseTo(fracP1, 0.25, 0.75);
+    auto evaluation2 = Utilities::NormaliseTo(fracP2, 0.25, 0.75);
+
+    return {evaluation1, evaluation2};
 }
 
 GameEngine::GameResult GameEngine::GetResult()
