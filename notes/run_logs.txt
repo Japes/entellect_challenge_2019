@@ -498,11 +498,11 @@ jp33:                    0/0/0                    10/1/5                   13/0/
 jp35:                    5/1/10                   0/0/0                    14/0/2                   (19/1/12)
 jp35_p2:                 3/0/13                   2/0/14                   0/0/0                    (5/0/27)
 
-thursday afternoon, take out issue in jp35_p2...==============================================================================================================
+friday afternoon, take out issue in jp35_p2...==============================================================================================================
 
 Engine version: 2019.3.2 -- 2019_September_06__06_29_53 -- ParallelID: 
 (wins/draws/losses):     jp35                     jp35_p2                  
-jp33:                    14/0/19                  18/0/16
+jp33:                    15/0/19                  18/0/16
 jp35:                    						  16/0/18                  
 
 
@@ -517,3 +517,79 @@ Engine version: 2019.3.2 -- 2019_September_06__06_25_14 -- ParallelID: 1
 jp35_p2:                 0/0/0                    8/0/9                    9/0/8                    (17/0/17)
 jp35:                    9/0/8                    0/0/0                    13/0/4                   (22/0/12)
 jp33:                    8/0/9                    4/0/13                   0/0/0                    (12/0/22)
+
+friday night, jp36 has a bunch of little fixes and has MULTI-HEURISTIC=========================================================================================
+There is still a player 1 bias!
+
+Engine version: 2019.3.2 -- 2019_September_07__07_40_21 -- ParallelID: 1
+(wins/draws/losses):     jp36                     
+jp35:                    40/0/37                  
+jp36:                    0/0/0                    
+
+
+
+Engine version: 2019.3.2 -- 2019_September_07__07_40_21 -- ParallelID: 1
+(wins/draws/losses):     jp35                     jp36                     
+jp35:                    0/0/0                    23/0/15                  (23/0/15)
+jp36:                    15/0/23                  0/0/0                    (15/0/23)
+
+Engine version: 2019.3.2 -- 2019_September_07__07_46_25 -- ParallelID: 
+(wins/draws/losses):     jp36                     jp35                     
+jp36:                    0/0/0                    21/0/17                  (21/0/17)
+jp35:                    17/0/21                  0/0/0                    (17/0/21)
+
+
+JP37 WAS SUPPOSED TO BE BETTER, MADE THINGS SYMMETRIC=========================================================================================================
+Engine version: 2019.3.2 -- 2019_September_07__03_34_28 -- ParallelID: 
+(wins/draws/losses):     jp36                     
+jp37:                    9/0/17
+
+Engine version: 2019.3.2 -- 2019_September_07__03_34_28 -- ParallelID: 
+(wins/draws/losses):     jp37                     jp36                     
+jp37:                    0/0/0                    4/0/9                    (4/0/9)
+jp36:                    9/0/4                    0/0/0                    (9/0/4)
+Engine version: 2019.3.2 -- 2019_September_07__03_39_59 -- ParallelID: 1
+(wins/draws/losses):     jp36                     jp37                     
+jp36:                    0/0/0                    8/0/5                    (8/0/5)
+jp37:                    5/0/8                    0/0/0                    (5/0/8)
+
+
+just added fix to that version of jp36=====================================================================================================================
+Engine version: 2019.3.2 -- 2019_September_07__08_37_54 -- ParallelID: 1
+(wins/draws/losses):     jp36_beatjp37            jp36_btjp37_asm          
+jp35:                    3/0/7                    4/0/6                
+jp36_beatjp37:                                    4/0/11                            
+
+
+Engine version: 2019.3.2 -- 2019_September_07__08_37_54 -- ParallelID: 1
+(wins/draws/losses):     jp35                     jp36_beatjp37            jp36_btjp37_asm          
+jp35:                    0/0/0                    2/0/3                    3/0/2                    (5/0/5) (7/0/13)
+jp36_beatjp37:           3/0/2                    0/0/0                    2/0/3                    (5/0/5) (11/0/9)
+jp36_btjp37_asm:         2/0/3                    3/0/2                    0/0/0                    (5/0/5) (12/0/8)
+
+Engine version: 2019.3.2 -- 2019_September_07__08_37_27 -- ParallelID: 
+(wins/draws/losses):     jp36_btjp37_asm          jp36_beatjp37            jp35                     
+jp36_btjp37_asm:         0/0/0                    3/0/2                    4/0/1                    (7/0/3)
+jp36_beatjp37:           2/0/3                    0/0/0                    4/0/1                    (6/0/4)
+jp35:                    1/0/4                    1/0/4                    0/0/0                    (2/0/8)
+
+post-submission verification =====================================================================================================================
+Engine version: 2019.3.2 -- 2019_September_08__03_49_03 -- ParallelID: 1
+(wins/draws/losses):     jp36_beatjp37            jp36_btjp37_asm          
+ab4:                     32/0/11                  49/1/53   
+jp36_beatjp37:           0/0/0                    60/0/43        
+
+
+
+Engine version: 2019.3.2 -- 2019_September_08__03_49_03 -- ParallelID: 1
+(wins/draws/losses):     ab4                      jp36_beatjp37            jp36_btjp37_asm          
+ab4:                     0/0/0                    32/0/11                  20/1/22                  (52/1/33)
+jp36_beatjp37:           11/0/32                  0/0/0                    21/0/22                  (32/0/54)
+jp36_btjp37_asm:         22/1/20                  22/0/21                  0/0/0                    (44/1/41)
+
+Engine version: 2019.3.2 -- 2019_September_08__04_12_02 -- ParallelID: 
+(wins/draws/losses):     jp36_btjp37_asm          ab4                      jp36_beatjp37            
+jp36_btjp37_asm:         0/0/0                    31/0/29                  21/0/39                  (52/0/68)
+ab4:                     29/0/31                  0/0/0                    0/0/0                    (29/0/31)
+jp36_beatjp37:           39/0/21                  0/0/0                    0/0/0                    (39/0/21)
+

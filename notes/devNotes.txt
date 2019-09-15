@@ -1,23 +1,33 @@
 TODO
 
    THERE IS A PLAYER1 BIAS!
-      player 1 tends to get the health packs slightly more...
+      see if its the healthpacks - make a healthpack rusher
+         then go shower
+      try reverse the random bias to get end rather - see if bias goes to 2
+	      if there's a tie, go towards centre?
+
+   did I dance last night?
       
-	ITS NOT DOING THE "DONT FREEZE FROZEN GUYS" THING PROPERLY...
+
+tunes?
+   clamp range
+   c
+   banana bonus
 
 	make a rubric of cost/benefit                                           EFFORT         PAYOFF
 
-      staged evaluation functions (master control alg) (see safe mode)     medium/high    high
-         explicit end thing of do i dance or do i shoot or WHAT
-         
-      optimization                                                         medium/low     medium
-      select cleverness                                                    low            medium
-      play with evaluation function (score up)                             low            medium/low?
-      adding pattern rec to playouts                                       medium         medium/low
+
       fix engine edge cases                                                medium/high    low
+      
+      select cleverness                                                    low            medium
+      play with evaluation functions                                       low            medium/low?
+      adding pattern rec to playouts                                       medium         medium/low
       resolve ties with random (mc and nextmove)                           low            low?
-	   rework output messages for a graphical view                          medium         medium/high
+	  optimization                                                         medium/low     medium
+	  rework output messages for a graphical view                          medium         medium/high
 	
+	  staged evaluation functions (master control alg) (see safe mode)     medium/high    high
+         explicit end thing of do i dance or do i shoot or WHAT
       building actual tree:                                                high,          medium
       banana (only if awesome) /snowball (no re).  use if low health.      low            high
 
@@ -27,6 +37,7 @@ TODO
       3 phases - early (mine) - mid (skirmishes) - late (fight/dance)
 
    runs
+      should do latest and greatest vs leon and vs jp33
       tonight - latest and greatest vs jp33
       lowering c should help!
       BANANA ONLY FULL HOUSE (13)
@@ -188,32 +199,77 @@ to run bot on state file:--------------------------------------------
  - input round number
 
 notes for blog post---------------------------------------------------
+	its a marathon not a sprint
+		only the last round is important
+		
    automation important!
       running matches
       making new bot
       analysis scripts
-   slow and steady - unit tests!
-   analysis
-      scripts
-      spreadsheets (not sure if that was helpful but it was fun)
-   optimization
+	
+	method
+		devnotes file, constantly reprioritising
+			(included notes for this blog post as i thought of them)
+		slow and steady - unit tests!
+		analysis
+			scripts
+			spreadsheets (not sure if that was helpful but it was fun)
+		be scientific and record everything (comparison logs)
+   
+   optimization - need a LOT of optimization
       interrupt method - link to stack overflow
-   monte carlo method
+	  inline (make sure you have flto)
+	  std::function has quite a bit of overhead
+	  flto and 03 (turn off while working, compiles long
+	  raw pointers instead of shared
+	  templates taking function pointers
+	  
+   the monte carlo method
+		link to wiki page
+		explain it in a nutshell
+		not ppl had success with it last time
+		note the simple way - not actually building tree
+		note u can optimise the opponent as well, that insight
+		priming with first node of next turn
+			tried with deeper nodedepths and actually building the tree
+			depth 1 seemed to be the sweet spot
+				tradeoff between number of runs and saving work
+		downsides
+			long to run, hard to tune
+			sensitive to edge cases in game state
+			shortsighted
+		upsides
+			robust to rules changes
+			dont need to analyse game as much - becomes a compsci problem
+		
    made sure i had a really solid engine
-   reuse for next time
-      didnt use last years because it was messy etc but could use this stuff for next time
+    spent a bit of time going through their source code for engine
+	lots of unit tests
+	comparisons with theirs
+	fixing "edge cases" had a noticable improvement
+	"bug for bug" compatible
+	
+	architecture
+		goals are performance, testability, flexibility
+		lots of functionalness
+		mention libraries used, catch2
+   
    put stuff on github and link to it
-   be scientific and record everything (comparison logs)
-   spent a bit of time going through their source code for engine
-   downsides
-      long to run, hard to tune
-      sensitive to edge cases in game state
-   devnotes file, constantly reprioritising
+   
    special thanks to
       WSL ubuntu
       dude who made visualizer
       LEON
       other colleagues
+   the chaos at the end
+   strategy vs tactics - monte carlo is shortsighted
+
+	reuse for next time
+      didnt use last years because it was messy etc but could use this stuff for next time
+	  
+what can i do better next time---------------------------------------
+   build scripts for versions of bot.  fresh checkout and build from branch/commit tag
+   enable/disable logging with a flag
 
 
 ======================================================================================================
